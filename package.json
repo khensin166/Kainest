@@ -1,0 +1,34 @@
+{
+  "name": "mosaic-vue",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@vueuse/core": "^12.0.0",
+    "axios": "^1.10.0",
+    "chart.js": "^4.4.1",
+    "chartjs-adapter-moment": "^1.0.1",
+    "flatpickr": "^4.6.13",
+    "lucide-vue-next": "^0.525.0",
+    "moment": "^2.29.4",
+    "pinia": "^3.0.3",
+    "vue": "^3.2.20",
+    "vue-flatpickr-component": "^11.0.3",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/compiler-sfc": "^3.2.20",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^4.0.0",
+    "vite": "^7.0.5"
+  }
+}
