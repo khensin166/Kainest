@@ -6,7 +6,8 @@ import DashboardLayout from "./layouts/DashboardLayout.vue";
 
 // Impor Halaman (Sesuaikan dengan nama file halaman fitur Anda nanti)
 import LoginPage from "./features/auth/presentation/pages/LoginPage.vue";
-import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue"; // ✅ Impor halaman registrasi
+import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue";
+import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue";
 import Dashboard from "./pages/Dashboard.vue"; // Ganti dengan halaman dashboard Kenin
 import TodoListPage from "./pages/Dashboard.vue"; // Ganti dengan halaman To-do List
 import GalleryPage from "./pages/Dashboard.vue"; // Ganti dengan halaman Galeri
@@ -18,6 +19,11 @@ import NotFound from "./partials/Forbidden.vue"; // Asumsi 404 sama dengan Forbi
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
+  {
+    path: "/",
+    name: "GetStarted",
+    component: GetStartedPage,
+  },
   {
     path: "/login",
     name: "Login",
