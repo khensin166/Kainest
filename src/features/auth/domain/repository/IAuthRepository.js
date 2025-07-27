@@ -1,20 +1,28 @@
-// 📦features/auth/domain/repository/IAuthRepository.js
+// src/features/auth/domain/repository/IAuthRepository.js
+// Ini adalah 'kontrak' atau interface abstrak untuk repository otentikasi.
+// Setiap repository otentikasi yang kita buat HARUS memiliki fungsi-fungsi ini.
+
 export class IAuthRepository {
   /**
-   * @returns {Promise<{token: string, user: UserEntity}>}
-   */
-  async login(email, password) {
-    throw new Error("METHOD_NOT_IMPLEMENTED");
-  }
-
-  /**
+   * @param {string} email
+   * @param {string} password
+   * @param {string} displayName
    * @returns {Promise<UserEntity>}
    */
-  async getProfile(token) {
-    throw new Error("METHOD_NOT_IMPLEMENTED");
+  async register(email, password, displayName) {
+    throw new Error("IAuthRepository.register() harus diimplementasikan");
   }
 
-  async logout() {
-    throw new Error("METHOD_NOT_IMPLEMENTED");
-}
+   /**
+   * ✅ TAMBAHKAN INI: Kontrak untuk fungsi login.
+   * Mengembalikan UserEntity pada sukses, atau Failure pada gagal.
+   * @param {string} email
+   * @param {string} password
+   * @returns {Promise<{left: Failure, right: null} | {left: null, right: UserEntity}>}
+   */
+  async login(email, password) {
+    throw new Error("IAuthRepository.login() harus diimplementasikan");
+  }
+
+  // Nanti kita akan tambahkan logout, getProfile, dll. di sini.
 }

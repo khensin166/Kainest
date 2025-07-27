@@ -1,3 +1,4 @@
+// features/auth/data/models/AuthResponseModel.js
 // Model untuk response /login
 export class LoginResponseModel {
   constructor({ statusCode, message, token }) {

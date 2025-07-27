@@ -1,4 +1,3 @@
-// AuthRepository.js
 import { IAuthRepository } from "../../domain/repository/IAuthRepository";
 import { UserEntity } from "../../domain/entities/UserEntity";
 import {
@@ -6,13 +5,9 @@ import {
   right,
   ServerFailure,
   IncorrectPasswordFailure,
-  RateLimitFailure,
 } from "../../../../core/error/failure.js";
-import {
-  LoginResponseModel,
-  ProfileUserModel,
-} from "../models/AuthResponseModel.js";
 import { AuthRemoteSource } from "../source/AuthRemoteSource";
+import { supabase } from "@/lib/supabase"; // ✅ INI BARIS YANG PERLU DITAMBAHKAN
 
 export class AuthRepository extends IAuthRepository {
   constructor() {
@@ -22,79 +17,56 @@ export class AuthRepository extends IAuthRepository {
 
   async login(email, password) {
     try {
-      const loginApiResponse = await this.remoteSource.login(email, password);
-      const loginModel = LoginResponseModel.fromJSON(loginApiResponse);
-      const token = loginModel.token;
+      const userFromAuth = await this.remoteSource.login(email, password);
 
-      if (!token) {
-        return left(new ServerFailure("Login gagal: Token tidak diterima."));
-      }
+      // Setelah login berhasil, ambil data profil dari tabel 'user_profiles'
+      const { data: profileData, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", userFromAuth.id)
+        .single();
 
-      localStorage.setItem("auth_token", token);
-      const profileResult = await this.getProfile();
+      if (profileError) throw profileError;
 
-      if (profileResult.left) {
-        return left(profileResult.left);
-      }
-
-      const userEntity = profileResult.right;
-      return right({ token, user: userEntity });
-    } catch (error) {
-      const statusCode = error.response?.status;
-      const errorData = error.response?.data;
-
-      if (statusCode === 401) {
-        // Jika password salah, gunakan pesan dari 'remaining_attempts'
-        const specificMessage =
-          errorData?.error?.remaining_attempts ||
-          errorData?.message ||
-          "Password salah.";
-        return left(new IncorrectPasswordFailure(specificMessage));
-      }
-
-      if (statusCode === 429) {
-        // Jika terlalu banyak percobaan, ambil waktu countdown
-        const retrySeconds = errorData?.error?.retry_after_seconds || 60;
-        return left(new RateLimitFailure(errorData.message, retrySeconds));
-      }
-
-      // Untuk semua error lainnya
-      return left(
-        new ServerFailure(error.message || "Terjadi kesalahan pada server.")
-      );
-    }
-  }
-
-  async getProfile(token) {
-    // PERUBAHAN: Tambahkan try-catch untuk menangani error
-    try {
-      const profileApiResponse = await this.remoteSource.getProfile(token);
-      const profileModel = ProfileUserModel.fromJSON(profileApiResponse.data);
-
+      // Ubah data gabungan menjadi UserEntity yang bersih
       const userEntity = new UserEntity({
-        id: profileModel.id,
-        name: profileModel.name,
-        email: profileModel.email,
-        role: profileModel.roleName,
-        username: profileModel.username,
-        phone: profileModel.phone || "",
-        gender: profileModel.gender || "",
-        dateOfBirth: profileModel.dateOfBirth || "",
-        photo: profileModel.photo || "",
+        id: userFromAuth.id,
+        email: userFromAuth.email,
+        displayName: profileData.display_name,
+        avatarUrl: profileData.avatar_url,
+        partnerId: profileData.partner_id,
       });
 
-      // PERUBAHAN: Kembalikan data sukses dalam 'right'
       return right(userEntity);
     } catch (error) {
-      // PERUBAHAN: Kembalikan error dalam 'left'
-      return left(new ServerFailure(error.message));
+      // Supabase mengembalikan pesan spesifik untuk password salah
+      if (error.message.includes("Invalid login credentials")) {
+        return left(new IncorrectPasswordFailure("Email atau password salah."));
+      }
+      // Untuk error lainnya
+      return left(new ServerFailure(error.message || "Gagal melakukan login."));
     }
   }
 
-  async logout() {
-    // Panggil API untuk memberitahu server agar menghapus sesi/token
-    await this.remoteSource.logout();
-    // Hapus token dari penyimpanan lokal
-    localStorage.removeItem("auth_token");
+  async register(email, password, displayName) {
+    try {
+      const userFromSupabase = await this.remoteSource.register(
+        email,
+        password,
+        displayName
+      );
+
+      const userEntity = new UserEntity({
+        id: userFromSupabase.id,
+        email: userFromSupabase.email,
+        displayName: userFromSupabase.profile.display_name,
+      });
+
+      return right(userEntity);
+    } catch (error) {
+      return left(
+        new ServerFailure(error.message || "Gagal melakukan registrasi.")
+      );
+    }
   }
 }

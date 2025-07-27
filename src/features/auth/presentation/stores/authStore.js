@@ -1,16 +1,11 @@
-// File: src/features/auth/presentation/stores/authStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 import { AuthRepository } from "../../data/repository/AuthRepository";
 import { LoginUserUseCase } from "../../domain/use-cases/LoginUserUseCase";
-import { GetProfileUseCase } from "../../domain/use-cases/GetProfileUseCase";
-import { LogoutUserUseCase } from "../../domain/use-cases/LogoutUserUseCase";
+import { RegisterUserUseCase } from "../../domain/use-cases/RegisterUserUseCase";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
-import {
-  RateLimitFailure,
-  IncorrectPasswordFailure,
-} from "../../../../core/error/failure";
+// ... (impor failure lainnya) ...
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
@@ -22,9 +17,13 @@ export const useAuthStore = defineStore("auth", () => {
   const modalStore = useModalStore();
   const repository = new AuthRepository();
   const loginUseCase = new LoginUserUseCase(repository);
-  const getProfileUseCase = new GetProfileUseCase(repository);
-  const logoutUseCase = new LogoutUserUseCase(repository);
+  // const getProfileUseCase = new GetProfileUseCase(repository);
+  // const logoutUseCase = new LogoutUserUseCase(repository);
+  const registerUseCase = new RegisterUserUseCase(repository); // ✅ Buat instance use case baru
 
+  /**
+   * ✅ TAMBAHKAN INI: Action untuk menangani login
+   */
   async function login(credentials) {
     isLoading.value = true;
     error.value = null;
@@ -40,85 +39,68 @@ export const useAuthStore = defineStore("auth", () => {
       error.value = message;
       isLoading.value = false;
 
-      // PERUBAHAN: Logika untuk menampilkan modal berdasarkan jenis Failure
-      if (failure instanceof RateLimitFailure) {
-        // Jika error 429, kirim countdown
-        modalStore.openModal({
-          newTitle: "Terlalu Banyak Percobaan",
-          newMessage: message,
-          newStatus: "error",
-          newCountdown: failure.retryAfterSeconds,
-        });
-      } else if (failure instanceof IncorrectPasswordFailure) {
-        // Jika error 401, kirim pesan spesifik
-        modalStore.openModal({
-          newTitle: "Login Gagal",
-          newMessage: failure.message,
-          newStatus: "error",
-        });
-      } else {
-        // Untuk error lainnya
-        modalStore.openModal({
-          newTitle: "Login Gagal",
-          newMessage: message,
-          newStatus: "error",
-        });
-      }
+      modalStore.openModal({
+        newTitle: "Login Gagal",
+        newMessage: message,
+        newStatus: "error",
+      });
 
       throw new Error(message);
     } else {
-      const data = result.right;
-      user.value = data.user;
-      token.value = data.token;
+      // Sukses
+      user.value = result.right;
       isAuthenticated.value = true;
       isLoading.value = false;
 
       modalStore.openModal({
-        newTitle: "Login Berhasil",
-        newMessage: `Selamat datang kembali, ${data.user.name}!`,
+        newTitle: "Login Berhasil!",
+        newMessage: `Selamat datang kembali, ${user.value.displayName}!`,
         newStatus: "success",
       });
     }
   }
 
-  async function initializeAuth() {
-    const existingToken = localStorage.getItem("auth_token");
-    if (existingToken) {
-      isLoading.value = true;
-
-      const result = await getProfileUseCase.execute(existingToken);
-
-      if (result.left) {
-        console.error(
-          "Session restore failed:",
-          mapFailureToMessage(result.left)
-        );
-        logout(); // Panggil fungsi logout jika token tidak valid
-      } else {
-        user.value = result.right;
-        token.value = existingToken;
-        isAuthenticated.value = true;
-      }
-      isLoading.value = false;
-    }
-  }
-
-  async function logout() {
+  /**
+   * ✅ TAMBAHKAN INI: Action untuk menangani registrasi
+   */
+  async function register(credentials) {
     isLoading.value = true;
-    try {
-      await logoutUseCase.execute();
-    } catch (e) {
-      console.error("An error occurred during server logout:", e);
-    } finally {
-      user.value = null;
-      token.value = null;
-      isAuthenticated.value = false;
+    error.value = null;
+
+    const result = await registerUseCase.execute({
+      email: credentials.email,
+      password: credentials.password,
+      displayName: credentials.displayName,
+    });
+
+    if (result.left) {
+      const failure = result.left;
+      const message = mapFailureToMessage(failure);
+      error.value = message;
       isLoading.value = false;
-      window.location.href = "/";
+
+      // Tampilkan modal error
+      modalStore.openModal({
+        newTitle: "Registrasi Gagal",
+        newMessage: message,
+        newStatus: "error",
+      });
+
+      throw new Error(message); // Lemparkan error agar komponen bisa menangani jika perlu
+    } else {
+      // Sukses
+      isLoading.value = false;
+
+      // Tampilkan modal sukses
+      modalStore.openModal({
+        newTitle: "Registrasi Berhasil!",
+        newMessage: `Akun untuk ${credentials.email} telah dibuat. Silakan login.`,
+        newStatus: "success",
+      });
+
+      return result.right; // Kembalikan user entity jika perlu
     }
   }
-
-  // HAPUS FUNGSI initializeAuth() KEDUA DARI SINI
 
   return {
     user,
@@ -127,7 +109,8 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading,
     error,
     login,
-    logout, // Hapus duplikasi
-    initializeAuth,
+    // logout,
+    // initializeAuth,
+    register, // ✅ Ekspor action baru
   };
 });

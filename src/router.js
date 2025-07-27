@@ -6,6 +6,7 @@ import DashboardLayout from "./layouts/DashboardLayout.vue";
 
 // Impor Halaman (Sesuaikan dengan nama file halaman fitur Anda nanti)
 import LoginPage from "./features/auth/presentation/pages/LoginPage.vue";
+import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue"; // ✅ Impor halaman registrasi
 import Dashboard from "./pages/Dashboard.vue"; // Ganti dengan halaman dashboard Kenin
 import TodoListPage from "./pages/Dashboard.vue"; // Ganti dengan halaman To-do List
 import GalleryPage from "./pages/Dashboard.vue"; // Ganti dengan halaman Galeri
@@ -21,6 +22,11 @@ const routes = [
     path: "/login",
     name: "Login",
     component: LoginPage,
+  },
+  {
+    path: "/Register",
+    name: "Register",
+    component: RegisterPage,
   },
   {
     path: "/utility/403",

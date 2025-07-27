@@ -3,6 +3,7 @@
     class="min-h-screen bg-[var(--color-violet-500)] flex items-center justify-center p-4"
   >
     <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+      <!-- Bagian Logo -->
       <div class="text-center mb-8">
         <img
           class="mx-auto h-12 w-auto"
@@ -11,21 +12,25 @@
         />
       </div>
 
+      <!-- Bagian Judul -->
       <div class="text-center mb-8">
         <h1 class="text-2xl font-bold text-[var(--color-gray-800)] mb-2">
-          Login Akun
+          Selamat Datang Kembali
         </h1>
         <p class="text-[var(--color-gray-600)] text-sm">
-          Masukkan email dan sandi untuk melanjutkan
+          Masukkan email dan sandi untuk melanjutkan.
         </p>
       </div>
 
+      <!-- Form Login -->
       <form @submit.prevent="handleLogin" class="space-y-6">
+        <!-- Input Email -->
         <div>
           <label
+            for="email-address"
             class="block text-[var(--color-gray-700)] text-sm font-medium mb-2"
           >
-            Alamat Email:
+            Alamat Email
           </label>
           <input
             id="email-address"
@@ -35,24 +40,18 @@
             autocomplete="email"
             required
             class="w-full px-4 py-3 bg-[var(--color-gray-100)] border-0 rounded-lg text-[var(--color-gray-800)] placeholder:text-[var(--color-gray-500)] focus:outline-none focus:ring-2 focus:ring-[var(--color-violet-500)] focus:bg-white transition-all"
-            placeholder="masukkan email"
+            placeholder="contoh@email.com"
           />
         </div>
 
+        <!-- Input Password -->
         <div>
-          <div class="flex justify-between items-center mb-2">
-            <label
-              class="block text-[var(--color-gray-700)] text-sm font-medium"
-            >
-              Sandi:
-            </label>
-            <a
-              href="#"
-              class="text-[var(--color-gray-500)] text-sm hover:text-[var(--color-violet-600)] transition-colors"
-            >
-              Lupa Password
-            </a>
-          </div>
+          <label
+            for="password"
+            class="block text-[var(--color-gray-700)] text-sm font-medium mb-2"
+          >
+            Sandi
+          </label>
           <div class="relative">
             <input
               id="password"
@@ -62,7 +61,7 @@
               autocomplete="current-password"
               required
               class="w-full px-4 py-3 bg-[var(--color-gray-100)] border-0 rounded-lg text-[var(--color-gray-800)] placeholder:text-[var(--color-gray-500)] focus:outline-none focus:ring-2 focus:ring-[var(--color-violet-500)] focus:bg-white transition-all pr-12"
-              placeholder="masukkan password"
+              placeholder="Masukkan sandi Anda"
             />
             <button
               type="button"
@@ -76,21 +75,7 @@
           </div>
         </div>
 
-        <div class="flex items-center">
-          <input
-            id="remember-password"
-            v-model="rememberPassword"
-            type="checkbox"
-            class="h-4 w-4 text-[var(--color-violet-600)] focus:ring-[var(--color-violet-500)] border-[var(--color-gray-300)] rounded"
-          />
-          <label
-            for="remember-password"
-            class="ml-2 text-sm text-[var(--color-gray-600)]"
-          >
-            Ingat Password
-          </label>
-        </div>
-
+        <!-- Tombol Submit -->
         <button
           type="submit"
           :disabled="auth.isLoading"
@@ -99,6 +84,7 @@
           {{ auth.isLoading ? "Memproses..." : "Login" }}
         </button>
 
+        <!-- Pesan Error dari Store (jika ada) -->
         <p
           v-if="auth.error"
           class="text-center text-sm text-[var(--color-red-600)]"
@@ -106,13 +92,17 @@
           {{ auth.error }}
         </p>
 
+        <!-- Link ke Halaman Registrasi -->
         <div class="text-center mt-6">
-          <a
-            href="#"
-            class="text-[var(--color-red-500)] text-sm hover:text-[var(--color-red-600)] transition-colors"
-          >
-            Lupa Password?
-          </a>
+          <p class="text-sm text-[var(--color-gray-600)]">
+            Belum punya akun?
+            <router-link
+              to="/register"
+              class="font-medium text-[var(--color-violet-600)] hover:text-[var(--color-violet-800)]"
+            >
+              Daftar di sini
+            </router-link>
+          </p>
         </div>
       </form>
     </div>
@@ -122,26 +112,32 @@
 <script setup>
 import { ref } from "vue";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline";
-import { useAuthStore } from "../stores/authStore"; // Pastikan path ini benar
+import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 import { useRouter } from "vue-router";
 
-// Menginisialisasi variabel dengan string kosong
+// State untuk form input
 const email = ref("");
 const password = ref("");
-const rememberPassword = ref(false);
 const showPassword = ref(false);
 
+// Mengambil instance store dan router
 const auth = useAuthStore();
 const router = useRouter();
 
+// Fungsi untuk menangani proses login
 const handleLogin = async () => {
   try {
     await auth.login({
       email: email.value,
       password: password.value,
     });
+
+    // Jika login berhasil, store akan menampilkan modal sukses,
+    // dan kita akan redirect ke dashboard.
     router.push("/dashboard");
   } catch (error) {
+    // Error sudah ditangani oleh store (menampilkan modal error),
+    // jadi kita hanya perlu mencatatnya di console untuk debugging.
     console.error("Gagal login dari komponen:", error.message);
   }
 };

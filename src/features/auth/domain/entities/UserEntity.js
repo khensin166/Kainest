@@ -1,14 +1,13 @@
-// 📦features/auth/domain/entities/UserEntity.js
+
+// Mendefinisikan bentuk data pengguna yang ideal di dalam aplikasi Anda.
+// Ini membantu menjaga konsistensi data.
+
 export class UserEntity {
-  constructor({ id, name, email, role, username, phone, gender, date_of_birth, photo }) {
+  constructor({ id, email, displayName, avatarUrl = null, partnerId = null }) {
     this.id = id;
-    this.name = name;
     this.email = email;
-    this.username = username;
-    this.role = role;
-    this.phone = phone;
-    this.gender = gender;
-    this.dateOfBirth = date_of_birth;
-    this.photo = photo;
+    this.displayName = displayName;
+    this.avatarUrl = avatarUrl;
+    this.partnerId = partnerId;
   }
 }
