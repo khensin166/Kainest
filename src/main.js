@@ -13,8 +13,8 @@ async function startApp() {
   app.use(createPinia());
 
   // 2. Panggil action inisialisasi SEBELUM memasang router
-  // const authStore = useAuthStore();
-  // await authStore.initializeAuth();
+  const authStore = useAuthStore();
+  await authStore.initializeAuth();
 
   // 3. Pasang Router setelah state auth pulih
   app.use(router);

@@ -4,25 +4,26 @@ import { useAuthStore } from "./features/auth/presentation/stores/authStore";
 // Impor Layout
 import DashboardLayout from "./layouts/DashboardLayout.vue";
 
-// Impor Halaman (Sesuaikan dengan nama file halaman fitur Anda nanti)
+// Impor Halaman
 import LoginPage from "./features/auth/presentation/pages/LoginPage.vue";
 import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue";
-import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue";
-import Dashboard from "./pages/Dashboard.vue"; // Ganti dengan halaman dashboard Kenin
-import TodoListPage from "./pages/Dashboard.vue"; // Ganti dengan halaman To-do List
-import GalleryPage from "./pages/Dashboard.vue"; // Ganti dengan halaman Galeri
-import CalendarPage from "./pages/Dashboard.vue"; // Ganti dengan halaman Kalender
-import VaultPage from "./pages/Dashboard.vue"; // Ganti dengan halaman Vault
+import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue"; // Nama file Anda GetStartedPage.vue
+import Dashboard from "./pages/Dashboard.vue";
+import TodoListPage from "./pages/Dashboard.vue";
+import GalleryPage from "./pages/Dashboard.vue";
+import CalendarPage from "./pages/Dashboard.vue";
+import VaultPage from "./pages/Dashboard.vue";
 import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vue";
 import Forbidden from "./partials/Forbidden.vue";
-import NotFound from "./partials/Forbidden.vue"; // Asumsi 404 sama dengan Forbidden
+import NotFound from "./partials/Forbidden.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
   {
+    // ✅ INI JADI SATU-SATUNYA HALAMAN UTAMA SAAT WEB DIBUKA
     path: "/",
     name: "GetStarted",
-    component: GetStartedPage,
+    component: GetStartedPage, // Menggunakan nama komponen yang benar
   },
   {
     path: "/login",
@@ -30,7 +31,7 @@ const routes = [
     component: LoginPage,
   },
   {
-    path: "/Register",
+    path: "/register", // Path dibuat lowercase agar konsisten
     name: "Register",
     component: RegisterPage,
   },
@@ -42,11 +43,13 @@ const routes = [
 
   // Halaman terproteksi yang menggunakan DashboardLayout
   {
-    path: "/",
+    // ✅ PATH DIUBAH MENJADI '/app'
+    path: "/app",
     component: DashboardLayout,
-    meta: { requiresAuth: true }, // ✅ Tandai semua child route di sini butuh login
+    meta: { requiresAuth: true },
     children: [
-      { path: "", redirect: "/dashboard" },
+      // Redirect dari /app ke /app/dashboard
+      { path: "", redirect: "/app/dashboard" },
       {
         path: "dashboard",
         name: "Dashboard",
@@ -55,22 +58,22 @@ const routes = [
       {
         path: "todos",
         name: "TodoList",
-        component: TodoListPage, // Ganti dengan komponen To-do Anda
+        component: TodoListPage,
       },
       {
         path: "gallery",
         name: "Gallery",
-        component: GalleryPage, // Ganti dengan komponen Galeri Anda
+        component: GalleryPage,
       },
       {
         path: "calendar",
         name: "Calendar",
-        component: CalendarPage, // Ganti dengan komponen Kalender Anda
+        component: CalendarPage,
       },
       {
         path: "vault",
         name: "Vault",
-        component: VaultPage, // Ganti dengan komponen Vault Anda
+        component: VaultPage,
       },
       {
         path: "settings",
@@ -93,20 +96,23 @@ const router = createRouter({
   routes,
 });
 
-// ✅ Navigation guard yang sudah disederhanakan
+// Navigation guard yang sudah disederhanakan
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  // Cek apakah route atau parent-nya memiliki meta 'requiresAuth'
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isAuthenticated) {
-    // Jika butuh login tapi belum login, redirect ke halaman Login
     next({ name: "Login" });
-  } else if (to.name === "Login" && authStore.isAuthenticated) {
-    // Jika sudah login tapi mencoba akses halaman login, redirect ke dashboard
-    next({ path: "/dashboard" });
+  } else if (
+    (to.name === "Login" ||
+      to.name === "Register" ||
+      to.name === "GetStarted") &&
+    authStore.isAuthenticated
+  ) {
+    // ✅ JIKA SUDAH LOGIN, JANGAN BIARKAN AKSES GETSTARTED, LOGIN, ATAU REGISTER
+    // Langsung arahkan ke dashboard di dalam /app
+    next({ path: "/app/dashboard" });
   } else {
-    // Jika tidak ada masalah, izinkan akses
     next();
   }
 });

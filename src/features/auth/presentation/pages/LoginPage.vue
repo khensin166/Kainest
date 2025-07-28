@@ -134,7 +134,7 @@ const handleLogin = async () => {
 
     // Jika login berhasil, store akan menampilkan modal sukses,
     // dan kita akan redirect ke dashboard.
-    router.push("/dashboard");
+    router.push("/app/dashboard");
   } catch (error) {
     // Error sudah ditangani oleh store (menampilkan modal error),
     // jadi kita hanya perlu mencatatnya di console untuk debugging.

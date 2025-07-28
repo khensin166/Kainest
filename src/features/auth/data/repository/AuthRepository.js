@@ -69,4 +69,48 @@ export class AuthRepository extends IAuthRepository {
       );
     }
   }
+
+  /**
+   * ✅ TAMBAHKAN INI: Implementasi untuk mendapatkan pengguna saat ini.
+   */
+  async getCurrentUser() {
+    try {
+      const session = await this.remoteSource.getCurrentSession();
+      if (!session) {
+        return right(null); // Tidak ada user yang login, ini bukan error.
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const userEntity = new UserEntity({
+        id: session.user.id,
+        email: session.user.email,
+        displayName: profileData.display_name,
+        avatarUrl: profileData.avatar_url,
+        partnerId: profileData.partner_id,
+      });
+
+      return right(userEntity);
+    } catch (error) {
+      return left(new ServerFailure(error.message));
+    }
+  }
+
+  /**
+   * ✅ TAMBAHKAN INI: Implementasi untuk logout.
+   */
+  async logout() {
+    try {
+      await this.remoteSource.logout();
+      return right(true); // Sukses
+    } catch (error) {
+      return left(new ServerFailure(error.message));
+    }
+  }
 }

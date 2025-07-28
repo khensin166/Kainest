@@ -13,7 +13,7 @@ export class IAuthRepository {
     throw new Error("IAuthRepository.register() harus diimplementasikan");
   }
 
-   /**
+  /**
    * ✅ TAMBAHKAN INI: Kontrak untuk fungsi login.
    * Mengembalikan UserEntity pada sukses, atau Failure pada gagal.
    * @param {string} email
@@ -24,5 +24,18 @@ export class IAuthRepository {
     throw new Error("IAuthRepository.login() harus diimplementasikan");
   }
 
-  // Nanti kita akan tambahkan logout, getProfile, dll. di sini.
+  /**
+   * ✅ TAMBAHKAN INI: Kontrak untuk mendapatkan pengguna yang sedang aktif.
+   * @returns {Promise<{left: Failure, right: null} | {left: null, right: UserEntity}>}
+   */
+  async getCurrentUser() {
+    throw new Error("IAuthRepository.getCurrentUser() harus diimplementasikan");
+  }
+
+  /**
+   * ✅ TAMBAHKAN INI: Kontrak untuk logout.
+   */
+  async logout() {
+    throw new Error("IAuthRepository.logout() harus diimplementasikan");
+  }
 }

@@ -39,7 +39,7 @@
             <ChevronLeftIcon class="w-5 h-5" />
           </button>
 
-          <router-link class="block" to="/">
+          <router-link class="block" to="/app/dashboard">
             <img
               src="/images/logo.png"
               alt="Logo"
@@ -162,7 +162,8 @@
           >
             <span class="sr-only">Expand / collapse sidebar</span>
             <ChevronRightIcon
-              class="w-5 h-5 transition-transform sidebar-expanded:rotate-180"
+              class="w-5 h-5 transition-transform"
+              :class="{ 'rotate-180': sidebarExpanded }"
             />
           </button>
         </div>
@@ -179,20 +180,11 @@ import SidebarLinkGroup from "./SidebarLinkGroup.vue";
 // Impor Ikon
 import {
   HomeIcon,
-  TagIcon,
   ArchiveBoxIcon,
-  BuildingStorefrontIcon,
-  UserGroupIcon,
-  StarIcon,
   PhotoIcon,
   CalendarDaysIcon,
-  TicketIcon,
-  DocumentChartBarIcon,
-  BanknotesIcon,
   Cog6ToothIcon,
-  ArrowLeftOnRectangleIcon,
   ChevronLeftIcon,
-  ChevronDownIcon,
   ChevronRightIcon,
   DocumentTextIcon,
 } from "@heroicons/vue/24/outline";
@@ -213,43 +205,36 @@ export default {
       storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
     );
 
-    // --- PERUBAHAN DIMULAI DI SINI ---
-
-    // 1. Hapus computed property `userRole`
-    // const userRole = computed(() => authStore.user?.role || "guest"); // 🗑️ DIHAPUS
-
-    // 2. Hapus semua properti `roles` dari konfigurasi menu
-    // 2. Konfigurasi menu yang sudah disesuaikan untuk aplikasi "Kenin"
     const menuConfig = ref([
       {
         type: "link",
         name: "Dashboard",
-        path: "/dashboard",
+        path: "/app/dashboard",
         iconComponent: HomeIcon,
       },
       {
         type: "group",
-        title: "Momen Kita", // Judul grup yang lebih sesuai
+        title: "Momen Kita",
         items: [
           {
             name: "To-do List Berdua",
-            path: "/todos", // Sesuaikan path ini dengan router Anda
-            iconComponent: DocumentTextIcon, // Atau ikon lain yang cocok
+            path: "/app/todos",
+            iconComponent: DocumentTextIcon,
           },
           {
             name: "Galeri Kenangan",
-            path: "/gallery", // Sesuaikan path ini dengan router Anda
+            path: "/app/gallery",
             iconComponent: PhotoIcon,
           },
           {
             name: "Kalender Cinta",
-            path: "/calendar", // Sesuaikan path ini dengan router Anda
+            path: "/app/calendar",
             iconComponent: CalendarDaysIcon,
           },
           {
             name: "Vault Rahasia",
-            path: "/vault", // Sesuaikan path ini dengan router Anda
-            iconComponent: ArchiveBoxIcon, // Menggunakan ikon yang sudah ada
+            path: "/app/vault",
+            iconComponent: ArchiveBoxIcon,
           },
         ],
       },
@@ -259,25 +244,16 @@ export default {
         items: [
           {
             name: "Pengaturan",
-            path: "/settings",
+            path: "/app/settings",
             iconComponent: Cog6ToothIcon,
           },
-          // {
-          //   name: "Logout",
-          //   path: "/logout", // Path fiktif untuk memicu fungsi logout
-          //   iconComponent: ArrowLeftOnRectangleIcon,
-          // },
         ],
       },
     ]);
 
-    // 3. Sederhanakan `filteredMenu` untuk menampilkan semua menu
     const filteredMenu = computed(() => {
-      // Langsung kembalikan semua menu tanpa filter
       return menuConfig.value;
     });
-
-    // --- PERUBAHAN SELESAI ---
 
     // Event handlers untuk sidebar mobile
     const clickHandler = ({ target }) => {
