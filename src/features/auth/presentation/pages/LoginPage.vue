@@ -1,3 +1,4 @@
+<!--features\auth\presentation\pages\LoginPage.vue -->
 <template>
   <main
     class="min-h-screen bg-[var(--color-violet-500)] flex items-center justify-center p-4"

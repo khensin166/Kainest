@@ -1,6 +1,5 @@
 
-// Mendefinisikan bentuk data pengguna yang ideal di dalam aplikasi Anda.
-// Ini membantu menjaga konsistensi data.
+// features\auth\domain\entities\UserEntity.js
 
 export class UserEntity {
   constructor({ id, email, displayName, avatarUrl = null, partnerId = null }) {

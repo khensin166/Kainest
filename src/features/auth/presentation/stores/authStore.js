@@ -1,3 +1,5 @@
+// 📄 features/auth/presentation/stores/authStore.js (GANTI TOTAL)
+
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
@@ -7,13 +9,17 @@ import { RegisterUserUseCase } from "../../domain/use-cases/RegisterUserUseCase"
 import { GetCurrentUserUseCase } from "../../domain/use-cases/GetCurrentUserUseCase";
 import { LogoutUserUseCase } from "../../domain/use-cases/LogoutUserUseCase";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
-import { supabase } from "@/lib/supabase";
+
+// Hapus 'import { supabase }'
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
   const isAuthenticated = ref(false);
   const error = ref(null);
   const isLoading = ref(false);
+
+  // Status untuk menandakan apakah pengecekan auth awal sudah selesai
+  const isAuthReady = ref(false);
 
   const modalStore = useModalStore();
   const repository = new AuthRepository();
@@ -22,47 +28,42 @@ export const useAuthStore = defineStore("auth", () => {
   const getCurrentUserUseCase = new GetCurrentUserUseCase(repository);
   const logoutUseCase = new LogoutUserUseCase(repository);
 
-  function initializeAuth() {
-    return new Promise((resolve) => {
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log("Auth state changed:", event);
+  /**
+   * PERUBAHAN BESAR: Menginisialisasi status auth saat aplikasi dimuat.
+   * Tidak lagi menggunakan onAuthStateChange.
+   * Fungsi ini harus dipanggil di main.js SEBELUM app.mount().
+   */
+  async function initializeAuth() {
+    console.log("Memulai inisialisasi status autentikasi...");
+    isLoading.value = true;
+    isAuthReady.value = false;
 
-        // ✅ Gunakan try...finally untuk memastikan resolve() selalu dipanggil
-        try {
-          if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
-            if (session) {
-              const result = await getCurrentUserUseCase.execute();
-              if (result.right) {
-                user.value = result.right;
-                isAuthenticated.value = true;
-              } else {
-                // ✅ Tambahkan log error untuk debugging
-                console.error(
-                  "Gagal mengambil profil saat inisialisasi:",
-                  result.left
-                );
-                user.value = null;
-                isAuthenticated.value = false;
-              }
-            } else {
-              user.value = null;
-              isAuthenticated.value = false;
-            }
-          } else if (event === "SIGNED_OUT") {
-            user.value = null;
-            isAuthenticated.value = false;
-          }
-        } catch (e) {
-          console.error("Terjadi error tak terduga di onAuthStateChange:", e);
-          user.value = null;
-          isAuthenticated.value = false;
-        } finally {
-          // ✅ Pastikan main.js bisa melanjutkan eksekusi
-          console.log("Inisialisasi auth selesai, melanjutkan aplikasi.");
-          resolve();
-        }
-      });
-    });
+    try {
+      // Panggil use case yang akan mengecek token di localStorage
+      // dan memvalidasinya ke /auth/me
+      const result = await getCurrentUserUseCase.execute();
+
+      if (result.right) {
+        // Sukses: result.right adalah UserEntity atau null
+        user.value = result.right;
+        isAuthenticated.value = !!result.right; // true jika user ada, false jika null
+        console.log("Inisialisasi auth sukses.", { user: user.value, isAuthenticated: isAuthenticated.value });
+      } else {
+        // Gagal (misal: server down, bukan token salah)
+        user.value = null;
+        isAuthenticated.value = false;
+        error.value = mapFailureToMessage(result.left);
+        console.error("Inisialisasi auth gagal:", error.value);
+      }
+    } catch (e) {
+      console.error("Terjadi error tak terduga saat inisialisasi auth:", e);
+      user.value = null;
+      isAuthenticated.value = false;
+    } finally {
+      isLoading.value = false;
+      isAuthReady.value = true;
+      console.log("Inisialisasi auth selesai.");
+    }
   }
 
   async function login(credentials) {
@@ -89,7 +90,9 @@ export const useAuthStore = defineStore("auth", () => {
       throw new Error(message);
     } else {
       // Sukses
-      // State user dan isAuthenticated akan di-handle oleh onAuthStateChange
+      // Berbeda dari Supabase, kita set user secara manual di sini
+      user.value = result.right;
+      isAuthenticated.value = true;
       isLoading.value = false;
 
       modalStore.openModal({
@@ -124,30 +127,32 @@ export const useAuthStore = defineStore("auth", () => {
 
       throw new Error(message);
     } else {
+      // Sukses
       isLoading.value = false;
 
       modalStore.openModal({
         newTitle: "Registrasi Berhasil!",
-        newMessage: `Akun untuk ${credentials.email} telah dibuat. Silakan cek email Anda untuk verifikasi.`,
+        // Ubah pesan ini, karena tidak ada lagi verifikasi email (kecuali Anda menambahkannya di Hono)
+        newMessage: `Akun untuk ${credentials.email} telah dibuat. Silakan login.`,
         newStatus: "success",
       });
 
-      return result.right;
+      // result.right sekarang adalah 'true', bukan UserEntity
+      return true;
     }
   }
 
   async function logout() {
     isLoading.value = true;
-    const result = await logoutUseCase.execute();
-    if (result.left) {
-      modalStore.openModal({
-        newTitle: "Logout Gagal",
-        newMessage: "Gagal mengakhiri sesi di server, sesi lokal akan dihapus.",
-        newStatus: "error",
-      });
-    }
-    // State akan di-reset secara otomatis oleh onAuthStateChange
+    await logoutUseCase.execute();
+    
+    // Reset state secara manual
+    user.value = null;
+    isAuthenticated.value = false;
     isLoading.value = false;
+
+    // Arahkan ke login (bisa juga ditangani oleh router guard)
+    // router.push('/login'); 
   }
 
   return {
@@ -155,6 +160,7 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     isLoading,
     error,
+    isAuthReady, // <-- Tambahkan ini
     login,
     logout,
     initializeAuth,

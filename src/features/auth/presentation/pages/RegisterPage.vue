@@ -1,3 +1,4 @@
+<!-- features\auth\presentation\pages\RegisterPage.vue -->
 <template>
   <main
     class="min-h-screen bg-[var(--color-violet-500)] flex items-center justify-center p-4"

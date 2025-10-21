@@ -236,6 +236,11 @@ export default {
             path: "/app/vault",
             iconComponent: ArchiveBoxIcon,
           },
+          {
+            name: "WA Bot Shift Automation",
+            path: "/app/wabot",
+            iconComponent: ArchiveBoxIcon,
+          },
         ],
       },
       {

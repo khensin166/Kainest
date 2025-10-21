@@ -14,6 +14,7 @@ import GalleryPage from "./pages/Dashboard.vue";
 import CalendarPage from "./pages/Dashboard.vue";
 import VaultPage from "./pages/Dashboard.vue";
 import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vue";
+import WaBotPage from "./features/wabot/presentation/pages/WaBotPage.vue";
 import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
 
@@ -79,6 +80,11 @@ const routes = [
         path: "settings",
         name: "Settings",
         component: SettingsPage,
+      },
+      {
+        path: "wabot",
+        name: "wabot",
+        component: WaBotPage,
       },
     ],
   },
