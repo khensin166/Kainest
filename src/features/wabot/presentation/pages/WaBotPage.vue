@@ -57,6 +57,7 @@ onMounted(() => {
   // Hubungkan ke server bot Anda
   // Ganti URL ini jika web dan bot Anda di-deploy di domain berbeda
   socket = io("https://whatsapp-bot-shifting-production.up.railway.app");
+  // socket = io("http://localhost:3000");
 
   // Mendengarkan event 'status' dari bot
   socket.on("status", (message) => {
