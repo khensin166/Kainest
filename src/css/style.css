@@ -137,3 +137,595 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+/* QR Fade Out Animation */
+@keyframes qr-fade-slide {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}
+
+.qr-fade-out {
+  animation: qr-fade-slide 0.6s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Bot Container */
+.bot-container {
+  position: relative;
+  width: 200px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status Badge */
+@keyframes badge-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.status-badge {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  animation: badge-slide-in 0.6s ease-out 0.3s both;
+  z-index: 10;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+/* Rotating Ring */
+@keyframes ring-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes ring-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.rotating-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180px;
+  height: 180px;
+  border: 4px solid transparent;
+  border-top-color: #10b981;
+  border-right-color: #10b981;
+  border-radius: 50%;
+  animation: ring-appear 0.5s ease-out 0.4s both, ring-rotate 3s linear infinite;
+  animation-delay: 0.4s, 0.9s;
+}
+
+/* Bot Body */
+.bot-body {
+  position: relative;
+  width: 140px;
+  height: 200px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+  animation: bot-float 3s ease-in-out infinite;
+  transition: all 0.6s ease;
+}
+
+/* Bot Connected State */
+.bot-body.bot-connected {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.5);
+}
+
+/* Bot Celebration Animation */
+@keyframes bot-celebrate {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-20px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.08) rotate(5deg);
+  }
+  70% {
+    transform: translateY(-15px) scale(1.08) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.bot-body.bot-celebrate {
+  animation: bot-celebrate 0.8s ease-out, bot-float 3s ease-in-out infinite 0.8s;
+}
+
+@keyframes bot-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Bot Head */
+.bot-head {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #34E87F 0%, #25D366 100%);
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+  animation: head-tilt 2s ease-in-out infinite;
+  transition: background 0.6s ease;
+}
+
+.bot-body.bot-connected .bot-head {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+
+@keyframes head-tilt {
+  0%, 100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-50%) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(-50%) rotate(5deg);
+  }
+}
+
+/* Bot Eyes */
+.bot-eyes {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 20px;
+}
+
+.bot-eye {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  position: relative;
+  animation: blink 3s infinite;
+}
+
+.bot-eye::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #128C7E;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  animation: eye-move 4s infinite;
+}
+
+@keyframes blink {
+  0%, 96%, 100% {
+    transform: scaleY(1);
+  }
+  98% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes eye-move {
+  0%, 100% {
+    left: 3px;
+  }
+  50% {
+    left: 5px;
+  }
+}
+
+/* Check Marks */
+@keyframes check-appear {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.check-marks {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.check-mark {
+  width: 16px;
+  height: 16px;
+  animation: check-appear 0.5s ease-out both;
+}
+
+.check-1 {
+  animation-delay: 0.5s;
+}
+
+.check-2 {
+  animation-delay: 0.6s;
+  margin-left: -6px;
+}
+
+/* Bot Antenna */
+.bot-antenna {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 20px;
+  background: #34E87F;
+  border-radius: 2px;
+  animation: antenna-wave 2s ease-in-out infinite;
+}
+
+@keyframes antenna-wave {
+  0%, 100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(10deg);
+  }
+}
+
+.antenna-ball {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: #FFD700;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  animation: ball-pulse 1s ease-in-out infinite;
+  transition: all 0.6s ease;
+}
+
+.antenna-ball.antenna-active {
+  background: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+  animation: ball-pulse-active 0.8s ease-in-out infinite;
+}
+
+@keyframes ball-pulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
+@keyframes ball-pulse-active {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.3);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 1);
+  }
+}
+
+/* Bot Screen */
+.bot-screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: screen-glow 2s ease-in-out infinite;
+}
+
+@keyframes screen-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.whatsapp-logo {
+  width: 50px;
+  height: 50px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: logo-spin 10s linear infinite;
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Big Check Mark */
+@keyframes big-check-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-90deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.big-check {
+  width: 45px;
+  height: 45px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: big-check-appear 0.6s ease-out 0.5s both;
+  stroke-width: 3;
+}
+
+/* Online Text */
+@keyframes online-text-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.online-text {
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  margin-top: 4px;
+  letter-spacing: 1px;
+  animation: online-text-appear 0.5s ease-out 0.8s both;
+}
+
+/* Bot Arms */
+.bot-arms {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.bot-arm {
+  position: absolute;
+  width: 30px;
+  height: 80px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: 15px;
+  top: 40px;
+  transition: background 0.6s ease;
+}
+
+.bot-body.bot-connected .bot-arm {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bot-arm.left {
+  left: -20px;
+  transform-origin: top right;
+  animation: wave-left 2s ease-in-out infinite;
+}
+
+.bot-arm.right {
+  right: -20px;
+  transform-origin: top left;
+  animation: wave-right 2s ease-in-out infinite;
+}
+
+@keyframes wave-left {
+  0%, 100% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes wave-right {
+  0%, 100% {
+    transform: rotate(20deg);
+  }
+  50% {
+    transform: rotate(40deg);
+  }
+}
+
+/* Floating Particles */
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #25D366;
+  border-radius: 50%;
+  opacity: 0.6;
+  transition: background 0.6s ease;
+}
+
+.particle.particle-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+.particle-1 {
+  top: 20px;
+  left: 10px;
+  animation: float-particle 3s ease-in-out infinite;
+}
+
+.particle-2 {
+  top: 60px;
+  right: 15px;
+  animation: float-particle 4s ease-in-out infinite 0.5s;
+}
+
+.particle-3 {
+  bottom: 40px;
+  left: 20px;
+  animation: float-particle 3.5s ease-in-out infinite 1s;
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 0.9;
+  }
+}
+
+/* Success Burst Particles */
+@keyframes burst-out {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--tx)), 
+      calc(-50% + var(--ty))
+    ) scale(1);
+    opacity: 0;
+  }
+}
+
+.burst-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.burst-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 50%;
+  --angle: calc(var(--i) * 30deg);
+  --tx: calc(cos(var(--angle)) * 100px);
+  --ty: calc(sin(var(--angle)) * 100px);
+  animation: burst-out 0.8s ease-out forwards;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Dark mode support */
+:global(.dark) .bot-body {
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.2);
+}
+
+:global(.dark) .bot-body.bot-connected {
+  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+}
+
+:global(.dark) .bot-head {
+  box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+}
+
+:global(.dark) .status-badge {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
