@@ -14,34 +14,45 @@
         <div>
           <button
             type="button"
-            class="px-3 py-2 text-sm font-medium text-violet-600 border border-violet-300 rounded-md"
+            @click="triggerFileInput"
+            :disabled="settingsStore.isUploadingPhoto"
+            class="px-3 py-2 text-sm font-medium text-violet-600 border border-violet-300 rounded-md disabled:opacity-50"
           >
-            Ubah Foto
+            {{
+              settingsStore.isUploadingPhoto ? "Mengunggah..." : "Ubah Foto"
+            }}
           </button>
+          <input
+            type="file"
+            ref="fileInput"
+            @change="handleFileChange"
+            accept="image/png, image/jpeg"
+            hidden
+          />
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="block text-sm font-medium mb-1" for="name">Nama</label>
+          <label class="block text-sm font-medium mb-1" for="name"
+            >Nama Lengkap (dari User)</label
+          >
           <input
             id="name"
-            class="form-input w-full disabled:bg-gray-100 dark:disabled:bg-gray-700"
+            class="form-input w-full"
             type="text"
             v-model="formData.name"
-            disabled
           />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" for="username"
-            >User Name</label
+          <label class="block text-sm font-medium mb-1" for="displayName"
+            >Nama Panggilan (dari UserProfile)</label
           >
           <input
-            id="username"
-            class="form-input w-full disabled:bg-gray-100 dark:disabled:bg-gray-700"
+            id="displayName"
+            class="form-input w-full"
             type="text"
-            v-model="formData.username"
-            disabled
+            v-model="formData.displayName"
           />
         </div>
         <div>
@@ -64,42 +75,20 @@
             id="phone"
             class="form-input w-full"
             type="text"
-            v-model="formData.phone"
+            v-model="formData.phone_number"
             placeholder="Belum diisi"
           />
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1" for="dateOfBirth"
-            >Tanggal Lahir</label
-          >
-          <input
-            id="dateOfBirth"
-            class="form-input w-full"
-            type="date"
-            v-model="formData.dateOfBirth"
-          />
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1" for="gender"
-            >Jenis Kelamin</label
-          >
-          <select
-            id="gender"
-            class="form-select w-full"
-            v-model="formData.gender"
-          >
-            <option value="">Pilih...</option>
-            <option value="male">Pria</option>
-            <option value="female">Wanita</option>
-          </select>
-        </div>
-      </div>
       <div class="flex justify-end mt-6">
         <button
           type="submit"
-          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md"
+          :disabled="settingsStore.isUpdatingProfile"
+          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400"
         >
-          Simpan Perubahan
+          {{
+            settingsStore.isUpdatingProfile ? "Menyimpan..." : "Simpan Perubahan"
+          }}
         </button>
       </div>
     </form>
@@ -108,47 +97,74 @@
 
 <script setup>
 import { ref, watch, computed } from "vue";
-import { useModalStore } from "../../../../stores/modalStore";
-import UserAvatar from "@/images/user-avatar-32.png"; // Impor gambar default
+import { useSettingsStore } from "../stores/settingsStore"; // Import store kita
+import UserAvatar from "@/images/user-avatar-32.png";
 
 const props = defineProps({
   user: Object,
 });
 
+const settingsStore = useSettingsStore(); // Inisialisasi store
 const formData = ref({});
-const modalStore = useModalStore();
+const fileInput = ref(null); // Ref untuk input file
 
-// PERUBAHAN: Buat computed property untuk foto profil
+// Computed property untuk foto profil
 const userPhoto = computed(() => {
-  // Jika props.user.photo ada isinya
-  if (props.user?.photo) {
-    return props.user.photo;
+  // Gunakan 'avatarUrl' dari 'profile' (sesuai backend Hono kita)
+  if (props.user?.profile?.avatarUrl) {
+    return props.user.profile.avatarUrl;
   }
-  // Jika tidak, gunakan gambar placeholder
   return UserAvatar;
 });
 
-// Salin data dari props ke state lokal saat props tersedia
+// Salin data dari props ke state lokal
 watch(
   () => props.user,
   (newUser) => {
     if (newUser) {
-      const formattedUser = { ...newUser };
-      if (formattedUser.dateOfBirth) {
-        formattedUser.dateOfBirth = formattedUser.dateOfBirth.split("T")[0];
-      }
-      formData.value = formattedUser;
+      // Gabungkan data dari User dan UserProfile
+      formData.value = {
+        name: newUser.name,
+        email: newUser.email,
+        phone_number: newUser.phone_number,
+        displayName: newUser.profile?.displayName,
+      };
     }
   },
   { immediate: true, deep: true }
 );
 
-const handleSubmit = () => {
-  console.log("Data to update:", formData.value);
-  modalStore.openModal({
-    newTitle: "Info",
-    newMessage: "Fitur update profil belum diimplementasikan.",
-    newStatus: "info",
-  });
+// --- FUNGSI BARU ---
+
+// Fungsi untuk memicu klik pada input file
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
+// Fungsi yang menangani saat file dipilih
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    // Panggil action di store untuk upload
+    await settingsStore.uploadNewAvatar(file);
+    // UI akan update otomatis karena authStore.user berubah
+  } catch (error) {
+    console.error("Avatar upload failed:", error.message);
+  } finally {
+    // Reset input file agar bisa pilih file yang sama lagi
+    event.target.value = null;
+  }
+};
+
+// Fungsi yang menangani submit form (data teks)
+const handleSubmit = async () => {
+  try {
+    // Panggil action di store untuk update data teks
+    await settingsStore.updateUserProfile(formData.value);
+  } catch (error) {
+    console.error("Profile update failed:", error.message);
+  }
 };
 </script>

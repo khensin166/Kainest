@@ -10,9 +10,20 @@ export class ISettingsRepository {
     throw new Error("METHOD_NOT_IMPLEMENTED");
   }
 
-  // Tambahkan kontrak lain di sini jika ada,
-  // misalnya untuk update profil
-  // async updateProfile(userData) {
-  //   throw new Error("METHOD_NOT_IMPLEMENTED");
-  // }
+  // --- TAMBAHAN BARU ---
+  /**
+   * @param {object} profileData (misal: { name, displayName, phone_number })
+   * @returns {Promise<Either<Failure, UserEntity>>}
+   */
+  async updateProfile(profileData) {
+    throw new Error("METHOD_NOT_IMPLEMENTED");
+  }
+
+  /**
+   * @param {File} file
+   * @returns {Promise<Either<Failure, {url: string}>>}
+   */
+  async uploadAvatar(file) {
+    throw new Error("METHOD_NOT_IMPLEMENTED");
+  }
 }

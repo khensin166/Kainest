@@ -27,6 +27,8 @@ export class RateLimitFailure extends Failure {
   }
 }
 
+export class GeneralFailure extends Failure {}
+
 // Fungsi helper untuk Either
 export const left = (failure) => ({ left: failure, right: null });
 export const right = (data) => ({ left: null, right: data });

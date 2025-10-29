@@ -1,3 +1,4 @@
+<!-- src\features\settings\presentation\pages\ChangePasswordForm.vue -->
 <template>
   <div>
     <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold mb-6">Ubah Sandi</h2>

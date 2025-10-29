@@ -1,4 +1,4 @@
-// 📄 src/lib/api.js (FILE BARU)
+// 📄 src/lib/api.js
 
 import axios from "axios";
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";

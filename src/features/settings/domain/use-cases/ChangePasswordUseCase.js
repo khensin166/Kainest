@@ -1,3 +1,4 @@
+// src\features\settings\domain\use-cases\ChangePasswordUseCase.js
 export class ChangePasswordUseCase {
   constructor(repository) {
     this.repository = repository;
