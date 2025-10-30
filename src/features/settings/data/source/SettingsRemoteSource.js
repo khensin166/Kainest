@@ -4,6 +4,16 @@ import axios from "axios";
 
 export class SettingsRemoteSource {
 
+  async getProfile() {
+    try {
+      // Panggil endpoint data profil LENGKAP
+      const response = await apiClient.get("/profile");
+      return response.data; // Mengembalikan { success: true, profile: {...} }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async changePassword({ currentPassword, newPassword, confirmationPassword }) {
     try {
       const response = await apiClient.put("/user/admin/change-password", {
@@ -22,7 +32,7 @@ export class SettingsRemoteSource {
     try {
       // Kita gunakan PATCH /profile (dari backend Hono kita)
       const response = await apiClient.patch("/profile", profileData);
-      return response.data; // Harapannya mengembalikan { success: true, profile: ... }
+      return response.data;
     } catch (error) {
       throw error;
     }

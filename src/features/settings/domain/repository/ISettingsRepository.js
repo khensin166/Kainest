@@ -2,6 +2,14 @@
 import { UserEntity } from "../../../auth/domain/entities/UserEntity";
 
 export class ISettingsRepository {
+
+  /**
+   * @returns {Promise<Either<Failure, UserEntity>>}
+   */
+  async getProfile() {
+    throw new Error("METHOD_NOT_IMPLEMENTED");
+  }
+  
   /**
    * @param {object} passwords 
    * @returns {Promise<Either<Failure, {message: string}>>}

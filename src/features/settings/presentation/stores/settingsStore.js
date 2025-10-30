@@ -9,6 +9,7 @@ import { mapFailureToMessage } from "../../../../core/error/map_failure_to_messa
 import { IncorrectPasswordFailure } from "../../../../core/error/failure";
 import { UpdateProfileUseCase } from "../../domain/use-cases/UpdateProfileUseCase.js";
 import { UploadAvatarUseCase } from "../../domain/use-cases/UploadAvatarUseCase.js";
+import { GetProfileUseCase } from "../../domain/use-cases/GetProfileUseCase.js";
 
 export const useSettingsStore = defineStore("settings", () => {
   const isLoading = ref(false);
@@ -22,6 +23,7 @@ export const useSettingsStore = defineStore("settings", () => {
   const changePasswordUseCase = new ChangePasswordUseCase(repository);
   const updateProfileUseCase = new UpdateProfileUseCase(repository);
   const uploadAvatarUseCase = new UploadAvatarUseCase(repository);
+  const getProfileUseCase = new GetProfileUseCase(repository);
 
   async function updatePassword(passwords) {
     isLoading.value = true;
@@ -100,10 +102,27 @@ export const useSettingsStore = defineStore("settings", () => {
   }
 
   // Fungsi untuk mengambil profil user dari authStore
-  function fetchProfile() {
-    if (!authStore.user) {
-      // Jika user data belum ada, panggil initializeAuth untuk memuatnya
-      return authStore.initializeAuth();
+  async function fetchProfile() {
+    // JANGAN panggil authStore.initializeAuth()
+    console.log("Memanggil settingsStore.fetchProfile() untuk data lengkap...");
+    isLoading.value = true; // Gunakan state loading dari settingsStore
+    
+    const result = await getProfileUseCase.execute();
+    
+    isLoading.value = false;
+
+    if (result.right) {
+      // Sukses! Simpan data lengkap ke authStore
+      // 'result.right' adalah data 'profile' lengkap
+      authStore.setUser(result.right); 
+    } else {
+      // Gagal
+      const message = mapFailureToMessage(result.left);
+      modalStore.openModal({
+        newTitle: "Gagal Memuat Profil",
+        newMessage: message,
+        newStatus: "error",
+      });
     }
   }
 

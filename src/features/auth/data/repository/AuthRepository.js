@@ -1,4 +1,4 @@
-// 📄 feature/auth/data/repository/AuthRepository.js (GANTI TOTAL)
+// 📄 feature/auth/data/repository/AuthRepository.js
 
 import { IAuthRepository } from "../../domain/repository/IAuthRepository";
 import { UserEntity } from "../../domain/entities/UserEntity";

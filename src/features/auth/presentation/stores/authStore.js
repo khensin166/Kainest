@@ -155,6 +155,12 @@ export const useAuthStore = defineStore("auth", () => {
     // router.push('/login'); 
   }
 
+  // Aksi untuk memperbarui data user dari store lain
+  function setUser(newUserData) {
+    user.value = newUserData;
+    isAuthenticated.value = !!newUserData;
+  }
+
   return {
     user,
     isAuthenticated,
@@ -165,5 +171,6 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     initializeAuth,
     register,
+    setUser,
   };
 });

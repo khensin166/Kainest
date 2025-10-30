@@ -80,4 +80,18 @@ export class SettingsRepository extends ISettingsRepository {
       return left(new ServerFailure(error.message || "Proses upload gagal."));
     }
   }
+
+  async getProfile() {
+    try {
+      const response = await this.remoteSource.getProfile();
+      if (response.success) {
+        // Kembalikan data 'profile' yang di-nest
+        return right(response.profile); 
+      } else {
+        return left(new ServerFailure(response.message || "Gagal mengambil profil."));
+      }
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || "Error server saat ambil profil."));
+    }
+  }
 }

@@ -54,19 +54,20 @@
 </template>
 
 <script setup>
-// Hapus impor Sidebar dan Header dari sini
-// Hapus logika `sidebarOpen` dari sini
 import { ref, onMounted } from "vue";
 import { useAuthStore } from "../../../auth/presentation/stores/authStore";
+import { useSettingsStore } from "../stores/settingsStore";
 import EditProfileForm from "./EditProfileForm.vue";
 import ChangePasswordForm from "./ChangePasswordForm.vue";
 
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 const activeTab = ref("profile");
 
 onMounted(() => {
   if (!authStore.user) {
-    authStore.initializeAuth();
+    // authStore.initializeAuth();
+    settingsStore.fetchProfile();
   }
 });
 </script>
