@@ -1,10 +1,8 @@
-// 📄 src/lib/api.js
-
 import axios from "axios";
+// 1. Tetap impor store di sini
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 
-// URL base dari backend Hono.js Anda
-const API_BASE_URL = "https://kainest-be.vercel.app";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -14,8 +12,6 @@ const api = axios.create({
 });
 
 // === Interceptor Request ===
-// Fungsi ini akan berjalan SEBELUM setiap request dikirim.
-// Tugasnya adalah mengambil token dari localStorage dan menambahkannya ke header.
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
@@ -29,30 +25,28 @@ api.interceptors.request.use(
   }
 );
 
-// === Interceptor Response ===
-// Fungsi ini berjalan SETELAH kita mendapat respons dari server.
-// Tugasnya adalah menangani error global, terutama '401 Unauthorized'.
+// === Interceptor Response (Diperbaiki) ===
 api.interceptors.response.use(
   (response) => {
-    // Jika respons sukses, teruskan saja
     return response;
   },
   (error) => {
-    // Jika error-nya adalah 401 (Unauthorized) atau 403 (Forbidden)
     if (error.response && [401, 403].includes(error.response.status)) {
       console.warn("Sesi tidak valid atau telah berakhir. Melakukan logout...");
-      // Panggil fungsi logout dari store untuk membersihkan state
-      // Kita gunakan 'useAuthStore.getState()' jika di luar setup/komponen
-      // Tapi karena ini file JS biasa, kita panggil localStorage langsung
-      localStorage.removeItem("authToken");
-      
-      // Arahkan ke halaman login
-      // Kita tidak bisa pakai router di sini, jadi kita reload halaman
-      // Router guard akan menangani sisanya.
-      window.location.href = "/login";
+
+      // 2. Panggil store DI DALAM fungsi
+      const authStore = useAuthStore();
+
+      // 3. Biarkan store yang mengurus sisanya
+      // (logout() akan menghapus token, mereset state, dan me-redirect)
+      authStore.logout();
+
+      // 4. Hapus side-effect navigasi dan localStorage dari sini
+      // localStorage.removeItem("authToken"); // Dihapus
+      // window.location.href = "/login"; // Dihapus
     }
-    
-    // Teruskan error agar bisa ditangani oleh block .catch() di repository
+
+    // Tetap teruskan error agar repository bisa menangani .left (Failure)
     return Promise.reject(error);
   }
 );
