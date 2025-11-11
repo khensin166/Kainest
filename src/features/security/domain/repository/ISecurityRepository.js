@@ -1,3 +1,4 @@
+// src/features/security/domain/repository/ISecurityRepository.js
 export class ISecurityRepository {
   /**
    * @param {object} passwords

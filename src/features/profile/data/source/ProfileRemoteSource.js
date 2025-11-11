@@ -1,3 +1,4 @@
+// src/features/profile/data/source/ProfileRemoteSource.js
 import apiClient from "../../../../lib/apiClient";
 import axios from "axios";
 
@@ -5,7 +6,7 @@ export class ProfileRemoteSource {
   async getProfile() {
     try {
       const response = await apiClient.get("/profile");
-      return response.data; // Mengembalikan { success: true, profile: {...} }
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -14,7 +15,7 @@ export class ProfileRemoteSource {
   async updateProfile(profileApiPayload) {
     try {
       const response = await apiClient.patch("/profile", profileApiPayload);
-      return response.data; // Mengembalikan { success: true, profile: {...} }
+      return response.data;
     } catch (error) {
       throw error;
     }

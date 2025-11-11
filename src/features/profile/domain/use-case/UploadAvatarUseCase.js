@@ -1,3 +1,4 @@
+// src/features/profile/domain/use-case/UploadAvatarUseCase.js
 export class UploadAvatarUseCase {
   constructor(repository) {
     this.repository = repository;

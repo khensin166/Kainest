@@ -1,3 +1,4 @@
+// src/features/profile/domain/repository/IProfileRepository.js
 export class IProfileRepository {
   /**
    * @returns {Promise<Either<Failure, ProfileEntity>>}

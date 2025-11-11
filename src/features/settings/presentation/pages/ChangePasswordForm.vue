@@ -6,7 +6,8 @@
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1" for="current_password">Sandi Sekarang</label>
-          <input id="current_password" class="form-input w-full" type="password" v-model="passwords.currentPassword" required />
+          <input id="current_password" class="form-input w-full" type="password" v-model="passwords.currentPassword"
+            required />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="new_password">Sandi Baru</label>
@@ -14,12 +15,14 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="confirmation_password">Konfirmasi Sandi Baru</label>
-          <input id="confirmation_password" class="form-input w-full" type="password" v-model="passwords.confirmationPassword" required />
+          <input id="confirmation_password" class="form-input w-full" type="password"
+            v-model="passwords.confirmationPassword" required />
         </div>
       </div>
       <div class="flex justify-end mt-6">
-        <button type="submit" :disabled="settingsStore.isLoading" class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400">
-          {{ settingsStore.isLoading ? 'Memproses...' : 'Simpan' }}
+        <button type="submit" :disabled="securityStore.isLoading"
+          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400">
+          {{ securityStore.isLoading ? 'Memproses...' : 'Simpan' }}
         </button>
       </div>
     </form>
@@ -28,9 +31,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useSettingsStore } from '../stores/settingsStore';
+import { useSecurityStore } from '../../../security/presentation/stores/useSecurityStore';
 
-const settingsStore = useSettingsStore();
+const securityStore = useSecurityStore();
 const passwords = ref({
   currentPassword: '',
   newPassword: '',
@@ -39,7 +42,7 @@ const passwords = ref({
 
 const handleChangePassword = async () => {
   try {
-    await settingsStore.updatePassword(passwords.value);
+    await securityStore.updatePassword(passwords.value);
     // Jika berhasil, reset form
     passwords.value = { currentPassword: '', newPassword: '', confirmationPassword: '' };
   } catch (error) {

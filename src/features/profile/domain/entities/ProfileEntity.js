@@ -1,3 +1,4 @@
+// src/features/profile/domain/entities/ProfileEntity.js
 export class ProfileEntity {
   constructor({
     id,
