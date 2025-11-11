@@ -1,9 +1,9 @@
 export class GetProfileUseCase {
   constructor(repository) {
     this.repository = repository;
-}
+  }
 
-   async execute() {
+  async execute() {
     return this.repository.getProfile();
-}
+  }
 }

@@ -1,7 +1,7 @@
 // 📄 feature/auth/data/repository/AuthRepository.js
 
 import { IAuthRepository } from "../../domain/repository/IAuthRepository";
-import { UserEntity } from "../../domain/entities/UserEntity";
+import { mapUserFromApi } from "../mappers/AuthMapper";
 import {
   left,
   right,
@@ -23,39 +23,31 @@ export class AuthRepository extends IAuthRepository {
   async login(email, password) {
     try {
       // 1. Panggil API /auth/login
-      //    Respons yang diharapkan: { success: true, token: "..." }
       const response = await this.remoteSource.login(email, password);
 
       if (!response.success || !response.token) {
-        throw new Error(response.message || "Token tidak diterima dari server.");
+        throw new Error(
+          response.message || "Token tidak diterima dari server."
+        );
       }
 
       // 2. Simpan token ke localStorage
       localStorage.setItem("authToken", response.token);
 
-      // 3. Ambil data profil user dengan token yang baru disimpan
-      //    (Interceptor axios akan otomatis menambahkannya ke header)
+      // Ambil data profil user (sekarang memanggil GET /profile)
       const profileData = await this.remoteSource.getProfile();
 
-      // 4. Buat UserEntity dari data profil
-      //    ASUMSI: Endpoint /auth/me Anda mengembalikan data dengan field ini.
-      //    Sesuaikan 'profileData.displayName' dll dengan respons API Anda.
-      const userEntity = new UserEntity({
-        id: profileData.id,
-        email: profileData.email,
-        displayName: profileData.displayName, // e.g., dari profileData.display_name
-        avatarUrl: profileData.avatarUrl,   // e.g., dari profileData.avatar_url
-        partnerId: profileData.partnerId,   // e.g., dari profileData.partner_id
-      });
+      // 4. Buat UserEntity dari data profil dengan mapper
+      const userEntity = mapUserFromApi(profileData);
 
       return right(userEntity);
-
     } catch (error) {
       if (error.response) {
         // Error dari server (misal: 401, 400)
-        const message = error.response.data?.message || "Email atau password salah.";
+        const message =
+          error.response.data?.message || "Email atau password salah.";
         if (error.response.status === 401) {
-           return left(new IncorrectPasswordFailure(message));
+          return left(new IncorrectPasswordFailure(message));
         }
         return left(new ServerFailure(message));
       } else if (error.request) {
@@ -63,7 +55,9 @@ export class AuthRepository extends IAuthRepository {
         return left(new NetworkFailure());
       } else {
         // Error JavaScript lainnya
-        return left(new ServerFailure(error.message || "Gagal melakukan login."));
+        return left(
+          new ServerFailure(error.message || "Gagal melakukan login.")
+        );
       }
     }
   }
@@ -73,17 +67,13 @@ export class AuthRepository extends IAuthRepository {
    */
   async register(email, password, displayName) {
     try {
-      await this.remoteSource.register(
-        email,
-        password,
-        displayName
-      );
+      await this.remoteSource.register(email, password, displayName);
 
       // Registrasi sukses. Kita kembalikan 'true'.
       // Store akan mengarahkan ke halaman login.
       return right(true);
     } catch (error) {
-       if (error.response) {
+      if (error.response) {
         const message = error.response.data?.message || "Registrasi gagal.";
         return left(new ServerFailure(message));
       } else if (error.request) {
@@ -110,17 +100,10 @@ export class AuthRepository extends IAuthRepository {
       // 2. Token ada, panggil /auth/me untuk validasi dan ambil profil
       const profileData = await this.remoteSource.getProfile();
 
-      // 3. Buat UserEntity (sesuaikan field jika perlu)
-      const userEntity = new UserEntity({
-        id: profileData.id,
-        email: profileData.email,
-        displayName: profileData.displayName,
-        avatarUrl: profileData.avatarUrl,
-        partnerId: profileData.partnerId,
-      });
+      // 3. Buat UserEntity 
+      const userEntity = mapUserFromApi(profileData);
 
       return right(userEntity);
-
     } catch (error) {
       // Jika error.response.status adalah 401/403, token tidak valid.
       // Interceptor kita akan menghapus token, tapi di sini kita
@@ -130,7 +113,9 @@ export class AuthRepository extends IAuthRepository {
         return right(null); // Bukan error, hanya tidak login
       }
       // Error lain (misal server down) adalah Failure
-      return left(new ServerFailure(error.message || "Gagal mengambil sesi user."));
+      return left(
+        new ServerFailure(error.message || "Gagal mengambil sesi user.")
+      );
     }
   }
 
@@ -142,7 +127,9 @@ export class AuthRepository extends IAuthRepository {
       localStorage.removeItem("authToken");
       return right(true); // Sukses
     } catch (error) {
-      return left(new ServerFailure(error.message || "Gagal menghapus sesi lokal."));
+      return left(
+        new ServerFailure(error.message || "Gagal menghapus sesi lokal.")
+      );
     }
   }
 }

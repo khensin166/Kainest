@@ -1,6 +1,4 @@
 import axios from "axios";
-// 1. Tetap impor store di sini
-import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,23 +28,23 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
+    // Buat jadi async
     if (error.response && [401, 403].includes(error.response.status)) {
       console.warn("Sesi tidak valid atau telah berakhir. Melakukan logout...");
 
-      // 2. Panggil store DI DALAM fungsi
+      // 1. Impor store HANYA di dalam fungsi ini
+      // Ini memutus circular dependency
+      const { useAuthStore } = await import(
+        "@/features/auth/presentation/stores/authStore"
+      );
       const authStore = useAuthStore();
 
-      // 3. Biarkan store yang mengurus sisanya
-      // (logout() akan menghapus token, mereset state, dan me-redirect)
+      // 2. Panggil aksi logout
       authStore.logout();
-
-      // 4. Hapus side-effect navigasi dan localStorage dari sini
-      // localStorage.removeItem("authToken"); // Dihapus
-      // window.location.href = "/login"; // Dihapus
     }
 
-    // Tetap teruskan error agar repository bisa menangani .left (Failure)
+    // Tetap teruskan error
     return Promise.reject(error);
   }
 );

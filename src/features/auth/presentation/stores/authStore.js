@@ -1,4 +1,4 @@
-// 📄 features/auth/presentation/stores/authStore.js (GANTI TOTAL)
+// 📄 features/auth/presentation/stores/authStore.js
 
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -9,8 +9,6 @@ import { RegisterUserUseCase } from "../../domain/use-cases/RegisterUserUseCase"
 import { GetCurrentUserUseCase } from "../../domain/use-cases/GetCurrentUserUseCase";
 import { LogoutUserUseCase } from "../../domain/use-cases/LogoutUserUseCase";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
-
-// Hapus 'import { supabase }'
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
@@ -43,18 +41,39 @@ export const useAuthStore = defineStore("auth", () => {
       // dan memvalidasinya ke /auth/me
       const result = await getCurrentUserUseCase.execute();
 
-      if (result.right) {
-        // Sukses: result.right adalah UserEntity atau null
-        user.value = result.right;
-        isAuthenticated.value = !!result.right; // true jika user ada, false jika null
-        console.log("Inisialisasi auth sukses.", { user: user.value, isAuthenticated: isAuthenticated.value });
-      } else {
-        // Gagal (misal: server down, bukan token salah)
+      // --- LOGIKA DIPERBAIKI DI SINI ---
+      if (result.left) {
+        // --- Kasus 1: ADA KEGAGALAN NYATA ---
+        // (Misal: server down, NetworkFailure)
         user.value = null;
         isAuthenticated.value = false;
         error.value = mapFailureToMessage(result.left);
         console.error("Inisialisasi auth gagal:", error.value);
+      } else {
+        // --- Kasus 2: TIDAK ADA KEGAGALAN ---
+        // result.right bisa berisi UserEntity (jika token valid)
+        // atau null (jika token tidak ada / tidak valid)
+        user.value = result.right; // Aman, bisa user atau null
+        isAuthenticated.value = !!result.right; // true jika user, false jika null
+        error.value = null; // Tidak ada error
+        console.log("Inisialisasi auth sukses.", {
+          user: user.value,
+          isAuthenticated: isAuthenticated.value,
+        });
       }
+      // --- BATAS PERBAIKAN ---
+      // if (result.right) {
+      //   // Sukses: result.right adalah UserEntity atau null
+      //   user.value = result.right;
+      //   isAuthenticated.value = !!result.right; // true jika user ada, false jika null
+      //   console.log("Inisialisasi auth sukses.", { user: user.value, isAuthenticated: isAuthenticated.value });
+      // } else {
+      //   // Gagal (misal: server down, bukan token salah)
+      //   user.value = null;
+      //   isAuthenticated.value = false;
+      //   error.value = mapFailureToMessage(result.left);
+      //   console.error("Inisialisasi auth gagal:", error.value);
+      // }
     } catch (e) {
       console.error("Terjadi error tak terduga saat inisialisasi auth:", e);
       user.value = null;
@@ -145,14 +164,14 @@ export const useAuthStore = defineStore("auth", () => {
   async function logout() {
     isLoading.value = true;
     await logoutUseCase.execute();
-    
+
     // Reset state secara manual
     user.value = null;
     isAuthenticated.value = false;
     isLoading.value = false;
 
     // Arahkan ke login (bisa juga ditangani oleh router guard)
-    // router.push('/login'); 
+    // router.push('/login');
   }
 
   // Aksi untuk memperbarui data user dari store lain

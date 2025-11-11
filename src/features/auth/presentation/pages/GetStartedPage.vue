@@ -1,3 +1,4 @@
+<!-- GetStartedPage.vue -->
 <template>
   <div
     class="min-h-screen bg-[var(--color-violet-500)] flex flex-col items-center justify-center px-4 overflow-hidden"

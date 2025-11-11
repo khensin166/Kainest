@@ -13,7 +13,6 @@ export class RegisterUserUseCase {
     if (password.length < 6) {
       throw new Error("Password harus terdiri dari minimal 6 karakter.");
     }
-    
     // Panggil metode register dari repository
     return this.repository.register(email, password, displayName);
   }
