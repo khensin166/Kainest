@@ -5,12 +5,17 @@ export class ChangePasswordUseCase {
   }
 
   async execute(passwords) {
+
+    // Validasi dasar
     if (!passwords.currentPassword || !passwords.newPassword) {
-      throw new Error("Password lama dan baru tidak boleh kosong.");
+      return left(
+        new GeneralFailure("Password lama dan baru tidak boleh kosong.")
+      );
     }
     if (passwords.newPassword !== passwords.confirmationPassword) {
-      throw new Error("Konfirmasi password baru tidak cocok.");
-    }
+      // Ini adalah error yang Anda lihat
+      return left(new GeneralFailure("Konfirmasi password baru tidak cocok."));
+    } 
     return this.repository.changePassword(passwords);
   }
 }

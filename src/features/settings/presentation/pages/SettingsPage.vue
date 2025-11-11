@@ -15,6 +15,12 @@
               ">Edit Profil</a>
           </li>
           <li class="mr-2">
+            <a href="#" @click.prevent="activeTab = 'couple'" class="inline-block p-4 border-b-2 rounded-t-lg" :class="activeTab === 'couple'
+              ? 'border-violet-500 text-violet-600'
+              : 'border-transparent hover:text-gray-600 hover:border-gray-300'
+              ">Konektivitas Pasangan</a>
+          </li>
+          <li class="mr-2">
             <a href="#" @click.prevent="activeTab = 'security'" class="inline-block p-4 border-b-2 rounded-t-lg" :class="activeTab === 'security'
               ? 'border-violet-500 text-violet-600'
               : 'border-transparent hover:text-gray-600 hover:border-gray-300'
@@ -26,6 +32,9 @@
       <div>
         <div v-if="activeTab === 'profile'">
           <EditProfileForm :user="authStore.user" />
+        </div>
+        <div v-if="activeTab === 'couple'">
+          <ConnectCoupleForm />
         </div>
         <div v-if="activeTab === 'security'">
           <ChangePasswordForm />
@@ -39,16 +48,22 @@
 import { ref, onMounted } from "vue";
 import { useAuthStore } from "../../../auth/presentation/stores/authStore";
 import { useProfileStore } from "../../../profile/presentation/stores/useProfileStore";
+import { useCoupleStore } from "../../../couple/presentation/stores/useCoupleStore";
 import EditProfileForm from "./EditProfileForm.vue";
 import ChangePasswordForm from "./ChangePasswordForm.vue";
+import ConnectCoupleForm from "../../../couple/presentation/pages/ConnectCoupleForm.vue";
 
 const authStore = useAuthStore();
-const profileStore = useProfileStore();
+const profileStore = useProfileStore()
+const coupleStore = useCoupleStore();;
 const activeTab = ref("profile");
 
 onMounted(() => {
   if (!authStore.user) {
     profileStore.fetchProfile();
+  }
+  if (!coupleStore.connectionStatus) {
+    coupleStore.fetchCoupleStatus();
   }
 });
 </script>
