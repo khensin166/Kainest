@@ -8,6 +8,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.31.0",
+    "@editorjs/header": "^2.8.8",
+    "@editorjs/image": "^2.10.3",
+    "@editorjs/list": "^2.0.9",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@supabase/supabase-js": "^2.52.1",
@@ -17,6 +21,7 @@
     "axios": "^1.10.0",
     "chart.js": "^4.4.1",
     "chartjs-adapter-moment": "^1.0.1",
+    "editorjs-html": "^4.0.5",
     "flatpickr": "^4.6.13",
     "lucide-vue-next": "^0.525.0",
     "moment": "^2.29.4",

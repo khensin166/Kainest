@@ -187,6 +187,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DocumentTextIcon,
+  PencilSquareIcon,
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -216,6 +217,11 @@ export default {
         type: "group",
         title: "Momen Kita",
         items: [
+          {
+            name: "Catatan Bersama",
+            path: "/app/notes",
+            iconComponent: PencilSquareIcon, 
+          },
           {
             name: "To-do List Berdua",
             path: "/app/todos",

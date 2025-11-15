@@ -18,7 +18,7 @@
             <a href="#" @click.prevent="activeTab = 'couple'" class="inline-block p-4 border-b-2 rounded-t-lg" :class="activeTab === 'couple'
               ? 'border-violet-500 text-violet-600'
               : 'border-transparent hover:text-gray-600 hover:border-gray-300'
-              ">Konektivitas Pasangan</a>
+              ">Pasangan</a>
           </li>
           <li class="mr-2">
             <a href="#" @click.prevent="activeTab = 'security'" class="inline-block p-4 border-b-2 rounded-t-lg" :class="activeTab === 'security'

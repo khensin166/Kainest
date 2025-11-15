@@ -17,6 +17,9 @@ import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vu
 import WaBotPage from "./features/wabot/presentation/pages/WaBotPage.vue";
 import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
+import NotesPage from "./features/notes/presentation/pages/NotesPage.vue";
+import NoteEditorPage from "./features/notes/presentation/pages/NoteEditorPage.vue";
+import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -60,6 +63,21 @@ const routes = [
         path: "todos",
         name: "TodoList",
         component: TodoListPage,
+      },
+      {
+        path: "notes", // Daftar semua notes
+        name: "Notes",
+        component: NotesPage,
+      },
+      {
+        path: "notes/new", // Halaman editor untuk note BARU
+        name: "NewNote",
+        component: NoteEditorPage,
+      },
+      {
+        path: "notes/:id", // Halaman editor untuk note yang SUDAH ADA
+        name: "EditNote",
+        component: NoteEditorPage,
       },
       {
         path: "gallery",
