@@ -3,13 +3,13 @@
   <div class="p-4 md:p-8">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Catatan Anda</h1>
-      <button @click="goToEditor" class="btn btn-primary text-white">
+      <button @click="goToEditor" class="btn bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)]">
         Buat Note Baru
       </button>
     </div>
 
     <div v-if="noteStore.isLoadingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="i in 3" :key="i" class="card bg-base-100 shadow-xl">
+      <div v-for="i in 3" :key="i" class="card bg-[var(--color-gray-50)] shadow-xl">
         <div class="card-body">
           <div class="skeleton h-8 w-3/4 mb-4"></div>
           <div class="skeleton h-4 w-1/2 mb-6"></div>
@@ -22,7 +22,7 @@
 
     <div v-else-if="noteStore.notesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="note in noteStore.notesList" :key="note.id" @click="goToNote(note.id)"
-        class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
+        class="card bg-[var(--color-gray-50)] shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
         <div class="card-body">
           <h2 class="card-title">{{ note.title }}</h2>
           <p class="text-sm text-gray-500">

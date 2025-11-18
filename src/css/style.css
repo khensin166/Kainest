@@ -4,9 +4,11 @@
 @import "./additional-styles/flatpickr.css";
 @import "./additional-styles/utility-patterns.css" layer(components);
 
+/* @plugin "@tailwindcss/forms"; */
 @plugin "@tailwindcss/forms" {
   strategy: base;
 }
+ @plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant sidebar-expanded (&:is(.sidebar-expanded *));
