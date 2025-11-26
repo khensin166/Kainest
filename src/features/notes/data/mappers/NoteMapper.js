@@ -1,3 +1,4 @@
+// src/features/notes/data/mappers/NoteMapper.js
 import { NoteEntity } from "../../domain/entities/NoteEntity";
 
 /**

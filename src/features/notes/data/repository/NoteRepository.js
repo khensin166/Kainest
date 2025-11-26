@@ -1,3 +1,4 @@
+// src/features/notes/data/repository/NoteRepository.js
 import { INoteRepository } from "../../domain/repository/INoteRepository";
 import { NoteRemoteSource } from "../source/NoteRemoteSource";
 import { mapNoteFromApi, mapNoteListFromApi } from "../mappers/NoteMapper";

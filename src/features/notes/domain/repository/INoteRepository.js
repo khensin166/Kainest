@@ -1,3 +1,4 @@
+// src/features/notes/domain/repository/INoteRepository.js
 export class INoteRepository {
   /**
    * Mengambil daftar semua notes (pribadi + shared)

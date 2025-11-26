@@ -1,3 +1,4 @@
+// src/features/notes/domain/entities/NoteEntity.js
 export class NoteEntity {
   constructor({
     id,

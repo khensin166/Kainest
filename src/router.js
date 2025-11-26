@@ -20,6 +20,7 @@ import NotFound from "./partials/Forbidden.vue";
 import NotesPage from "./features/notes/presentation/pages/NotesPage.vue";
 import NoteEditorPage from "./features/notes/presentation/pages/NoteEditorPage.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
+import BudgetDashboardPage from "./features/budgeting/presentation/pages/BudgetDashboardPage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -98,6 +99,11 @@ const routes = [
         path: "settings",
         name: "Settings",
         component: SettingsPage,
+      },
+      {
+        path: "budgeting",
+        name: "budgeting",
+        component: BudgetDashboardPage,
       },
       {
         path: "wabot",

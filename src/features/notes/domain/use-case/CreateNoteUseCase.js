@@ -1,3 +1,4 @@
+// src/features/notes/domain/use-case/CreateNoteUseCase.js
 import { left, GeneralFailure } from "../../../../core/error/failure";
 
 export class CreateNoteUseCase {

@@ -1,0 +1,121 @@
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+
+// --- Dependencies Injection ---
+import { BudgetRepository } from "../../data/repository/BudgetRepository";
+import { GetDashboardSummaryUseCase } from "../../domain/use-case/GetDashboardSummaryUseCase";
+import { GetAiAdviceUseCase } from "../../domain/use-case/GetAiAdviceUseCase";
+import { CreateTransactionUseCase } from "../../domain/use-case/CreateTransactionUseCase";
+
+const budgetRepository = new BudgetRepository();
+const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(
+  budgetRepository
+);
+const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
+const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
+
+export const useBudgetStore = defineStore("budget", () => {
+  // =========================================
+  // 📦 STATE
+  // =========================================
+  const summaryData = ref(null);
+  const isLoadingSummary = ref(false);
+  const errorSummary = ref(null);
+  const isTransactionSubmitting = ref(false);
+
+  // =========================================
+  // 🧠 GETTERS
+  // =========================================
+  const budgetCategories = computed(() => summaryData.value?.categories || []);
+  const totalRemaining = computed(
+    () => summaryData.value?.totals?.remaining || 0
+  );
+  const currentPeriodMonth = computed(() => summaryData.value?.month || "-");
+  const hasData = computed(
+    () => !!summaryData.value && !isLoadingSummary.value
+  );
+
+  // =========================================
+  // ⚡ ACTIONS (DIPERBAIKI DISINI)
+  // =========================================
+
+  async function fetchDashboardSummary() {
+    console.log(
+      "⚡ [STORE ACTION] fetchDashboardSummary dipanggil (Support Failure Lama)!"
+    );
+    isLoadingSummary.value = true;
+    errorSummary.value = null;
+
+    // 1. Panggil Use Case
+    const result = await getDashboardSummaryUseCase.execute();
+
+    // console.log("🔍 Debug Result dari UseCase:", result); // Uncomment kalau mau liat bentuk objeknya
+
+    // 2. Cek Hasil (PERBAIKAN: Cek properti 'right' secara langsung)
+    // Jika result.right ada isinya (tidak null), berarti sukses.
+    if (result.right) {
+      // Sukses: Ambil datanya dari properti .right
+      summaryData.value = result.right;
+      console.log("✅ Data berhasil dimuat ke Store:", summaryData.value);
+    } else {
+      // Gagal: Ambil pesan error dari properti .left.message
+      // Kita pakai optional chaining (?.) jaga-jaga kalau result.left entah kenapa null
+      errorSummary.value =
+        result.left?.message || "Terjadi kesalahan tidak diketahui.";
+      summaryData.value = null;
+      console.error("❌ Gagal memuat data:", errorSummary.value);
+    }
+
+    isLoadingSummary.value = false;
+  }
+
+  async function fetchAiAdviceForCategory(categoryId) {
+    if (!summaryData.value || !summaryData.value.categories) return;
+    const categoryIndex = summaryData.value.categories.findIndex(
+      (c) => c.categoryId === categoryId
+    );
+    if (categoryIndex === -1) return;
+
+    const result = await getAiAdviceUseCase.execute(categoryId);
+
+    // (PERBAIKAN: Cek properti 'right')
+    if (result.right) {
+      const adviceData = result.right; // Ambil data dari .right
+      const targetCategory = summaryData.value.categories[categoryIndex];
+      targetCategory.zone = adviceData.zone;
+      targetCategory.aiAdvice = adviceData.advice;
+    } else {
+      // Ambil error dari .left
+      console.error("Gagal mengambil saran AI:", result.left?.message);
+    }
+  }
+
+  async function submitTransaction(transactionData) {
+    isTransactionSubmitting.value = true;
+    const result = await createTransactionUseCase.execute(transactionData);
+    isTransactionSubmitting.value = false;
+
+    // (PERBAIKAN: Cek properti 'right')
+    if (result.right) {
+      await fetchDashboardSummary();
+      return { success: true };
+    } else {
+      // Ambil error dari .left
+      return { success: false, message: result.left?.message };
+    }
+  }
+
+  return {
+    summaryData,
+    isLoadingSummary,
+    errorSummary,
+    isTransactionSubmitting,
+    budgetCategories,
+    totalRemaining,
+    currentPeriodMonth,
+    hasData,
+    fetchDashboardSummary,
+    fetchAiAdviceForCategory,
+    submitTransaction,
+  };
+});
