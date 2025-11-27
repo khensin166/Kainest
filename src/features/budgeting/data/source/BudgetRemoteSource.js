@@ -41,4 +41,14 @@ export class BudgetRemoteSource {
     const response = await apiClient.get("/budget/categories");
     return response.data;
   }
+
+  /**
+   * GET /api/budget/trend
+   * Mengambil data transaksi harian yang diagregasi
+   */
+  async getSpendingTrend() {
+    const response = await apiClient.get("/budget/trend");
+    return response.data; 
+    // Mengharapkan: { success: true, data: { month: '...', trend: [{date: '...', totalSpent: ...}] } }
+  }
 }

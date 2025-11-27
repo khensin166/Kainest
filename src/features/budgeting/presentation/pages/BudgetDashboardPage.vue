@@ -7,6 +7,7 @@ import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
+import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
@@ -25,6 +26,7 @@ const closeTransactionModal = () => {
 onMounted(() => {
   console.log("🖥️ [VUE PAGE] onMounted dipanggil! Memanggil store...");
   budgetStore.fetchDashboardSummary();
+  budgetStore.fetchSpendingTrend();
 });
 </script>
 
@@ -64,8 +66,30 @@ onMounted(() => {
       <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :monthName="budgetStore.currentPeriodMonth" />
 
       <div
-        class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60 p-5 justify-center items-center text-gray-400 border-dashed border-2">
-        Grafik Tren Pengeluaran akan muncul di sini (Next Step)
+        class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">
+        <header class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60 flex items-center">
+          <h2 class="font-semibold text-gray-800 dark:text-gray-100">Tren Pengeluaran Bulan Ini</h2>
+        </header>
+
+        <div class="p-5">
+          <div v-if="budgetStore.isLoadingTrend" class="flex justify-center items-center h-72">
+            <div class="animate-pulse flex flex-col items-center text-gray-400">
+              <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path>
+              </svg>
+              <span>Memuat grafik...</span>
+            </div>
+          </div>
+
+          <div v-else-if="budgetStore.chartDataCollection" class="h-72">
+            <SpendingTrendChart :chartData="budgetStore.chartDataCollection" />
+          </div>
+
+          <div v-else class="h-72 flex items-center justify-center text-gray-400">
+            Belum ada data tren tersedia.
+          </div>
+        </div>
       </div>
 
       <div class="col-span-full mt-4 mb-2">

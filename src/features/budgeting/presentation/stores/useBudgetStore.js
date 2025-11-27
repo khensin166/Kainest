@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
 // --- Dependencies Injection ---
-import { BudgetRepository } from "../../data/repository/BudgetRepository";
 import { GetDashboardSummaryUseCase } from "../../domain/use-case/GetDashboardSummaryUseCase";
 import { GetAiAdviceUseCase } from "../../domain/use-case/GetAiAdviceUseCase";
 import { CreateTransactionUseCase } from "../../domain/use-case/CreateTransactionUseCase";
 import { GetCategoriesUseCase } from "../../domain/use-case/GetCategoriesUseCase";
+import { BudgetRepository } from "../../data/repository/BudgetRepository";
+import { GetSpendingTrendUseCase } from "../../domain/use-case/GetSpendingTrendUseCase";
+
 4;
 
 const budgetRepository = new BudgetRepository();
@@ -16,6 +18,7 @@ const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(
 const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
 const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
 const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
+const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -27,6 +30,8 @@ export const useBudgetStore = defineStore("budget", () => {
   const isTransactionSubmitting = ref(false);
   const categoriesList = ref([]); // Menyimpan array CategoryEntity
   const isLoadingCategories = ref(false); // Status loading dropdown
+  const trendDataList = ref([]); // Menyimpan array TrendDataEntity penuh satu bulan
+  const isLoadingTrend = ref(false);
 
   // =========================================
   // 🧠 GETTERS
@@ -43,6 +48,29 @@ export const useBudgetStore = defineStore("budget", () => {
     categoriesList.value.filter((c) => c.type === "EXPENSE")
   );
 
+  // GETTER BARU: Mengubah data entity menjadi format siap pakai untuk Chart.js
+  // Chart.js butuh object terpisah untuk labels (sumbu X) dan data (sumbu Y)
+  const chartDataCollection = computed(() => {
+    if (trendDataList.value.length === 0) return null;
+
+    return {
+      // Labels sumbu X (misal: ["1", "2", "3", ...])
+      labels: trendDataList.value.map((item) => item.labelDay),
+      datasets: [
+        {
+          label: "Realisasi Pengeluaran",
+          // Data sumbu Y (misal: [0, 50000, 0, ...])
+          data: trendDataList.value.map((item) => item.amount),
+          // Config warna chart (bisa dipindah ke komponen UI nanti)
+          borderColor: "#10B981", // Tailwind green-500
+          backgroundColor: "rgba(16, 185, 129, 0.1)",
+          tension: 0.3, // Garis agak melengkung
+          fill: true,
+        },
+        // Nanti bisa ditambahkan dataset kedua untuk "Limit Harian" jika mau
+      ],
+    };
+  });
   // =========================================
   // ⚡ ACTIONS (DIPERBAIKI DISINI)
   // =========================================
@@ -141,10 +169,33 @@ export const useBudgetStore = defineStore("budget", () => {
     isLoadingCategories.value = false;
   }
 
+  /**
+   * ACTION BARU: Mengambil data tren harian untuk grafik
+   * Dipanggil bersamaan dengan fetchDashboardSummary di onMounted
+   */
+  async function fetchSpendingTrend() {
+    console.log("⚡ [STORE ACTION] fetchSpendingTrend dipanggil!");
+    isLoadingTrend.value = true;
+
+    const result = await getSpendingTrendUseCase.execute();
+
+    if (result.right) {
+      trendDataList.value = result.right; // Simpan data entity penuh
+      console.log(`✅ Data grafik dimuat: ${trendDataList.value.length} hari`);
+    } else {
+      console.error("❌ Gagal memuat data grafik:", result.left?.message);
+      // Opsional: set error state khusus grafik
+    }
+
+    isLoadingTrend.value = false;
+  }
+
   return {
     summaryData,
     isLoadingSummary,
     errorSummary,
+    trendDataList,
+    isLoadingTrend,
     categoriesList,
     isLoadingCategories,
     isTransactionSubmitting,
@@ -153,9 +204,11 @@ export const useBudgetStore = defineStore("budget", () => {
     currentPeriodMonth,
     hasData,
     fetchDashboardSummary,
+    chartDataCollection,
     expenseCategories,
     fetchAiAdviceForCategory,
     submitTransaction,
+    fetchSpendingTrend,
     fetchAllCategories,
   };
 });

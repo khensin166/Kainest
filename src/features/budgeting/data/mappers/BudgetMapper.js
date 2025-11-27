@@ -2,6 +2,7 @@
 import { BudgetSummaryEntity } from "../../domain/entities/BudgetSummaryEntity";
 import { TransactionEntity } from "../../domain/entities/TransactionEntity";
 import { CategoryEntity } from "../../domain/entities/CategoryEntity";
+import { TrendDataEntity } from "../../domain/entities/TrendDataEntity";
 
 export const BudgetMapper = {
   /**
@@ -81,5 +82,46 @@ export const BudgetMapper = {
           isDefault: cat.isDefault,
         })
     );
+  },
+
+  /**
+   * MAPPING RUMIT: Mengubah data "bolong-bolong" dari API menjadi data harian penuh.
+   * API hanya kirim tgl yang ada transaksi. Mapper ini mengisi tgl kosong dengan 0.
+   * @param {Array} sparseApiData - Data dari API [{date: '2025-11-05', totalSpent: 100000}]
+   * @returns {TrendDataEntity[]} - Array penuh dari tgl 1 s/d akhir bulan
+   */
+  mapTrendDataFromApi(sparseApiData) {
+    const rawData = sparseApiData || [];
+    const fullMonthData = [];
+
+    // 1. Tentukan konteks waktu saat ini (untuk tahu jumlah hari dalam bulan ini)
+    const now = new Date();
+    const year = now.getFullYear();
+    const monthIndex = now.getMonth(); // 0-11
+    // Trik mendapatkan jumlah hari di bulan ini (tgl 0 bulan depan = tgl terakhir bulan ini)
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+    // 2. Looping dari hari ke-1 sampai hari terakhir bulan ini
+    for (let day = 1; day <= daysInMonth; day++) {
+      // Buat string tanggal format YYYY-MM-DD (harus sama persis dengan format API backend)
+      // String padStart memastikan ada angka 0 di depan jika tgl < 10 (misal: '05')
+      const dateString = `${year}-${String(monthIndex + 1).padStart(
+        2,
+        "0"
+      )}-${String(day).padStart(2, "0")}`;
+
+      // 3. Cari apakah tanggal ini ada di data API?
+      const foundData = rawData.find((item) => item.date === dateString);
+
+      // 4. Jika ketemu pakai datanya, jika tidak pakai 0. Buat Entity.
+      fullMonthData.push(
+        new TrendDataEntity({
+          date: dateString,
+          amount: foundData ? foundData.totalSpent : 0,
+        })
+      );
+    }
+
+    return fullMonthData;
   },
 };

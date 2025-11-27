@@ -129,4 +129,34 @@ export class BudgetRepository {
       );
     }
   }
+
+  async getSpendingTrend() {
+    try {
+      const response = await this.remoteSource.getSpendingTrend();
+
+      if (response.success && response.data) {
+        const sparseTrendData = response.data.trend || [];
+
+        // 🔥 Panggil Mapper Ajaib kita untuk mengisi data kosong
+        const fullEntities = BudgetMapper.mapTrendDataFromApi(sparseTrendData);
+
+        // Bungkus dengan right()
+        return right(fullEntities);
+      } else {
+        return left(
+          new ServerFailure(
+            response.message || "Gagal mengambil data tren grafik."
+          )
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(
+          error.response?.data?.message ||
+            error.message ||
+            "Terjadi kesalahan koneksi."
+        )
+      );
+    }
+  }
 }
