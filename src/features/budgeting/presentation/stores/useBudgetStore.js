@@ -6,6 +6,8 @@ import { BudgetRepository } from "../../data/repository/BudgetRepository";
 import { GetDashboardSummaryUseCase } from "../../domain/use-case/GetDashboardSummaryUseCase";
 import { GetAiAdviceUseCase } from "../../domain/use-case/GetAiAdviceUseCase";
 import { CreateTransactionUseCase } from "../../domain/use-case/CreateTransactionUseCase";
+import { GetCategoriesUseCase } from "../../domain/use-case/GetCategoriesUseCase";
+4;
 
 const budgetRepository = new BudgetRepository();
 const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(
@@ -13,6 +15,7 @@ const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(
 );
 const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
 const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
+const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -22,6 +25,8 @@ export const useBudgetStore = defineStore("budget", () => {
   const isLoadingSummary = ref(false);
   const errorSummary = ref(null);
   const isTransactionSubmitting = ref(false);
+  const categoriesList = ref([]); // Menyimpan array CategoryEntity
+  const isLoadingCategories = ref(false); // Status loading dropdown
 
   // =========================================
   // 🧠 GETTERS
@@ -33,6 +38,9 @@ export const useBudgetStore = defineStore("budget", () => {
   const currentPeriodMonth = computed(() => summaryData.value?.month || "-");
   const hasData = computed(
     () => !!summaryData.value && !isLoadingSummary.value
+  );
+  const expenseCategories = computed(() =>
+    categoriesList.value.filter((c) => c.type === "EXPENSE")
   );
 
   // =========================================
@@ -104,18 +112,50 @@ export const useBudgetStore = defineStore("budget", () => {
       return { success: false, message: result.left?.message };
     }
   }
+  /**
+   * ACTION BARU: Mengambil daftar semua kategori untuk dropdown form
+   * Biasanya dipanggil saat modal transaksi dibuka
+   */
+  async function fetchAllCategories() {
+    // Jika data sudah ada, tidak perlu fetch ulang (caching sederhana)
+    if (categoriesList.value.length > 0) return;
+
+    console.log("⚡ [STORE ACTION] fetchAllCategories dipanggil!");
+    isLoadingCategories.value = true;
+
+    const result = await getCategoriesUseCase.execute();
+
+    // Cek hasil (menggunakan properti .right sesuai struktur failure.js kamu)
+    if (result.right) {
+      categoriesList.value = result.right; // Simpan array entity
+      console.log(
+        "✅ Kategori berhasil dimuat:",
+        categoriesList.value.length,
+        "item"
+      );
+    } else {
+      console.error("❌ Gagal memuat kategori:", result.left?.message);
+      // Opsional: Bisa set error state khusus jika perlu ditampilkan di UI dropdown
+    }
+
+    isLoadingCategories.value = false;
+  }
 
   return {
     summaryData,
     isLoadingSummary,
     errorSummary,
+    categoriesList,
+    isLoadingCategories,
     isTransactionSubmitting,
     budgetCategories,
     totalRemaining,
     currentPeriodMonth,
     hasData,
     fetchDashboardSummary,
+    expenseCategories,
     fetchAiAdviceForCategory,
     submitTransaction,
+    fetchAllCategories,
   };
 });

@@ -1,105 +1,5 @@
-<template>
-  <TransitionRoot appear :show="isOpen" as="template">
-    <Dialog as="div" @close="!loading && emit('close')" class="relative z-50">
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black/50" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="flex min-h-full items-center justify-center p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all"
-            >
-              <slot name="header">
-                <DialogTitle
-                  as="h3"
-                  class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-500"
-                >
-                  Judul Modal Default
-                </DialogTitle>
-              </slot>
-
-              <div class="mt-4">
-                <slot name="body">
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Konten body modal default.
-                  </p>
-                </slot>
-              </div>
-
-              <div class="mt-6 flex justify-end space-x-3">
-                <slot name="footer">
-                  <div
-                    v-if="loading"
-                    class="flex items-center justify-center w-full"
-                  >
-                    <svg
-                      class="animate-spin h-5 w-5 text-[var(--color-violet-600)]"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div v-else class="flex justify-end space-x-3">
-                    <button
-                      @click="emit('close')"
-                      type="button"
-                      class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      @click="emit('confirm')"
-                      type="button"
-                      class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] border border-transparent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-violet-500)] focus-visible:ring-offset-2"
-                    >
-                      Konfirmasi
-                    </button>
-                  </div>
-                </slot>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
-</template>
-
 <script setup>
+import { computed } from 'vue';
 import {
   TransitionRoot,
   TransitionChild,
@@ -108,10 +8,107 @@ import {
   DialogTitle,
 } from "@headlessui/vue";
 
-defineProps({
+// Kita simpan defineProps ke variabel 'props' agar bisa diakses di dalam computed
+const props = defineProps({
   isOpen: { type: Boolean, required: true },
   loading: { type: Boolean, default: false },
+  hideFooter: { type: Boolean, default: false },
+  // Prop untuk mengontrol ukuran modal
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'].includes(value)
+  }
 });
 
 const emit = defineEmits(["close", "confirm"]);
+
+// Logika untuk menentukan lebar modal berdasarkan prop 'size'
+const maxWidthClass = computed(() => {
+  switch (props.size) {
+    case 'sm': return 'max-w-sm';
+    case 'md': return 'max-w-md';
+    case 'lg': return 'max-w-lg';
+    case 'xl': return 'max-w-xl';
+    case '2xl': return 'max-w-2xl';
+    case '3xl': return 'max-w-3xl';
+    case '4xl': return 'max-w-4xl';
+    case '5xl': return 'max-w-5xl';
+    default: return 'max-w-md';
+  }
+});
 </script>
+
+<template>
+  <TransitionRoot appear :show="isOpen" as="template">
+    <Dialog as="div" @close="!loading && emit('close')" class="relative z-50">
+      <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+        leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-black/50 bg-opacity-75 transition-opacity" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+          <TransitionChild as="template" enter="duration-300 ease-out"
+            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="duration-200 ease-in"
+            leave-from="opacity-100 translate-y-0 sm:scale-100"
+            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+            <DialogPanel :class="[
+              'relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 w-full',
+              maxWidthClass
+            ]">
+
+              <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                      <slot name="header">
+                        Judul Default
+                      </slot>
+                    </DialogTitle>
+
+                    <div class="mt-4">
+                      <slot name="body">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Konten default...</p>
+                      </slot>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="!hideFooter"
+                class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <slot name="footer">
+                  <button type="button"
+                    class="inline-flex w-full justify-center rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="loading" @click="emit('confirm')">
+                    <span v-if="loading" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                      </svg>
+                      Memproses...
+                    </span>
+                    <span v-else>Konfirmasi</span>
+                  </button>
+                  <button type="button"
+                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto"
+                    @click="emit('close')" :disabled="loading">
+                    Batal
+                  </button>
+                </slot>
+              </div>
+
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+</template>

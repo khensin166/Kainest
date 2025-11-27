@@ -1,6 +1,7 @@
 // src/features/budgeting/data/mappers/BudgetMapper.js
 import { BudgetSummaryEntity } from "../../domain/entities/BudgetSummaryEntity";
 import { TransactionEntity } from "../../domain/entities/TransactionEntity";
+import { CategoryEntity } from "../../domain/entities/CategoryEntity";
 
 export const BudgetMapper = {
   /**
@@ -11,17 +12,20 @@ export const BudgetMapper = {
   mapSummaryListFromApi(apiCategories) {
     if (!apiCategories || !Array.isArray(apiCategories)) return [];
 
-    return apiCategories.map(cat => new BudgetSummaryEntity({
-      categoryId: cat.categoryId,
-      categoryName: cat.categoryName,
-      icon: cat.icon,
-      limit: cat.limit,
-      spent: cat.spent,
-      remaining: cat.remaining,
-      percentageUsed: cat.percentage_used,
-      status: cat.status // 'SAFE' | 'WARNING' | 'OVERBUDGET'
-      // Zone & AI Advice masih null di tahap ini
-    }));
+    return apiCategories.map(
+      (cat) =>
+        new BudgetSummaryEntity({
+          categoryId: cat.categoryId,
+          categoryName: cat.categoryName,
+          icon: cat.icon,
+          limit: cat.limit,
+          spent: cat.spent,
+          remaining: cat.remaining,
+          percentageUsed: cat.percentage_used,
+          status: cat.status, // 'SAFE' | 'WARNING' | 'OVERBUDGET'
+          // Zone & AI Advice masih null di tahap ini
+        })
+    );
   },
 
   /**
@@ -37,7 +41,7 @@ export const BudgetMapper = {
     return new BudgetSummaryEntity({
       ...summaryEntity, // Copy properti lama
       zone: apiAdviceData.zone, // Tambahkan data baru
-      aiAdvice: apiAdviceData.advice
+      aiAdvice: apiAdviceData.advice,
     });
   },
 
@@ -55,7 +59,27 @@ export const BudgetMapper = {
       date: apiTransaction.date,
       // Asumsi API transaksi include data kategori
       categoryName: apiTransaction.category?.name,
-      categoryIcon: apiTransaction.category?.icon
+      categoryIcon: apiTransaction.category?.icon,
     });
-  }
+  },
+
+  /**
+   * Mengubah array kategori mentah dari API /budget/categories menjadi array CategoryEntity
+   * @param {Array} apiCategoriesList
+   * @returns {CategoryEntity[]}
+   */
+  mapCategoryListFromApi(apiCategoriesList) {
+    if (!apiCategoriesList || !Array.isArray(apiCategoriesList)) return [];
+
+    return apiCategoriesList.map(
+      (cat) =>
+        new CategoryEntity({
+          id: cat.id,
+          name: cat.name,
+          type: cat.type,
+          icon: cat.icon,
+          isDefault: cat.isDefault,
+        })
+    );
+  },
 };

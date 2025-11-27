@@ -94,4 +94,39 @@ export class BudgetRepository {
       );
     }
   }
+
+  /**
+   * Mengambil daftar kategori untuk dropdown dan mengubahnya jadi Entity
+   * @returns {Promise<Either<Failure, CategoryEntity[]>>}
+   */
+  async getCategories() {
+    try {
+      const response = await this.remoteSource.getCategories();
+
+      if (response.success) {
+        // Data kategori ada di response.data (array)
+        const rawList = response.data || [];
+        // Mapping ke Entity
+        const entities = BudgetMapper.mapCategoryListFromApi(rawList);
+        // Bungkus dengan right() (Sukses)
+        return right(entities);
+      } else {
+        // Bungkus error dengan left() (Gagal)
+        return left(
+          new ServerFailure(
+            response.message || "Gagal mengambil daftar kategori."
+          )
+        );
+      }
+    } catch (error) {
+      // Tangkap error jaringan/axios
+      return left(
+        new ServerFailure(
+          error.response?.data?.message ||
+            error.message ||
+            "Terjadi kesalahan koneksi."
+        )
+      );
+    }
+  }
 }
