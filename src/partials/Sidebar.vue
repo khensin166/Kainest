@@ -125,6 +125,7 @@ import {
   PencilSquareIcon,
   ChatBubbleBottomCenterTextIcon,
   BanknotesIcon,
+  ReceiptRefundIcon,
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -183,6 +184,11 @@ export default {
             name: "Budgeting",
             path: "/app/budgeting",
             iconComponent: BanknotesIcon,
+          },
+          {
+            name: "transactions",
+            path: "/app/transactions",
+            iconComponent: ReceiptRefundIcon,
           },
           {
             name: "WhatsApp Bot",

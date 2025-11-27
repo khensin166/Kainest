@@ -8,6 +8,10 @@ import { CreateTransactionUseCase } from "../../domain/use-case/CreateTransactio
 import { GetCategoriesUseCase } from "../../domain/use-case/GetCategoriesUseCase";
 import { BudgetRepository } from "../../data/repository/BudgetRepository";
 import { GetSpendingTrendUseCase } from "../../domain/use-case/GetSpendingTrendUseCase";
+import { GetTransactionsListUseCase } from "../../domain/use-case/GetTransactionsListUseCase";
+import { GetTransactionDetailUseCase } from "../../domain/use-case/GetTransactionDetailUseCase";
+import { UpdateTransactionUseCase } from "../../domain/use-case/UpdateTransactionUseCase";
+import { DeleteTransactionUseCase } from "../../domain/use-case/DeleteTransactionUseCase";
 
 4;
 
@@ -19,6 +23,14 @@ const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
 const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
 const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
 const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
+const getTransactionsListUseCase = new GetTransactionsListUseCase(
+  budgetRepository
+);
+const getTransactionDetailUseCase = new GetTransactionDetailUseCase(
+  budgetRepository
+);
+const updateTransactionUseCase = new UpdateTransactionUseCase(budgetRepository);
+const deleteTransactionUseCase = new DeleteTransactionUseCase(budgetRepository);
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -32,6 +44,11 @@ export const useBudgetStore = defineStore("budget", () => {
   const isLoadingCategories = ref(false); // Status loading dropdown
   const trendDataList = ref([]); // Menyimpan array TrendDataEntity penuh satu bulan
   const isLoadingTrend = ref(false);
+  const transactionsList = ref([]); // Array TransactionEntity
+  const transactionsMeta = ref(null); // Object pagination { currentPage, totalPages, ... }
+  const isLoadingTransactions = ref(false);
+  // Menyimpan ID transaksi yang sedang dihapus agar bisa menampilkan spinner di tombol spesifik
+  const isDeletingTransactionId = ref(null);
 
   // =========================================
   // 🧠 GETTERS
@@ -71,6 +88,12 @@ export const useBudgetStore = defineStore("budget", () => {
       ],
     };
   });
+
+  // --- BARU: GETTER UNTUK PAGINATION ---
+  const currentPage = computed(() => transactionsMeta.value?.currentPage || 1);
+  const totalPages = computed(() => transactionsMeta.value?.totalPages || 1);
+  const hasNextPage = computed(() => currentPage.value < totalPages.value);
+  const hasPreviousPage = computed(() => currentPage.value > 1);
   // =========================================
   // ⚡ ACTIONS (DIPERBAIKI DISINI)
   // =========================================
@@ -190,6 +213,119 @@ export const useBudgetStore = defineStore("budget", () => {
     isLoadingTrend.value = false;
   }
 
+  /**
+   * CREATE: Membuat transaksi baru (Existing)
+   */
+  async function submitTransaction(transactionData) {
+    isTransactionSubmitting.value = true;
+    const result = await createTransactionUseCase.execute(transactionData);
+    isTransactionSubmitting.value = false;
+
+    if (result.right) {
+      // Refresh dashboard dan list transaksi (jika sedang dibuka) agar data sinkron
+      await fetchDashboardSummary();
+      // Kita tidak await ini agar UI lebih responsif, biarkan refresh di background
+      fetchTransactions({ page: 1 });
+      return { success: true };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
+  /**
+   * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
+   * @param {object} params - { page, limit, startDate, endDate }
+   */
+  async function fetchTransactions(params = {}) {
+    console.log("⚡ [STORE ACTION] fetchTransactions dipanggil:", params);
+    isLoadingTransactions.value = true;
+
+    // Set default params jika tidak ada
+    const finalParams = { page: 1, limit: 10, ...params };
+
+    const result = await getTransactionsListUseCase.execute(finalParams);
+
+    if (result.right) {
+      // Simpan data list dan metadata pagination
+      transactionsList.value = result.right.transactions;
+      transactionsMeta.value = result.right.meta;
+      console.log(
+        `✅ List transaksi dimuat: ${transactionsList.value.length} item (Page ${transactionsMeta.value.currentPage}/${transactionsMeta.value.totalPages})`
+      );
+    } else {
+      console.error("❌ Gagal memuat list transaksi:", result.left?.message);
+      // Opsional: set error state khusus list
+    }
+    isLoadingTransactions.value = false;
+  }
+
+  /**
+   * BARU: READ DETAIL - Mengambil satu data untuk pre-fill form edit
+   * @param {string} id
+   * @returns {TransactionEntity | null}
+   */
+  async function fetchTransactionById(id) {
+    isLoadingTransactions.value = true; // Gunakan loading global atau buat khusus
+    const result = await getTransactionDetailUseCase.execute(id);
+    isLoadingTransactions.value = false;
+
+    if (result.right) {
+      return result.right; // Kembalikan entity langsung ke komponen pemanggil
+    } else {
+      console.error(
+        "❌ Gagal mengambil detail transaksi:",
+        result.left?.message
+      );
+      return null;
+    }
+  }
+
+  /**
+   * BARU: UPDATE - Menyimpan perubahan transaksi
+   * @param {string} id
+   * @param {object} updateData
+   */
+  async function updateTransaction(id, updateData) {
+    isTransactionSubmitting.value = true; // Re-use state loading form
+    const result = await updateTransactionUseCase.execute(id, updateData);
+    isTransactionSubmitting.value = false;
+
+    if (result.right) {
+      // Refresh data agar UI sinkron
+      await fetchDashboardSummary(); // Update sisa uang di dashboard
+      // Refresh halaman list saat ini agar data yang diedit berubah
+      if (transactionsMeta.value?.currentPage) {
+        fetchTransactions({ page: transactionsMeta.value.currentPage });
+      }
+      return { success: true };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
+  /**
+   * BARU: DELETE - Menghapus transaksi
+   * @param {string} id
+   */
+  async function deleteTransaction(id) {
+    // Set ID yang sedang dihapus untuk loading spinner spesifik
+    isDeletingTransactionId.value = id;
+
+    const result = await deleteTransactionUseCase.execute(id);
+
+    isDeletingTransactionId.value = null; // Reset loading
+
+    if (result.right) {
+      // Refresh data
+      await fetchDashboardSummary(); // Update sisa uang
+      // Refresh halaman list (kembali ke page 1 jaga-jaga jika item terakhir di page tersebut dihapus)
+      fetchTransactions({ page: 1 });
+      return { success: true };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
   return {
     summaryData,
     isLoadingSummary,
@@ -197,12 +333,20 @@ export const useBudgetStore = defineStore("budget", () => {
     trendDataList,
     isLoadingTrend,
     categoriesList,
+    transactionsList,
+    transactionsMeta,
+    isLoadingTransactions,
+    isDeletingTransactionId,
     isLoadingCategories,
     isTransactionSubmitting,
     budgetCategories,
     totalRemaining,
     currentPeriodMonth,
     hasData,
+    transactionsList,
+    transactionsMeta,
+    isLoadingTransactions,
+    isDeletingTransactionId,
     fetchDashboardSummary,
     chartDataCollection,
     expenseCategories,
@@ -210,5 +354,9 @@ export const useBudgetStore = defineStore("budget", () => {
     submitTransaction,
     fetchSpendingTrend,
     fetchAllCategories,
+    fetchTransactions,
+    fetchTransactionById,
+    updateTransaction,
+    deleteTransaction,
   };
 });

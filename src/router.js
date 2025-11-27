@@ -21,6 +21,7 @@ import NotesPage from "./features/notes/presentation/pages/NotesPage.vue";
 import NoteEditorPage from "./features/notes/presentation/pages/NoteEditorPage.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
 import BudgetDashboardPage from "./features/budgeting/presentation/pages/BudgetDashboardPage.vue";
+import TransactionListPage from "./features/budgeting/presentation/pages/TransactionListPage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -104,6 +105,11 @@ const routes = [
         path: "budgeting",
         name: "budgeting",
         component: BudgetDashboardPage,
+      },
+      {
+        path: "transactions",
+        name: "TransactionList",
+        component: TransactionListPage,
       },
       {
         path: "wabot",

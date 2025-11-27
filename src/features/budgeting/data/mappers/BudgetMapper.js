@@ -124,4 +124,15 @@ export const BudgetMapper = {
 
     return fullMonthData;
   },
+
+  /**
+   * BARU: Mengubah array transaksi mentah dari API menjadi array TransactionEntity
+   * @param {Array} apiTransactionList
+   * @returns {TransactionEntity[]}
+   */
+  mapTransactionListFromApi(apiTransactionList) {
+    if (!apiTransactionList || !Array.isArray(apiTransactionList)) return [];
+    // Kita gunakan ulang mapper satuan yang sudah ada
+    return apiTransactionList.map((item) => this.mapTransactionFromApi(item));
+  },
 };

@@ -159,4 +159,94 @@ export class BudgetRepository {
       );
     }
   }
+
+  /**
+   * BARU: Mengambil daftar transaksi (pagination)
+   * Returns: { data: Entity[], meta: Object }
+   */
+  async getTransactions(params) {
+    try {
+      const response = await this.remoteSource.getTransactions(params);
+      if (response.success) {
+        const entities = BudgetMapper.mapTransactionListFromApi(response.data);
+        // Kita kembalikan data yang sudah dimapping DAN metadata pagination
+        return right({
+          transactions: entities,
+          meta: response.meta, // { totalItems, totalPages, currentPage, ... }
+        });
+      } else {
+        return left(
+          new ServerFailure(
+            response.message || "Gagal mengambil daftar transaksi."
+          )
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message)
+      );
+    }
+  }
+
+  /**
+   * BARU: Mengambil detail satu transaksi untuk diedit
+   */
+  async getTransactionById(id) {
+    try {
+      const response = await this.remoteSource.getTransactionById(id);
+      if (response.success && response.data) {
+        const entity = BudgetMapper.mapTransactionFromApi(response.data);
+        return right(entity);
+      } else {
+        return left(
+          new ServerFailure(response.message || "Transaksi tidak ditemukan.")
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message)
+      );
+    }
+  }
+
+  /**
+   * BARU: Update transaksi
+   */
+  async updateTransaction(id, data) {
+    try {
+      const response = await this.remoteSource.updateTransaction(id, data);
+      if (response.success) {
+        // Opsional: kembalikan data yang baru diupdate jika perlu
+        return right(true);
+      } else {
+        return left(
+          new ServerFailure(response.message || "Gagal mengupdate transaksi.")
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message)
+      );
+    }
+  }
+
+  /**
+   * BARU: Hapus transaksi
+   */
+  async deleteTransaction(id) {
+    try {
+      const response = await this.remoteSource.deleteTransaction(id);
+      if (response.success) {
+        return right(true); // Sukses
+      } else {
+        return left(
+          new ServerFailure(response.message || "Gagal menghapus transaksi.")
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message)
+      );
+    }
+  }
 }
