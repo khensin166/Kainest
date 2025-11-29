@@ -2,10 +2,7 @@
 import { ref, watch, onMounted } from 'vue';
 import flatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
-// Tema gelap opsional untuk flatpickr
-// import 'flatpickr/dist/themes/dark.css'; 
 
-// Menerima v-model dari parent (berupa array string [startDate, endDate] atau null)
 const props = defineProps({
     modelValue: {
         type: Array,

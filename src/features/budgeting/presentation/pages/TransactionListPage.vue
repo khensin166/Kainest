@@ -1,22 +1,20 @@
 <!-- TransactionListPage.vue -->
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
-// Import komponen reusable yang baru direfactor (sesuaikan path)
 import Datepicker from '@/components/forms/Datepicker.vue';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
-// Import komponen item transaksi
 import TransactionItem from '../components/TransactionItem.vue';
+import { debounce } from '../../../../utils/debounce';
 
 const budgetStore = useBudgetStore();
 
 // State untuk filter (menggunakan v-model komponen)
-const dateRange = ref(null); // Akan berisi [startDate, endDate] dari Datepicker
-const limitPerPage = ref(1); // Default limit
+const dateRange = ref(null);
+const limitPerPage = ref(10);
 
 // Opsi untuk dropdown limit
 const limitOptions = [
-  { label: '1 Halaman', value: 1 },
   { label: '10 Halaman', value: 10 },
   { label: '25 Halaman', value: 25 },
   { label: '50 Halaman', value: 50 },
@@ -38,12 +36,38 @@ const loadTransactions = (page = 1) => {
   });
 };
 
-// Watcher: Reload data otomatis saat filter berubah
-watch([dateRange, limitPerPage], () => {
-  loadTransactions(1); // Reset ke halaman 1 saat filter berubah
+const debouncedLoadTransactions = debounce(() => {
+  loadTransactions(1);
+}, 500);
+
+// 🔥 2. SOLUSI PAMUNGKAS: Buat Computed Property Stabil 🔥
+// Kita ubah array dateRange menjadi string JSON.
+// Jika isinya sama (misal ["2025-01-01"], stringnya akan selalu sama.
+// Ini mencegah trigger watcher karena perubahan referensi array.
+const dateRangeStable = computed(() => {
+  return dateRange.value ? JSON.stringify(dateRange.value) : null;
 });
 
-// Pagination handlers (tetap sama)
+
+// 🔥 3. UBAH WATCHER 🔥
+// Jangan watch 'dateRange' langsung, tapi watch 'dateRangeStable'
+watch([dateRangeStable, limitPerPage], ([newDateStr, newLimit], [oldDateStr, oldLimit]) => {
+  // Logika debugging bisa kita sederhanakan sekarang karena pemicunya sudah stabil
+  console.log("🔍 Watcher Filter Stabil Terpanggil");
+  console.log(`Date berubah: ${oldDateStr !== newDateStr}`);
+  console.log(`Limit berubah: ${oldLimit !== newLimit}`);
+
+  // Panggil fungsi debounced
+  debouncedLoadTransactions();
+});
+
+const clearFilters = () => {
+  // 1. Reset state filter ke nilai default
+  dateRange.value = null;
+  limitPerPage.value = 10;
+
+};
+
 const nextPage = () => { if (budgetStore.hasNextPage) loadTransactions(budgetStore.currentPage + 1); };
 const prevPage = () => { if (budgetStore.hasPreviousPage) loadTransactions(budgetStore.currentPage - 1); };
 
@@ -72,6 +96,10 @@ onMounted(() => {
         <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
 
         <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
+        <button v-if="dateRange || limitPerPage !== 1" @click="clearFilters"
+          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400">
+          <span class="hidden xs:block ml-2">Hapus Filter</span>
+        </button>
       </div>
     </div>
 

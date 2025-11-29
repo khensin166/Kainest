@@ -17,7 +17,6 @@
     note: "",
   });
 
-  // Fetch kategori saat form dibuka pertama kali
   onMounted(() => {
     budgetStore.fetchAllCategories();
   });
