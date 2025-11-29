@@ -48,6 +48,16 @@ const dateRangeStable = computed(() => {
   return dateRange.value ? JSON.stringify(dateRange.value) : null;
 });
 
+const isFilterActive = computed(() => {
+  // Cek apakah array tanggal ada isinya
+  const hasDateFilter = dateRange.value !== null && dateRange.value.length > 0;
+  // Cek apakah limit halaman berbeda dari default (asumsi defaultnya 1)
+  const hasLimitFilter = limitPerPage.value !== 1;
+
+  // Return true jika salah satu kondisi terpenuhi
+  return hasDateFilter || hasLimitFilter;
+});
+
 
 // 🔥 3. UBAH WATCHER 🔥
 // Jangan watch 'dateRange' langsung, tapi watch 'dateRangeStable'
@@ -96,9 +106,19 @@ onMounted(() => {
         <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
 
         <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
-        <button v-if="dateRange || limitPerPage !== 1" @click="clearFilters"
-          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400">
-          <span class="hidden xs:block ml-2">Hapus Filter</span>
+        <button v-if="isFilterActive" @click="clearFilters"
+          class="btn border transition-colors duration-200 flex items-center px-3" :class="[
+            isFilterActive
+              ? 'bg-violet-50 text-violet-600 border-violet-200 hover:bg-violet-100 hover:border-violet-300 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-700/50 dark:hover:bg-violet-900/40' // Warna UNGU saat aktif
+              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400' // Warna ABU saat tidak aktif (fallback)
+          ]">
+
+          <svg class="w-4 h-4 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M19 7a1 1 0 0 0-1 1v11.191A1.92 1.92 0 0 1 15.99 21H8.01A1.92 1.92 0 0 1 6 19.191V8a1 1 0 0 0-2 0v11.191A3.918 3.918 0 0 0 8.01 23h7.98A3.918 3.918 0 0 0 20 19.191V8a1 1 0 0 0-1-1Zm1-3h-4V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2ZM10 4V3h4v1Z" />
+          </svg>
+
+          <span class="hidden sm:block ml-2">Hapus Filter</span>
         </button>
       </div>
     </div>
