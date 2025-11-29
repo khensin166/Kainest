@@ -15,10 +15,12 @@ const budgetStore = useBudgetStore();
 const isTransactionModalOpen = ref(false);
 
 const openTransactionModal = () => {
+  console.log("🔓 openTransactionModal dipanggil. isTransactionModalOpen = true");
   isTransactionModalOpen.value = true;
 };
 
 const closeTransactionModal = () => {
+  console.log("🔒 closeTransactionModal dipanggil. isTransactionModalOpen = false");
   isTransactionModalOpen.value = false;
 };
 

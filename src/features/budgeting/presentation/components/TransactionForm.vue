@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, computed, onMounted, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 
 // Define emits untuk memberi tahu parent (Modal) kapan harus ditutup
@@ -37,18 +37,30 @@ const formattedAmountPreview = computed(() => {
 const handleSubmit = async () => {
   if (!isFormValid.value || budgetStore.isTransactionSubmitting) return;
 
-  // Panggil action di store
-  // Kita spread (...) formData agar mengirim copy objek, bukan referensi reaktif
+  // Panggil action di store (ini yang memicu update besar-besaran)
   const result = await budgetStore.submitTransaction({ ...formData });
 
   if (result.success) {
-    // Jika sukses, reset form dan tutup modal
+    // 🔥 PERBAIKAN KRUSIAL DI SINI 🔥
+
+    // Kita minta Vue untuk menunggu satu "tick" (siklus update DOM)
+    // Ini memastikan semua efek samping dari fetchDashboardSummary sudah selesai
+    await nextTick();
+
+    // Setelah DOM stabil, baru kita reset formnya
     formData.amount = null;
     formData.categoryId = "";
     formData.note = "";
-    emit('close'); 
+    // Reset tanggal ke hari ini lagi agar tidak kosong
+    formData.date = new Date().toISOString().split('T')[0];
+
+    console.log("✅ Data di-reset, mengirim sinyal close ke parent...");
+
+    // Terakhir, kirim sinyal untuk menutup modal
+    emit('close');
+
   } else {
-    // Handle error sederhana (bisa diganti toast notification nanti)
+    // Handle error
     alert(`Gagal menyimpan: ${result.message}`);
   }
 };
@@ -56,7 +68,7 @@ const handleSubmit = async () => {
 
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4">
-    
+
     <div>
       <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Jumlah Pengeluaran
@@ -65,15 +77,9 @@ const handleSubmit = async () => {
         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <span class="text-gray-500 sm:text-sm">Rp</span>
         </div>
-        <input
-          type="number"
-          id="amount"
-          v-model.number="formData.amount"
-          min="1"
+        <input type="number" id="amount" v-model.number="formData.amount" min="1"
           class="block w-full rounded-md border-gray-300 dark:border-gray-600 pl-10 pr-4 py-2 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm placeholder-gray-400"
-          placeholder="0"
-          required
-        />
+          placeholder="0" required />
       </div>
       <p v-if="formData.amount > 0" class="mt-1 text-xs text-violet-600 dark:text-violet-400 font-medium">
         {{ formattedAmountPreview }}
@@ -84,19 +90,11 @@ const handleSubmit = async () => {
       <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Kategori
       </label>
-      <select
-        id="category"
-        v-model="formData.categoryId"
+      <select id="category" v-model="formData.categoryId"
         class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm"
-        required
-        :disabled="budgetStore.isLoadingCategories"
-      >
+        required :disabled="budgetStore.isLoadingCategories">
         <option value="" disabled>-- Pilih Kategori --</option>
-        <option 
-          v-for="cat in budgetStore.expenseCategories" 
-          :key="cat.id" 
-          :value="cat.id"
-        >
+        <option v-for="cat in budgetStore.expenseCategories" :key="cat.id" :value="cat.id">
           {{ cat.displayName }} </option>
       </select>
       <p v-if="budgetStore.isLoadingCategories" class="mt-1 text-xs text-gray-500 animate-pulse">
@@ -108,44 +106,37 @@ const handleSubmit = async () => {
       <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Tanggal
       </label>
-      <input
-        type="date"
-        id="date"
-        v-model="formData.date"
+      <input type="date" id="date" v-model="formData.date"
         class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm"
-        required
-      />
+        required />
     </div>
 
     <div>
       <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Catatan (Opsional)
       </label>
-      <textarea
-        id="note"
-        v-model="formData.note"
-        rows="2"
+      <textarea id="note" v-model="formData.note" rows="2"
         class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm placeholder-gray-400"
-        placeholder="Contoh: Makan siang nasi padang..."
-      ></textarea>
+        placeholder="Contoh: Makan siang nasi padang..."></textarea>
     </div>
 
     <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-      <button
-        type="button"
-        @click="emit('close')"
+      <button type="button" @click="emit('close')"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-        :disabled="budgetStore.isTransactionSubmitting"
-      >
+        :disabled="budgetStore.isTransactionSubmitting">
         Batal
       </button>
-      <button
-        type="submit"
+      <button type="submit"
         class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-violet-600 border border-transparent rounded-md hover:bg-violet-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="!isFormValid || budgetStore.isTransactionSubmitting"
-      >
+        :disabled="!isFormValid || budgetStore.isTransactionSubmitting">
         <span v-if="budgetStore.isTransactionSubmitting" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
           Menyimpan...
         </span>
         <span v-else>Simpan Pengeluaran</span>
