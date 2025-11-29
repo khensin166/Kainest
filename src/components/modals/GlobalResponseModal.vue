@@ -1,3 +1,4 @@
+<!-- GlobalResponModal -->
 <template>
   <BaseModal :isOpen="modalStore.isOpen" @close="modalStore.closeModal">
     <template #header>

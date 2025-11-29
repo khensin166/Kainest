@@ -2,17 +2,17 @@
   <script setup>
   import { reactive, computed, onMounted, inject } from 'vue';
   import { useBudgetStore } from '../stores/useBudgetStore';
+  import { useModalStore } from '../../../../stores/modalStore';
 
   const budgetStore = useBudgetStore();
+  const modalStore = useModalStore();
 
   // 3. Inject fungsi 'closeModalFunc' yang disediakan oleh parent
   const closeModalFunc = inject('closeModalFunc');
 
-  // State lokal untuk menampung data input form
   const formData = reactive({
     amount: null,
-    categoryId: "", // Akan diisi ID kategori yang dipilih
-    // Default tanggal hari ini format YYYY-MM-DD untuk input type="date"
+    categoryId: "",
     date: new Date().toISOString().split('T')[0],
     note: "",
   });
@@ -58,10 +58,18 @@
       } else {
         console.error("Inject 'closeModalFunc' tidak ditemukan!");
       }
+      modalStore.openModal({
+        newTitle: 'Transaksi Berhasil!',
+        newMessage: 'Data pengeluaran Anda telah berhasil disimpan.',
+        newStatus: 'success',
+      });
 
     } else {
-      // Handle error
-      alert(`Gagal menyimpan: ${result.message}`);
+      modalStore.openModal({
+        newTitle: 'Gagal Menyimpan',
+        newMessage: result.message || 'Terjadi kesalahan saat mencoba menyimpan data.',
+        newStatus: 'error',
+      });
     }
   };
 </script>
