@@ -1,8 +1,7 @@
 <!-- BudgetDashboard -->
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, provide } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
-// Import komponen-komponen yang baru kita buat
 import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
@@ -11,7 +10,6 @@ import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
-
 const isTransactionModalOpen = ref(false);
 
 const openTransactionModal = () => {
@@ -19,10 +17,14 @@ const openTransactionModal = () => {
   isTransactionModalOpen.value = true;
 };
 
+// Fungsi ini yang akan kita "provide"
 const closeTransactionModal = () => {
-  console.log("🔒 closeTransactionModal dipanggil. isTransactionModalOpen = false");
+  console.log("🔒 closeTransactionModal dipanggil lewat Inject. isTransactionModalOpen = false");
   isTransactionModalOpen.value = false;
 };
+
+// 2. Lakukan Provide. Kita beri nama kuncinya 'closeModalFunc'
+provide('closeModalFunc', closeTransactionModal);
 
 // Panggil data saat komponen dimount (dibuka pertama kali)
 onMounted(() => {
@@ -65,7 +67,8 @@ onMounted(() => {
 
     <div v-else-if="budgetStore.hasData" class="grid grid-cols-12 gap-6">
 
-      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :monthName="budgetStore.currentPeriodMonth" />
+      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :monthName="budgetStore.currentPeriodMonth"
+        :trendData="budgetStore.chartDataCollection" />
 
       <div
         class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">
@@ -108,7 +111,7 @@ onMounted(() => {
           Catat Pengeluaran Baru
         </template>
         <template #body>
-          <TransactionForm @close="closeTransactionModal" />
+          <TransactionForm />
         </template>
       </BaseModal>
     </div>

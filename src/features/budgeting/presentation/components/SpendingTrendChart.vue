@@ -1,3 +1,4 @@
+<!-- SpendingTrendCard.vue -->
 <script setup>
 // Import komponen Line dari vue-chartjs
 import { Line } from 'vue-chartjs'

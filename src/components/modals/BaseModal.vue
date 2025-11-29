@@ -23,6 +23,16 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "confirm"]);
 
+// --- FUNGSI HANDLER BARU ---
+// Fungsi ini hanya dipanggil oleh Headless UI saat klik luar/ESC
+const handleDialogClose = () => {
+  // Jangan tutup jika sedang loading (opsional, tergantung kebutuhan)
+  if (props.loading) return;
+
+  console.log("🛑 BaseModal: Dialog @close triggered (klik luar/ESC). Emitting 'close'...");
+  emit('close');
+};
+
 // Logika untuk menentukan lebar modal berdasarkan prop 'size'
 const maxWidthClass = computed(() => {
   switch (props.size) {
@@ -41,7 +51,7 @@ const maxWidthClass = computed(() => {
 
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
-    <Dialog as="div" @close="!loading && emit('close')" class="relative z-50">
+    <Dialog as="div" @close="handleDialogClose" class="relative z-50">
       <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
         leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-black/50 bg-opacity-75 transition-opacity" />

@@ -1,3 +1,4 @@
+// useBudgetStore.js
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
@@ -45,7 +46,6 @@ export const useBudgetStore = defineStore("budget", () => {
   const transactionsList = ref([]); // Array TransactionEntity
   const transactionsMeta = ref(null); // Object pagination { currentPage, totalPages, ... }
   const isLoadingTransactions = ref(false);
-  // Menyimpan ID transaksi yang sedang dihapus agar bisa menampilkan spinner di tombol spesifik
   const isDeletingTransactionId = ref(null);
 
   // =========================================
@@ -210,7 +210,7 @@ export const useBudgetStore = defineStore("budget", () => {
     isTransactionSubmitting.value = false;
 
     if (result.right) {
-      await fetchDashboardSummary();
+      fetchDashboardSummary();
       fetchTransactions({ page: 1 });
       return { success: true };
     } else {
@@ -266,7 +266,7 @@ export const useBudgetStore = defineStore("budget", () => {
     isTransactionSubmitting.value = false;
 
     if (result.right) {
-      await fetchDashboardSummary();
+      fetchDashboardSummary();
       if (transactionsMeta.value?.currentPage) {
         fetchTransactions({ page: transactionsMeta.value.currentPage });
       }
@@ -287,7 +287,7 @@ export const useBudgetStore = defineStore("budget", () => {
     isDeletingTransactionId.value = null;
 
     if (result.right) {
-      await fetchDashboardSummary();
+      fetchDashboardSummary();
       fetchTransactions({ page: 1 });
       return { success: true };
     } else {

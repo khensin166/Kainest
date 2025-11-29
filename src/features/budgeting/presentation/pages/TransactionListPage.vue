@@ -1,3 +1,4 @@
+<!-- TransactionListPage.vue -->
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
