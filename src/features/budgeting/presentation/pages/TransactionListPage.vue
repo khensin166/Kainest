@@ -1,13 +1,18 @@
 <!-- TransactionListPage.vue -->
 <script setup>
-import { onMounted, ref, watch, computed } from 'vue';
+import { onMounted, ref, watch, computed, provide } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import Datepicker from '@/components/forms/Datepicker.vue';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
 import TransactionItem from '../components/TransactionItem.vue';
 import { debounce } from '../../../../utils/debounce';
+import { useModalStore } from '../../../../stores/modalStore';
+import { DialogTitle } from '@headlessui/vue';
+import BaseModal from '@/components/modals/BaseModal.vue';
+import TransactionForm from '../components/TransactionForm.vue';
 
 const budgetStore = useBudgetStore();
+const modalStore = useModalStore();
 
 // State untuk filter (menggunakan v-model komponen)
 const dateRange = ref(null);
@@ -19,6 +24,15 @@ const limitOptions = [
   { label: '25 Halaman', value: 25 },
   { label: '50 Halaman', value: 50 },
 ];
+
+// ===========================
+// STATE UNTUK FITUR EDIT ✨
+// ===========================
+const isEditModalOpen = ref(false);
+// Menyimpan objek transaksi lengkap yang akan diedit
+const selectedTransactionToEdit = ref(null);
+// Computed untuk mendapatkan ID-nya saja (untuk prop form)
+const selectedTransactionId = computed(() => selectedTransactionToEdit.value?.id || null);
 
 // Fungsi Load Data
 const loadTransactions = (page = 1) => {
@@ -49,10 +63,8 @@ const dateRangeStable = computed(() => {
 });
 
 const isFilterActive = computed(() => {
-  // Cek apakah array tanggal ada isinya
   const hasDateFilter = dateRange.value !== null && dateRange.value.length > 0;
-  // Cek apakah limit halaman berbeda dari default (asumsi defaultnya 1)
-  const hasLimitFilter = limitPerPage.value !== 1;
+  const hasLimitFilter = limitPerPage.value !== 10;
 
   // Return true jika salah satu kondisi terpenuhi
   return hasDateFilter || hasLimitFilter;
@@ -72,7 +84,6 @@ watch([dateRangeStable, limitPerPage], ([newDateStr, newLimit], [oldDateStr, old
 });
 
 const clearFilters = () => {
-  // 1. Reset state filter ke nilai default
   dateRange.value = null;
   limitPerPage.value = 10;
 
@@ -81,10 +92,65 @@ const clearFilters = () => {
 const nextPage = () => { if (budgetStore.hasNextPage) loadTransactions(budgetStore.currentPage + 1); };
 const prevPage = () => { if (budgetStore.hasPreviousPage) loadTransactions(budgetStore.currentPage - 1); };
 
-// Action handlers (placeholder)
-const handleEditClick = (id) => alert("Fitur Edit segera hadir!");
-const handleDeleteClick = async (id) => {
-  if (confirm("Yakin hapus?")) await budgetStore.deleteTransaction(id);
+// ===========================
+// HANDLERS AKSI (EDIT & DELETE)
+// ===========================
+
+// ✨ Handler saat tombol EDIT diklik di TransactionItem
+// Menerima seluruh objek data transaksi
+const handleEditClick = (transactionData) => {
+  console.log("📝 Membuka modal EDIT untuk:", transactionData.categoryName);
+  // Isi state dengan data yang diterima dari child component
+  selectedTransactionToEdit.value = transactionData;
+  // Buka modal
+  isEditModalOpen.value = true;
+};
+
+// ✨ Fungsi untuk menutup modal edit dan mereset state
+const closeEditModal = () => {
+  console.log("🔒 Menutup modal edit.");
+  isEditModalOpen.value = false;
+  // Tunggu sebentar sebelum reset data agar transisi modal mulus
+  setTimeout(() => {
+    selectedTransactionToEdit.value = null;
+  }, 300);
+};
+
+// ✨ Provide fungsi close ini agar bisa dipanggil dari dalam TransactionForm
+provide('closeModalFunc', closeEditModal);
+
+// Handler saat tombol tong sampah di item diklik
+const handleDeleteClick = (id) => {
+  console.log("🗑️ Membuka Global Delete Modal untuk ID:", id);
+
+  // Panggil store untuk membuka modal global
+  modalStore.openDeleteModal({
+    title: 'Hapus Transaksi?', // Judul kustom (opsional)
+    message: 'Apakah Anda yakin ingin menghapus transaksi ini dari riwayat Anda?', // Pesan kustom (opsional)
+    // INI BAGIAN PENTING: Fungsi yang akan dijalankan jika user klik "Ya, Hapus"
+    onConfirm: async () => {
+      console.log("🔥 Eksekusi hapus dari Global Modal untuk ID:", id);
+      const result = await budgetStore.deleteTransaction(id);
+
+      if (result.success) {
+        // Tampilkan notifikasi sukses global
+        modalStore.openModal({
+          newTitle: 'Berhasil Dihapus',
+          newMessage: 'Transaksi telah berhasil dihapus.',
+          newStatus: 'success',
+        });
+        // Data list otomatis refresh
+      } else {
+        // Tampilkan notifikasi error global
+        modalStore.openModal({
+          newTitle: 'Gagal Menghapus',
+          newMessage: result.message || 'Terjadi kesalahan.',
+          newStatus: 'error',
+        });
+        throw new Error(result.message);
+      }
+    }
+  });
 };
 
 onMounted(() => {
@@ -104,7 +170,6 @@ onMounted(() => {
 
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
         <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
-
         <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
         <button v-if="isFilterActive" @click="clearFilters"
           class="btn border transition-colors duration-200 flex items-center px-3" :class="[
@@ -144,7 +209,7 @@ onMounted(() => {
           <div v-for="(transactions, groupName) in budgetStore.groupedTransactions" :key="groupName" class="mb-4">
 
             <header
-              class="text-xs uppercase text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-xs font-semibold p-2 mb-1 sticky top-0 z-10">
+              class="text-xs uppercase text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-xl font-semibold p-2 mb-1 sticky top-0 z-10">
               {{ groupName }}
             </header>
 
@@ -179,4 +244,13 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
+  <BaseModal :isOpen="isEditModalOpen" @close="closeEditModal" size="md" :hideFooter="true">
+    <template #header>
+      Edit Transaksi
+    </template>
+    <template #body>
+      <TransactionForm :initialData="selectedTransactionToEdit" :transactionId="selectedTransactionId" />
+    </template>
+  </BaseModal>
 </template>

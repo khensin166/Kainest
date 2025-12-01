@@ -1,3 +1,4 @@
+<!-- TransactionItem.vue -->
 <script setup>
 import { computed } from 'vue';
 
@@ -57,7 +58,7 @@ const formattedDate = computed(() => {
         
         <div class="flex space-x-2">
           <button 
-            @click="emit('edit', transaction.id)"
+            @click="emit('edit', transaction)"
             class="p-2 text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-700 rounded-full transition-colors"
             title="Edit Transaksi"
           >

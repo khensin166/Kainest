@@ -1,6 +1,6 @@
 <!-- BudgetDashboard -->
 <script setup>
-import { onMounted, ref, provide } from 'vue';
+import { onMounted, ref, provide, computed } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
@@ -10,9 +10,14 @@ import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
+
 const isTransactionModalOpen = ref(false);
+const selectedTransactionToEdit = ref(null);
+
+const selectedTransactionId = computed(() => selectedTransactionToEdit.value?.id || null);
 
 const openTransactionModal = () => {
+  selectedTransactionToEdit.value = null; // RESET state edit
   console.log("🔓 openTransactionModal dipanggil. isTransactionModalOpen = true");
   isTransactionModalOpen.value = true;
 };
@@ -23,6 +28,11 @@ const closeTransactionModal = () => {
   isTransactionModalOpen.value = false;
 };
 
+const handleEditTransaction = (transactionData) => {
+  console.log("📝 Membuka modal EDIT untuk:", transactionData.categoryName);
+  selectedTransactionToEdit.value = transactionData; // SET state edit dengan data yang diterima
+  isTransactionModalOpen.value = true; // Buka modal yang sama
+}
 // 2. Lakukan Provide. Kita beri nama kuncinya 'closeModalFunc'
 provide('closeModalFunc', closeTransactionModal);
 
@@ -105,13 +115,12 @@ onMounted(() => {
         :category="category" />
 
 
-      <BaseModal :isOpen="isTransactionModalOpen" @close="closeTransactionModal" title="Catat Pengeluaran Baru"
-        size="md" :hideFooter="true">
+      <BaseModal :isOpen="isTransactionModalOpen" @close="closeTransactionModal" size="md" :hideFooter="true">
         <template #header>
-          Catat Pengeluaran Baru
+          {{ selectedTransactionId ? 'Edit Transaksi' : 'Catat Pengeluaran Baru' }}
         </template>
         <template #body>
-          <TransactionForm />
+          <TransactionForm :initialData="selectedTransactionToEdit" :transactionId="selectedTransactionId" />
         </template>
       </BaseModal>
     </div>

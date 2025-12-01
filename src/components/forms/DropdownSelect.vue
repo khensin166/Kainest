@@ -67,24 +67,26 @@ const selectOption = (value) => {
       enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
       leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
       <div v-show="dropdownOpen" ref="dropdown"
-        class="origin-top-right z-10 absolute top-full min-w-[9rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
+        class="origin-top-right z-50 absolute top-full min-w-[9rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
         :class="align === 'right' ? 'right-0' : 'left-0'">
         <ul class="text-sm font-medium">
           <li v-for="option in options" :key="option.value">
             <button @click="selectOption(option.value)"
               class="flex items-center w-full px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors duration-150"
-              :class="modelValue === option.value ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-gray-600 dark:text-gray-300'">
+              :class="modelValue === option.value
+                ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-gray-700'
+                : 'text-gray-600 dark:text-gray-300'">
+
               <span class="grow text-left">{{ option.label }}</span>
-              <svg v-if="modelValue === option.value"
-                class="fill-current text-violet-600 dark:text-violet-400 shrink-0 ml-2" width="12" height="9"
-                viewBox="0 0 12 9">
-                <path
-                  d="M10.28.28L3.989 6.575 1.695 4.28A1 1 0 00.28 5.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28.28z" />
-              </svg>
+
+              <span v-if="modelValue === option.value"
+                class="shrink-0 ml-2 w-2 h-2 rounded-full bg-violet-600 dark:bg-violet-400">
+              </span>
+
             </button>
           </li>
         </ul>
       </div>
     </transition>
   </div>
-</template> 
+</template>
