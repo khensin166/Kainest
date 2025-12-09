@@ -58,7 +58,7 @@ export const BudgetMapper = {
       amount: apiTransaction.amount,
       note: apiTransaction.note,
       date: apiTransaction.date,
-      // Asumsi API transaksi include data kategori
+      categoryId: apiTransaction.categoryId,
       categoryName: apiTransaction.category?.name,
       categoryIcon: apiTransaction.category?.icon,
     });

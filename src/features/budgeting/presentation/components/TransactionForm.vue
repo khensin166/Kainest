@@ -1,3 +1,4 @@
+<!-- Transaction Form -->
 <script setup>
 import { reactive, computed, onMounted, inject, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
@@ -38,7 +39,25 @@ const populateForm = () => {
   if (isEditMode.value) {
     console.log("✏️ Mengisi form untuk EDIT:", props.initialData);
     formData.amount = props.initialData.amount;
-    formData.categoryId = props.initialData.categoryId;
+
+    // ============================================================
+    // 🔥 PERBAIKAN BUG DI SINI 🔥
+    // ============================================================
+    // Masalah: Log menunjukkan props.initialData tidak memiliki 'categoryId' di level teratas.
+    // Solusi: Kita coba cari ID tersebut di dua kemungkinan lokasi:
+    // 1. Level teratas: props.initialData.categoryId
+    // 2. Nested object: props.initialData.category.id (menggunakan optional chaining '?.' agar aman)
+    const targetCategoryId = props.initialData.categoryId || props.initialData.category?.id;
+
+    console.log("🔍 Mencoba menemukan Category ID...", {
+      diLevelAtas: props.initialData.categoryId,
+      diNested: props.initialData.category?.id,
+      hasilAkhir: targetCategoryId
+    });
+
+    // Jika ditemukan, ubah menjadi string dan masukkan ke formData
+    formData.categoryId = targetCategoryId ? String(targetCategoryId) : "";
+    // ============================================================
 
     // Format tanggal untuk input type="date"
     let dateValue = props.initialData.date;
@@ -63,7 +82,31 @@ const populateForm = () => {
 
 // Watcher: Isi form setiap kali props berubah.
 // Hapus { immediate: true } untuk menghindari race condition saat inisialisasi.
-watch(() => [props.initialData, props.transactionId], populateForm);
+// watch(() => [props.initialData, props.transactionId], populateForm);
+// =========================================
+// Watcher untuk Kategori (Race Condition Fix)
+// =========================================
+watch(
+  () => budgetStore.expenseCategories,
+  (newCategories) => {
+    if (newCategories && newCategories.length > 0 && isEditMode.value && props.initialData) {
+      console.log("🔄 Data kategori tiba. Mapping ulang dropdown...");
+
+      // 🔥 PERBAIKAN BUG DI SINI 🔥
+      // Kita coba ambil ID dari level teratas (.categoryId).
+      // Jika tidak ada, kita coba ambil dari objek nested (.category?.id).
+      // Optional chaining (?.) digunakan agar tidak error jika props.initialData.category bernilai null.
+      const targetCategoryId = props.initialData.categoryId || props.initialData.category?.id;
+
+      // Pastikan kita mendapatkan nilai sebelum mengubah formData
+      if (targetCategoryId) {
+        formData.categoryId = String(targetCategoryId);
+      }
+    }
+  },
+  { deep: true }
+);
+// =========================================
 
 onMounted(() => {
   budgetStore.fetchAllCategories();

@@ -1,6 +1,6 @@
 <!-- BudgetDashboard -->
 <script setup>
-import { onMounted, ref, provide, computed } from 'vue';
+import { onMounted, ref, provide, computed, onActivated } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
@@ -38,7 +38,15 @@ provide('closeModalFunc', closeTransactionModal);
 
 // Panggil data saat komponen dimount (dibuka pertama kali)
 onMounted(() => {
-  console.log("🖥️ [VUE PAGE] onMounted dipanggil! Memanggil store...");
+  if (!budgetStore.hasData) {
+    budgetStore.fetchDashboardSummary();
+    budgetStore.fetchSpendingTrend();
+  }
+});
+
+onActivated(() => {
+  console.log("👀 User kembali melihat Dashboard, cek data baru...");
+
   budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
 });

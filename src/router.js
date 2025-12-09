@@ -14,14 +14,9 @@ import GalleryPage from "./pages/Dashboard.vue";
 import CalendarPage from "./pages/Dashboard.vue";
 import VaultPage from "./pages/Dashboard.vue";
 import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vue";
-import WaBotPage from "./features/wabot/presentation/pages/WaBotPage.vue";
 import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
-import NotesPage from "./features/notes/presentation/pages/NotesPage.vue";
-import NoteEditorPage from "./features/notes/presentation/pages/NoteEditorPage.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
-import BudgetDashboardPage from "./features/budgeting/presentation/pages/BudgetDashboardPage.vue";
-import TransactionListPage from "./features/budgeting/presentation/pages/TransactionListPage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -69,17 +64,17 @@ const routes = [
       {
         path: "notes", // Daftar semua notes
         name: "Notes",
-        component: NotesPage,
+        component: () => import('./features/notes/presentation/pages/NotesPage.vue'),
       },
       {
         path: "notes/new", // Halaman editor untuk note BARU
         name: "NewNote",
-        component: NoteEditorPage,
+        component: () => import('./features/notes/presentation/pages/NoteEditorPage.vue'),
       },
       {
         path: "notes/:id", // Halaman editor untuk note yang SUDAH ADA
         name: "EditNote",
-        component: NoteEditorPage,
+        component: () => import('./features/notes/presentation/pages/NoteEditorPage.vue'),
       },
       {
         path: "gallery",
@@ -104,17 +99,17 @@ const routes = [
       {
         path: "budgeting",
         name: "budgeting",
-        component: BudgetDashboardPage,
+        component: () => import('./features/budgeting/presentation/pages/BudgetDashboardPage.vue'),
       },
       {
         path: "transactions",
         name: "TransactionList",
-        component: TransactionListPage,
+        component: () => import ('./features/budgeting/presentation/pages/TransactionListPage.vue'),
       },
       {
         path: "wabot",
         name: "wabot",
-        component: WaBotPage,
+        component: () => import('./features/wabot/presentation/pages/WaBotPage.vue'),
       },
     ],
   },

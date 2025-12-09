@@ -211,7 +211,7 @@ export const useBudgetStore = defineStore("budget", () => {
 
     if (result.right) {
       fetchDashboardSummary();
-      fetchTransactions({ page: 1 });
+      fetchTransactions({ page: 1 }, true);
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -221,8 +221,13 @@ export const useBudgetStore = defineStore("budget", () => {
   /**
    * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
    */
-  async function fetchTransactions(params = {}) {
-    console.log("⚡ [STORE ACTION] fetchTransactions dipanggil:", params);
+  async function fetchTransactions(params = {}, forceRefresh = false) {
+    if (transactionsList.value.length > 0 && !forceRefresh) {
+      console.log("⚡ Menggunakan data cache di Store (Tidak request API)");
+      return;
+    }
+
+    console.log("🌐 Mengambil data baru dari API...");
     isLoadingTransactions.value = true;
 
     const finalParams = { page: 1, limit: 10, ...params };
@@ -268,7 +273,7 @@ export const useBudgetStore = defineStore("budget", () => {
     if (result.right) {
       fetchDashboardSummary();
       if (transactionsMeta.value?.currentPage) {
-        fetchTransactions({ page: transactionsMeta.value.currentPage });
+        fetchTransactions({ page: transactionsMeta.value.currentPage }, true);
       }
       return { success: true };
     } else {
@@ -288,7 +293,7 @@ export const useBudgetStore = defineStore("budget", () => {
 
     if (result.right) {
       fetchDashboardSummary();
-      fetchTransactions({ page: 1 });
+      fetchTransactions({ page: 1 }, true);
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };

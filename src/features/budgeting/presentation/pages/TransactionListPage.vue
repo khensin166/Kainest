@@ -1,6 +1,12 @@
 <!-- TransactionListPage.vue -->
+
+<script>
+export default {
+  name: 'TransactionListPage'
+}
+</script>
 <script setup>
-import { onMounted, ref, watch, computed, provide } from 'vue';
+import { onMounted, ref, watch, computed, provide, onActivated } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import Datepicker from '@/components/forms/Datepicker.vue';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
@@ -35,7 +41,7 @@ const selectedTransactionToEdit = ref(null);
 const selectedTransactionId = computed(() => selectedTransactionToEdit.value?.id || null);
 
 // Fungsi Load Data
-const loadTransactions = (page = 1) => {
+const loadTransactions = (page = 1, force = false) => {
   let startDate, endDate;
   if (dateRange.value && dateRange.value.length === 2) {
     startDate = dateRange.value[0];
@@ -47,7 +53,7 @@ const loadTransactions = (page = 1) => {
     limit: limitPerPage.value,
     startDate: startDate,
     endDate: endDate
-  });
+  }, force);
 };
 
 const debouncedLoadTransactions = debounce(() => {
@@ -154,103 +160,112 @@ const handleDeleteClick = (id) => {
 };
 
 onMounted(() => {
-  loadTransactions(1);
+  console.log("🔴 MOUNTED (Halaman dibuat baru - Cache GAGAL)");
+  loadTransactions(1, true); // Ini harusnya cuma jalan 1x seumur hidup tab
+});
+
+onActivated(() => {
+  console.log("🟢 ACTIVATED (Halaman dari cache - Cache SUKSES)");
+  loadTransactions(budgetStore.currentPage, true);
+  // loadTransactions(1); // Jangan panggil ini dulu saat testing
 });
 </script>
 
 <template>
-  <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+  <div>
+    <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-    <div class="sm:flex sm:justify-between sm:items-center mb-8">
-      <div class="mb-4 sm:mb-0">
-        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
-          Riwayat Transaksi
-        </h1>
-      </div>
-
-      <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-        <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
-        <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
-        <button v-if="isFilterActive" @click="clearFilters"
-          class="btn border transition-colors duration-200 flex items-center px-3" :class="[
-            isFilterActive
-              ? 'bg-violet-50 text-violet-600 border-violet-200 hover:bg-violet-100 hover:border-violet-300 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-700/50 dark:hover:bg-violet-900/40' // Warna UNGU saat aktif
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400' // Warna ABU saat tidak aktif (fallback)
-          ]">
-
-          <svg class="w-4 h-4 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path
-              d="M19 7a1 1 0 0 0-1 1v11.191A1.92 1.92 0 0 1 15.99 21H8.01A1.92 1.92 0 0 1 6 19.191V8a1 1 0 0 0-2 0v11.191A3.918 3.918 0 0 0 8.01 23h7.98A3.918 3.918 0 0 0 20 19.191V8a1 1 0 0 0-1-1Zm1-3h-4V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2ZM10 4V3h4v1Z" />
-          </svg>
-
-          <span class="hidden sm:block ml-2">Hapus Filter</span>
-        </button>
-      </div>
-    </div>
-
-    <div
-      class="col-span-full bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60 relative">
-      <header class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60">
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100">Aktivitas Terakhir</h2>
-      </header>
-
-      <div class="p-3">
-
-        <div v-if="budgetStore.isLoadingTransactions" class="flex justify-center items-center h-32">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+      <div class="sm:flex sm:justify-between sm:items-center mb-8">
+        <div class="mb-4 sm:mb-0">
+          <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
+            Riwayat Transaksi
+          </h1>
         </div>
 
-        <div v-else-if="budgetStore.transactionsList.length === 0"
-          class="flex flex-col items-center justify-center h-32 text-gray-500">
-          <p>Tidak ada transaksi yang ditemukan.</p>
+        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+          <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
+          <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
+          <button v-if="isFilterActive" @click="clearFilters"
+            class="btn border transition-colors duration-200 flex items-center px-3" :class="[
+              isFilterActive
+                ? 'bg-violet-50 text-violet-600 border-violet-200 hover:bg-violet-100 hover:border-violet-300 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-700/50 dark:hover:bg-violet-900/40' // Warna UNGU saat aktif
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400' // Warna ABU saat tidak aktif (fallback)
+            ]">
+
+            <svg class="w-4 h-4 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M19 7a1 1 0 0 0-1 1v11.191A1.92 1.92 0 0 1 15.99 21H8.01A1.92 1.92 0 0 1 6 19.191V8a1 1 0 0 0-2 0v11.191A3.918 3.918 0 0 0 8.01 23h7.98A3.918 3.918 0 0 0 20 19.191V8a1 1 0 0 0-1-1Zm1-3h-4V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2ZM10 4V3h4v1Z" />
+            </svg>
+
+            <span class="hidden sm:block ml-2">Hapus Filter</span>
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="col-span-full bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60 relative">
+        <header class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60">
+          <h2 class="font-semibold text-gray-800 dark:text-gray-100">Aktivitas Terakhir</h2>
+        </header>
+
+        <div class="p-3">
+
+          <div v-if="budgetStore.isLoadingTransactions" class="flex justify-center items-center h-32">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+          </div>
+
+          <div v-else-if="budgetStore.transactionsList.length === 0"
+            class="flex flex-col items-center justify-center h-32 text-gray-500">
+            <p>Tidak ada transaksi yang ditemukan.</p>
+          </div>
+
+          <div v-else>
+            <div v-for="(transactions, groupName) in budgetStore.groupedTransactions" :key="groupName" class="mb-4">
+
+              <header
+                class="text-xs uppercase text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-xl font-semibold p-2 mb-1 sticky top-0 z-10">
+                {{ groupName }}
+              </header>
+
+              <ul class="my-1 space-y-2">
+                <li v-for="transaction in transactions" :key="transaction.id">
+                  <TransactionItem :transaction="transaction"
+                    :isDeleting="budgetStore.isDeletingTransactionId === transaction.id" @edit="handleEditClick"
+                    @delete="handleDeleteClick"
+                    class="!shadow-none !border-b !border-gray-100 dark:!border-gray-700/60 hover:!bg-gray-50 dark:hover:!bg-gray-700/20 rounded-none p-2" />
+                </li>
+              </ul>
+            </div>
+          </div>
+
         </div>
 
-        <div v-else>
-          <div v-for="(transactions, groupName) in budgetStore.groupedTransactions" :key="groupName" class="mb-4">
-
-            <header
-              class="text-xs uppercase text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-xl font-semibold p-2 mb-1 sticky top-0 z-10">
-              {{ groupName }}
-            </header>
-
-            <ul class="my-1 space-y-2">
-              <li v-for="transaction in transactions" :key="transaction.id">
-                <TransactionItem :transaction="transaction"
-                  :isDeleting="budgetStore.isDeletingTransactionId === transaction.id" @edit="handleEditClick"
-                  @delete="handleDeleteClick"
-                  class="!shadow-none !border-b !border-gray-100 dark:!border-gray-700/60 hover:!bg-gray-50 dark:hover:!bg-gray-700/20 rounded-none p-2" />
-              </li>
-            </ul>
+        <div v-if="budgetStore.transactionsList.length > 0"
+          class="px-5 py-3 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            Halaman <b>{{ budgetStore.currentPage }}</b> dari <b>{{ budgetStore.totalPages }}</b>
+          </div>
+          <div class="flex space-x-2">
+            <button @click="prevPage" :disabled="!budgetStore.hasPreviousPage || budgetStore.isLoadingTransactions"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+              Sebelumnya
+            </button>
+            <button @click="nextPage" :disabled="!budgetStore.hasNextPage || budgetStore.isLoadingTransactions"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+              Selanjutnya
+            </button>
           </div>
         </div>
-
-      </div>
-
-      <div v-if="budgetStore.transactionsList.length > 0"
-        class="px-5 py-3 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
-        <div class="text-sm text-gray-500 dark:text-gray-400">
-          Halaman <b>{{ budgetStore.currentPage }}</b> dari <b>{{ budgetStore.totalPages }}</b>
-        </div>
-        <div class="flex space-x-2">
-          <button @click="prevPage" :disabled="!budgetStore.hasPreviousPage || budgetStore.isLoadingTransactions"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-            Sebelumnya
-          </button>
-          <button @click="nextPage" :disabled="!budgetStore.hasNextPage || budgetStore.isLoadingTransactions"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-            Selanjutnya
-          </button>
-        </div>
       </div>
     </div>
-  </div>
 
-  <BaseModal :isOpen="isEditModalOpen" @close="closeEditModal" size="md" :hideFooter="true">
-    <template #header>
-      Edit Transaksi
-    </template>
-    <template #body>
-      <TransactionForm :initialData="selectedTransactionToEdit" :transactionId="selectedTransactionId" />
-    </template>
-  </BaseModal>
+    <BaseModal :isOpen="isEditModalOpen" @close="closeEditModal" size="md" :hideFooter="true">
+      <template #header>
+        Edit Transaksi
+      </template>
+      <template #body>
+        <TransactionForm :initialData="selectedTransactionToEdit" :transactionId="selectedTransactionId" />
+      </template>
+    </BaseModal>
+  </div>
 </template>
