@@ -23,6 +23,7 @@ const modalStore = useModalStore();
 // State untuk filter (menggunakan v-model komponen)
 const dateRange = ref(null);
 const limitPerPage = ref(10);
+const searchQuery = ref('');
 
 // Opsi untuk dropdown limit
 const limitOptions = [
@@ -52,12 +53,13 @@ const loadTransactions = (page = 1, force = false) => {
     page: page,
     limit: limitPerPage.value,
     startDate: startDate,
-    endDate: endDate
+    endDate: endDate,
+    search: searchQuery.value
   }, force);
 };
 
 const debouncedLoadTransactions = debounce(() => {
-  loadTransactions(1);
+  loadTransactions(1, true);
 }, 500);
 
 // 🔥 2. SOLUSI PAMUNGKAS: Buat Computed Property Stabil 🔥
@@ -71,17 +73,19 @@ const dateRangeStable = computed(() => {
 const isFilterActive = computed(() => {
   const hasDateFilter = dateRange.value !== null && dateRange.value.length > 0;
   const hasLimitFilter = limitPerPage.value !== 10;
+  const hasSearchFilter = searchQuery.value.trim() !== '';
 
   // Return true jika salah satu kondisi terpenuhi
-  return hasDateFilter || hasLimitFilter;
+  return hasDateFilter || hasLimitFilter || hasSearchFilter;
 });
 
 
 // 🔥 3. UBAH WATCHER 🔥
 // Jangan watch 'dateRange' langsung, tapi watch 'dateRangeStable'
-watch([dateRangeStable, limitPerPage], ([newDateStr, newLimit], [oldDateStr, oldLimit]) => {
+watch([dateRangeStable, limitPerPage, searchQuery], ([newDateStr, newLimit], [oldDateStr, oldLimit]) => {
   // Logika debugging bisa kita sederhanakan sekarang karena pemicunya sudah stabil
   console.log("🔍 Watcher Filter Stabil Terpanggil");
+  console.log("🔍 Filter/Search berubah. Memuat ulang data...");
   console.log(`Date berubah: ${oldDateStr !== newDateStr}`);
   console.log(`Limit berubah: ${oldLimit !== newLimit}`);
 
@@ -92,7 +96,7 @@ watch([dateRangeStable, limitPerPage], ([newDateStr, newLimit], [oldDateStr, old
 const clearFilters = () => {
   dateRange.value = null;
   limitPerPage.value = 10;
-
+  searchQuery.value = '';
 };
 
 const nextPage = () => { if (budgetStore.hasNextPage) loadTransactions(budgetStore.currentPage + 1); };
@@ -161,13 +165,12 @@ const handleDeleteClick = (id) => {
 
 onMounted(() => {
   console.log("🔴 MOUNTED (Halaman dibuat baru - Cache GAGAL)");
-  loadTransactions(1, true); // Ini harusnya cuma jalan 1x seumur hidup tab
+  loadTransactions(1, false);
 });
 
 onActivated(() => {
   console.log("🟢 ACTIVATED (Halaman dari cache - Cache SUKSES)");
-  loadTransactions(budgetStore.currentPage, true);
-  // loadTransactions(1); // Jangan panggil ini dulu saat testing
+  loadTransactions(budgetStore.currentPage, false);
 });
 </script>
 
@@ -183,6 +186,25 @@ onActivated(() => {
         </div>
 
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+          <div class="relative w-full max-w-xs sm:max-w-md">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a1 1 0 11-1.414 1.414l-3.329-3.328A7 7 0 012 9z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+
+            <input v-model="searchQuery" type="text" class="block w-full rounded-md border-0 py-2 pl-10 pr-3 
+           text-gray-900 ring-1 ring-inset ring-gray-300 
+           placeholder:text-gray-400 
+           focus:ring-2 focus:ring-inset focus:ring-violet-600 
+           
+           dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 
+           dark:placeholder:text-gray-500 dark:focus:ring-violet-500
+           
+           sm:text-sm sm:leading-6 transition-colors duration-200 ease-in-out" placeholder="Cari transaksi..." />
+          </div>
           <Datepicker v-model="dateRange" placeholder="Filter Tanggal..." />
           <DropdownSelect label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
           <button v-if="isFilterActive" @click="clearFilters"
