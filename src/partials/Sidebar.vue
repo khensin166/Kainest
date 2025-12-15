@@ -126,6 +126,7 @@ import {
   ChatBubbleBottomCenterTextIcon,
   BanknotesIcon,
   ReceiptRefundIcon,
+  SparklesIcon,
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -193,6 +194,11 @@ export default {
           {
             name: "WhatsApp Bot",
             path: "/app/wabot",
+            iconComponent: SparklesIcon,
+          },
+          {
+            name: "WhatsApp Api",
+            path: "/app/wabot-api",
             iconComponent: ChatBubbleBottomCenterTextIcon,
           },
         ],

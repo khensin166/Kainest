@@ -7,7 +7,7 @@ import DashboardLayout from "./layouts/DashboardLayout.vue";
 // Impor Halaman
 import LoginPage from "./features/auth/presentation/pages/LoginPage.vue";
 import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue";
-import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue"; // Nama file Anda GetStartedPage.vue
+import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import TodoListPage from "./pages/Dashboard.vue";
 import GalleryPage from "./pages/Dashboard.vue";
@@ -110,6 +110,11 @@ const routes = [
         path: "wabot",
         name: "wabot",
         component: () => import('./features/wabot/presentation/pages/WaBotPage.vue'),
+      },
+      {
+        path: "wabot-api",
+        name: "wabot-api",
+        component: () => import('./features/wabot/presentation/pages/WaBotApiPage.vue'),
       },
     ],
   },

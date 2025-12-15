@@ -165,7 +165,7 @@ const showCelebration = ref(false);
 let socket = null;
 
 onMounted(() => {
-  socket = io("https://whatsapp-bot-shifting-production-1086.up.railway.app");
+  socket = io("https://whatsapp-bot-shifting-production-f65b.up.railway.app");
 
   socket.on("status", (message) => {
     statusMessage.value = message;
