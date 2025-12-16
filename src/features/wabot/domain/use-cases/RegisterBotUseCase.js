@@ -1,3 +1,4 @@
+// RegisterBotUseCase.js
 export class RegisterBotUseCase {
   constructor(repository) {
     this.repository = repository;

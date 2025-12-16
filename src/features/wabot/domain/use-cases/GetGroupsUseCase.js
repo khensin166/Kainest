@@ -1,3 +1,4 @@
+// GetGroupsUseCase.js
 export class GetGroupsUseCase {
   constructor(repository) {
     this.repository = repository;

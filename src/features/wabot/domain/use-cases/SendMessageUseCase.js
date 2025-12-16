@@ -1,3 +1,4 @@
+// SendMessageUseCase.js
 export class SendMessageUseCase {
   constructor(repository) {
     this.repository = repository;

@@ -1,3 +1,4 @@
+<!-- WaBotPage.vue -->
 <template>
   <div class="flex flex-col items-center justify-center min-h-[80vh] px-4 sm:px-6 lg:px-8 py-8">
 
@@ -154,55 +155,107 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, reactive, watch } from "vue";
 import io from "socket.io-client";
 import QrcodeVue from "qrcode.vue";
+import { useWaBotStore } from "../stores/useWaBotStore"; // Pastikan path benar
+
+const waStore = useWaBotStore();
 
 const qrValue = ref(null);
-const statusMessage = ref("Menghubungkan ke Bot...");
+const statusMessage = ref("Menginisialisasi...");
 const isConnected = ref(false);
 const showCelebration = ref(false);
 let socket = null;
 
-onMounted(() => {
-  socket = io("https://whatsapp-bot-shifting-production-f65b.up.railway.app");
+const form = reactive({
+  url: '',
+  secret: ''
+});
+
+// Fungsi simpan config awal
+const saveInitialConfig = async () => {
+  if (!form.url) return alert("URL wajib diisi");
+  try {
+    await waStore.connectBot(form.url, "Kainest Bot", form.secret);
+    // Connect socket setelah config tersimpan
+    connectSocket(form.url);
+  } catch (e) {
+    alert("Gagal menyimpan config");
+  }
+};
+
+const resetConfig = () => {
+  if (confirm("Yakin ingin reset URL?")) {
+    waStore.logout(); // Hapus key lokal
+    // Opsional: Panggil API Backend untuk hapus data DB
+    // Disini hanya reset state frontend agar form muncul
+    waStore.baseUrl = '';
+    if (socket) socket.disconnect();
+  }
+}
+
+// Logic Koneksi Socket
+const connectSocket = (url) => {
+  if (socket) socket.disconnect();
+  if (!url) return;
+
+  statusMessage.value = `Menghubungkan ke ${url}...`;
+
+  socket = io(url);
+
+  socket.on("connect", () => {
+    statusMessage.value = "Terhubung ke Server Bot. Mengecek status WA...";
+  });
 
   socket.on("status", (message) => {
     statusMessage.value = message;
     if (message === "WhatsApp Terhubung!") {
       qrValue.value = null;
-
-      // Trigger celebration animation
       if (!isConnected.value) {
         isConnected.value = true;
         showCelebration.value = true;
-
-        // Hide celebration after animation completes
-        setTimeout(() => {
-          showCelebration.value = false;
-        }, 1000);
+        setTimeout(() => { showCelebration.value = false; }, 1000);
       }
     }
   });
 
   socket.on("qr_code", (qrData) => {
-    console.log("Data QR diterima dari bot!");
+    console.log("QR Code diterima");
     qrValue.value = qrData;
     statusMessage.value = "Silakan Scan QR Code";
     isConnected.value = false;
   });
 
+  socket.on("disconnect", () => {
+    statusMessage.value = "Terputus dari server.";
+    isConnected.value = false;
+  });
+
   socket.on("connect_error", (err) => {
-    console.error("Socket connection error:", err.message);
-    statusMessage.value = "Gagal terhubung ke server bot.";
+    console.error("Socket error:", err.message);
+    statusMessage.value = "Gagal konek ke Server Bot (Cek URL/CORS).";
     isConnected.value = false;
     qrValue.value = null;
   });
+};
+
+onMounted(async () => {
+  // 1. Load config dari DB/Local
+  await waStore.loadConfig();
+
+  // 2. Jika URL sudah ada, inisialisasi socket
+  if (waStore.baseUrl) {
+    connectSocket(waStore.baseUrl);
+  }
+});
+
+// Watcher jika URL berubah
+watch(() => waStore.baseUrl, (newUrl) => {
+  if (newUrl) connectSocket(newUrl);
 });
 
 onBeforeUnmount(() => {
-  if (socket) {
-    socket.disconnect();
-  }
+  if (socket) socket.disconnect();
 });
 </script>

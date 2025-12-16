@@ -1,3 +1,4 @@
+// WaGroupEntity.js
 export class WaGroupEntity {
   constructor({ id, subject }) {
     this.id = id;
