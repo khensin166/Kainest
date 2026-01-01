@@ -1,3 +1,4 @@
+// src/features/wabot/data/sources/WaBotRemoteSource.js
 import axios from "axios";
 
 export class WaBotRemoteSource {
@@ -47,5 +48,15 @@ export class WaBotRemoteSource {
     // Payload: { phone, message, isGroup }
     const response = await client.post("/api/send-message", payload);
     return response.data;
+  }
+
+  async getAllApiKeys(baseUrl, adminSecret) {
+    const cleanUrl = baseUrl.replace(/\/$/, "");
+    const response = await axios.get(`${cleanUrl}/api/admin/keys`, {
+      headers: {
+        "x-admin-secret": adminSecret, // Header khusus admin
+      },
+    });
+    return response.data; // Mengembalikan { status, count, data: [...] }
   }
 }

@@ -1,3 +1,4 @@
+<!-- WaBotApiPage.vue -->
 <template>
   <div class="p-6 max-w-7xl mx-auto space-y-8">
 
@@ -21,45 +22,97 @@
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           ⚙️ Pengaturan Koneksi
         </h2>
+
         <button v-if="waStore.apiKey" @click="resetConfig" class="text-sm text-red-600 hover:text-red-800 font-medium">
-          Reset API Key
+          Reset / Ganti Akun
         </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bot API Base URL</label>
-          <input v-model="configForm.baseUrl" type="text" placeholder="https://whatsapp-bot-kamu.up.railway.app"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-all" />
-          <p class="text-xs text-gray-500">Masukkan URL root server bot Anda (tanpa /api).</p>
+          <input v-model="configForm.baseUrl" type="text" placeholder="https://..."
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
         </div>
 
-        <div v-if="!waStore.apiKey" class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Admin Secret</label>
-          <div class="flex gap-2">
-            <input v-model="configForm.adminSecret" type="password" placeholder="rahasia123"
-              class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
-            <button @click="handleConnect" :disabled="waStore.isLoading || !configForm.baseUrl"
-              class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-              <svg v-if="waStore.isLoading" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
-              </svg>
-              Generate Key
-            </button>
+        <div class="space-y-2">
+          <div v-if="!waStore.apiKey">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Admin Secret</label>
+            <div class="flex flex-col gap-2">
+              <input v-model="configForm.adminSecret" type="password" placeholder="rahasia123"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
+
+              <div class="flex gap-2">
+                <button @click="handleConnect" :disabled="waStore.isLoading"
+                  class="flex-1 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors text-sm">
+                  Generate Baru
+                </button>
+
+                <button @click="openKeyModal" :disabled="waStore.isLoading"
+                  class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-medium transition-colors text-sm border border-gray-300 dark:border-gray-600">
+                  Pilih Key Lama
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-else>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">API Key Aktif</label>
+            <div class="flex items-center gap-2">
+              <code
+                class="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-mono text-gray-600 dark:text-gray-400 truncate">
+            {{ waStore.apiKey }}
+          </code>
+              <button @click="openKeyModal" class="btn btn-xs btn-ghost" title="Ganti Key">
+                Change
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div v-else class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">API Key Aktif</label>
-          <div class="flex items-center gap-2">
-            <code
-              class="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-mono text-gray-600 dark:text-gray-400 break-all">
-              {{ waStore.apiKey }}
-            </code>
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">Pilih API Key Tersedia</h3>
+          <button @click="showModal = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            ✕
+          </button>
+        </div>
+
+        <div class="p-0 overflow-y-auto flex-1">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-900/50 sticky top-0">
+              <tr>
+                <th class="px-6 py-3 font-semibold text-gray-900 dark:text-white">Nama Aplikasi</th>
+                <th class="px-6 py-3 font-semibold text-gray-900 dark:text-white">Key</th>
+                <th class="px-6 py-3 font-semibold text-gray-900 dark:text-white">Status</th>
+                <th class="px-6 py-3 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr v-for="key in waStore.apiKeysList" :key="key.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                <td class="px-6 py-4 font-medium">{{ key.name }}</td>
+                <td class="px-6 py-4 font-mono text-xs text-gray-500">{{ key.key.substring(0, 8) }}...</td>
+                <td class="px-6 py-4">
+                  <span class="px-2 py-1 rounded-full text-xs font-bold"
+                    :class="key.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                    {{ key.is_active ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button @click="selectKeyFromList(key.key)"
+                    class="text-violet-600 hover:text-violet-800 font-medium text-xs border border-violet-200 px-3 py-1 rounded hover:bg-violet-50">
+                    Gunakan
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div v-if="waStore.apiKeysList.length === 0" class="p-8 text-center text-gray-500">
+            Tidak ada API Key ditemukan.
           </div>
         </div>
       </div>
@@ -105,10 +158,9 @@
                   class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                   <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ group.name }}</td>
                   <td class="px-6 py-4">
-                    <button @click="copyToClipboard(group.id)"
-                      class="font-mono text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-copy"
-                      title="Klik untuk menyalin">
-                      {{ group.id }}
+                    <button @click="copyToClipboard(key.key)" class="text-gray-400 hover:text-violet-600"
+                      title="Copy Key">
+                      📋
                     </button>
                   </td>
                   <td class="px-6 py-4 text-right">
@@ -207,6 +259,24 @@ onMounted(async () => {
     waStore.fetchGroups();
   }
 });
+
+// Tambahkan di script setup
+const showModal = ref(false);
+
+const openKeyModal = async () => {
+  // Update store state dulu dari form input user
+  waStore.baseUrl = configForm.baseUrl;
+  waStore.adminSecret = configForm.adminSecret;
+
+  await waStore.fetchApiKeysList();
+  showModal.value = true;
+};
+
+const selectKeyFromList = async (key) => {
+  await waStore.selectApiKey(key);
+  showModal.value = false;
+  alert("API Key berhasil diganti!");
+};
 
 // 2. Connect / Generate Key
 const handleConnect = async () => {

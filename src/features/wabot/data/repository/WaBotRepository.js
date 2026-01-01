@@ -1,3 +1,4 @@
+// src/features/wabot/data/repository/WaBotRepository.js
 import { WaGroupEntity } from "../../domain/entities/WaGroupEntity";
 import { WaBotRemoteSource } from "../sources/WaBotRemoteSource";
 
@@ -36,5 +37,13 @@ export class WaBotRepository {
 
   async sendMessage(baseUrl, apiKey, payload) {
     return await this.remoteSource.sendMessage(baseUrl, apiKey, payload);
+  }
+
+  async getAllApiKeys(baseUrl, adminSecret) {
+    const response = await this.remoteSource.getAllApiKeys(
+      baseUrl,
+      adminSecret
+    );
+    return response.data; // Mengembalikan array keys
   }
 }
