@@ -1,7 +1,7 @@
 // WaGroupEntity.js
 export class WaGroupEntity {
-  constructor({ id, subject }) {
+  constructor({ id, name }) {
     this.id = id;
-    this.subject = subject || "Tanpa Nama";
+    this.name = name || "Tanpa Nama";
   }
 }

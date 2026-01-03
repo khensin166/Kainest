@@ -246,6 +246,24 @@ const configForm = reactive({
 const isGroupMode = ref(false);
 const messageForm = reactive({ target: '', message: '' });
 
+
+// --- TAMBAHKAN BLOK INI ---
+// Watcher ini akan memantau perubahan pada apiKey dan baseUrl di store.
+// Begitu keduanya tersedia (entah dari localStorage awal atau setelah loadConfig dari DB),
+// fungsi fetchGroups akan otomatis dipanggil.
+watch(
+  [() => waStore.apiKey, () => waStore.baseUrl],
+  ([newKey, newUrl]) => {
+    if (newKey && newUrl) {
+      console.log("Config loaded. Auto-fetching groups...");
+      waStore.fetchGroups();
+    }
+  },
+  { immediate: true } // Cek juga saat pertama kali komponen dibuat
+);
+
+
+
 // 1. Initial Load (Sync dengan DB)
 onMounted(async () => {
   await waStore.loadConfig();
@@ -254,10 +272,10 @@ onMounted(async () => {
   if (waStore.baseUrl) configForm.baseUrl = waStore.baseUrl;
   if (waStore.adminSecret) configForm.adminSecret = waStore.adminSecret;
 
-  // Jika sudah punya API Key, langsung ambil grup
-  if (waStore.apiKey && waStore.baseUrl) {
-    waStore.fetchGroups();
-  }
+  // // Jika sudah punya API Key, langsung ambil grup
+  // if (waStore.apiKey && waStore.baseUrl) {
+  //   waStore.fetchGroups();
+  // }
 });
 
 // Tambahkan di script setup
