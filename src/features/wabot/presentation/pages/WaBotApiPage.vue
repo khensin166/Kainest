@@ -160,7 +160,7 @@
                   <td class="px-6 py-4">
                     <button @click="copyToClipboard(key.key)" class="text-gray-400 hover:text-violet-600"
                       title="Copy Key">
-                      📋
+                      📋{{ group.id }}
                     </button>
                   </td>
                   <td class="px-6 py-4 text-right">
