@@ -41,6 +41,13 @@ const routes = [
     name: "Forbidden",
     component: Forbidden,
   },
+  
+  // ✅ ROUTE UNTUK SHARED NOTES (PUBLIK)
+  {
+    path: "/share/notes/:id",
+    name: "SharedNote",
+    component: SharedNotePage,
+  },
 
   // Halaman terproteksi yang menggunakan DashboardLayout
   {
