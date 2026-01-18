@@ -169,10 +169,21 @@ export class BudgetRepository {
       const response = await this.remoteSource.getTransactions(params);
       if (response.success) {
         const entities = BudgetMapper.mapTransactionListFromApi(response.data);
-        // Kita kembalikan data yang sudah dimapping DAN metadata pagination
+        
+        // MAPPING METADATA: Pastikan formatnya sesuai dengan yang ekspektasi Store (CamelCase)
+        // Backend mungkin mengirim snake_case (current_page, last_page, dll)
+        const rawMeta = response.meta || {};
+        
+        const mappedMeta = {
+          totalItems: rawMeta.totalItems || rawMeta.total || 0,
+          totalPages: rawMeta.totalPages || rawMeta.last_page || 1,
+          currentPage: rawMeta.currentPage || rawMeta.current_page || 1,
+          itemsPerPage: rawMeta.itemsPerPage || rawMeta.per_page || 10,
+        };
+
         return right({
           transactions: entities,
-          meta: response.meta, // { totalItems, totalPages, currentPage, ... }
+          meta: mappedMeta, 
         });
       } else {
         return left(

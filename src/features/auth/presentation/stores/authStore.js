@@ -1,13 +1,13 @@
-// 📄 features/auth/presentation/stores/authStore.js
-
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
-import { AuthRepository } from "../../data/repository/AuthRepository";
-import { LoginUserUseCase } from "../../domain/use-cases/LoginUserUseCase";
-import { RegisterUserUseCase } from "../../domain/use-cases/RegisterUserUseCase";
-import { GetCurrentUserUseCase } from "../../domain/use-cases/GetCurrentUserUseCase";
-import { LogoutUserUseCase } from "../../domain/use-cases/LogoutUserUseCase";
+// import { AuthRepository } from "../../data/repository/AuthRepository"; // DIP: Removed direct dependency
+import { 
+  loginUserUseCase, 
+  registerUserUseCase, 
+  getCurrentUserUseCase, 
+  logoutUserUseCase 
+} from "../../../../core/di/di"; // DIP: Injected dependencies
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
 export const useAuthStore = defineStore("auth", () => {
@@ -20,11 +20,13 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthReady = ref(false);
 
   const modalStore = useModalStore();
-  const repository = new AuthRepository();
-  const loginUseCase = new LoginUserUseCase(repository);
-  const registerUseCase = new RegisterUserUseCase(repository);
-  const getCurrentUserUseCase = new GetCurrentUserUseCase(repository);
-  const logoutUseCase = new LogoutUserUseCase(repository);
+  
+  // DIP Refactoring: No more 'new Class()' here.
+  // const repository = new AuthRepository();
+  const loginUseCase = loginUserUseCase;
+  const registerUseCase = registerUserUseCase;
+  const getCurrentUserUseCaseInstance = getCurrentUserUseCase; // Renamed to avoid collision if needed, but simple variable assignment works
+  const logoutUseCase = logoutUserUseCase;
 
   /**
    * PERUBAHAN BESAR: Menginisialisasi status auth saat aplikasi dimuat.
@@ -39,7 +41,7 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       // Panggil use case yang akan mengecek token di localStorage
       // dan memvalidasinya ke /auth/me
-      const result = await getCurrentUserUseCase.execute();
+      const result = await getCurrentUserUseCaseInstance.execute();
 
       // --- LOGIKA DIPERBAIKI DI SINI ---
       if (result.left) {

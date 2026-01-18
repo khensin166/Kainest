@@ -1,14 +1,15 @@
 // src/features/notes/presentation/stores/useNoteStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { NoteRepository } from "../../data/repository/NoteRepository";
-import { GetNotesUseCase } from "../../domain/use-case/GetNotesUseCase";
-import { GetNoteByIdUseCase } from "../../domain/use-case/GetNoteByIdUseCase";
-import { CreateNoteUseCase } from "../../domain/use-case/CreateNoteUseCase";
-import { UpdateNoteUseCase } from "../../domain/use-case/UpdateNoteUseCase";
-import { UpdateNotePermissionsUseCase } from "../../domain/use-case/UpdateNotePermissionsUseCase";
-import { DeleteNoteUseCase } from "../../domain/use-case/DeleteNoteUseCase";
-import { GetPublicNoteUseCase } from "../../domain/use-case/GetPublicNoteUseCase";
+import { 
+  getNotesUseCase, 
+  getNoteByIdUseCase, 
+  createNoteUseCase, 
+  updateNoteUseCase, 
+  updateNotePermissionsUseCase, 
+  deleteNoteUseCase, 
+  getPublicNoteUseCase 
+} from "../../../../core/di/di";
 import { useModalStore } from "../../../../stores/modalStore";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
@@ -21,18 +22,15 @@ export const useNoteStore = defineStore("note", () => {
 
   // === DEPENDENCIES ===
   const modalStore = useModalStore();
-  const repository = new NoteRepository();
-
-  // === USE CASES ===
-  const getNotesUseCase = new GetNotesUseCase(repository);
-  const getNoteByIdUseCase = new GetNoteByIdUseCase(repository);
-  const createNoteUseCase = new CreateNoteUseCase(repository);
-  const updateNoteUseCase = new UpdateNoteUseCase(repository);
-  const updateNotePermissionsUseCase = new UpdateNotePermissionsUseCase(
-    repository
-  );
-  const deleteNoteUseCase = new DeleteNoteUseCase(repository);
-  const getPublicNoteUseCase = new GetPublicNoteUseCase(repository);
+  
+  // === USE CASES (Injected) ===
+  const getNotesUseCaseInstance = getNotesUseCase;
+  const getNoteByIdUseCaseInstance = getNoteByIdUseCase;
+  const createNoteUseCaseInstance = createNoteUseCase;
+  const updateNoteUseCaseInstance = updateNoteUseCase;
+  const updateNotePermissionsUseCaseInstance = updateNotePermissionsUseCase;
+  const deleteNoteUseCaseInstance = deleteNoteUseCase;
+  const getPublicNoteUseCaseInstance = getPublicNoteUseCase;
 
   // === ACTIONS ===
 
@@ -41,7 +39,7 @@ export const useNoteStore = defineStore("note", () => {
    */
   async function fetchNotes() {
     isLoadingList.value = true;
-    const result = await getNotesUseCase.execute();
+    const result = await getNotesUseCaseInstance.execute();
     isLoadingList.value = false;
 
     if (result.right) {
@@ -61,7 +59,7 @@ export const useNoteStore = defineStore("note", () => {
   async function fetchNoteById(noteId) {
     isLoadingNote.value = true;
     currentNote.value = null; // Kosongkan dulu
-    const result = await getNoteByIdUseCase.execute(noteId);
+    const result = await getNoteByIdUseCaseInstance.execute(noteId);
     isLoadingNote.value = false;
 
     if (result.right) {
@@ -81,7 +79,7 @@ export const useNoteStore = defineStore("note", () => {
    */
   async function createNewNote(data) {
     isLoadingNote.value = true;
-    const result = await createNoteUseCase.execute(data);
+    const result = await createNoteUseCaseInstance.execute(data);
     isLoadingNote.value = false;
 
     if (result.right) {
@@ -104,7 +102,7 @@ export const useNoteStore = defineStore("note", () => {
    */
   async function updateNoteContent(noteId, data) {
     isLoadingNote.value = true;
-    const result = await updateNoteUseCase.execute(noteId, data);
+    const result = await updateNoteUseCaseInstance.execute(noteId, data);
     isLoadingNote.value = false;
 
     if (result.right) {
@@ -129,7 +127,7 @@ export const useNoteStore = defineStore("note", () => {
    */
   async function updateNotePerms(noteId, data) {
     isLoadingNote.value = true;
-    const result = await updateNotePermissionsUseCase.execute(noteId, data);
+    const result = await updateNotePermissionsUseCaseInstance.execute(noteId, data);
     isLoadingNote.value = false;
 
     if (result.right) {
@@ -154,7 +152,7 @@ export const useNoteStore = defineStore("note", () => {
    */
   async function deleteNote(noteId) {
     isLoadingNote.value = true;
-    const result = await deleteNoteUseCase.execute(noteId);
+    const result = await deleteNoteUseCaseInstance.execute(noteId);
     isLoadingNote.value = false;
 
     if (result.right) {
@@ -181,7 +179,7 @@ export const useNoteStore = defineStore("note", () => {
   async function fetchPublicNote(noteId) {
     isLoadingNote.value = true;
     publicNote.value = null;
-    const result = await getPublicNoteUseCase.execute(noteId);
+    const result = await getPublicNoteUseCaseInstance.execute(noteId);
     isLoadingNote.value = false;
 
     if (result.right) {

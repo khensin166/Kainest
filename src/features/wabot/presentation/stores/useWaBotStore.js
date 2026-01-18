@@ -1,11 +1,13 @@
+// src/features/wabot/presentation/stores/useWaBotStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import axios from "axios"; // <--- 1. PERBAIKAN: TAMBAHKAN IMPORT INI
 import apiClient from "@/lib/apiClient";
-import { WaBotRepository } from "../../data/repository/WaBotRepository";
-import { RegisterBotUseCase } from "../../domain/use-cases/RegisterBotUseCase";
-import { GetGroupsUseCase } from "../../domain/use-cases/GetGroupsUseCase";
-import { SendMessageUseCase } from "../../domain/use-cases/SendMessageUseCase";
+import { 
+  registerBotUseCase, 
+  getGroupsUseCase, 
+  sendMessageUseCase, 
+  waBotRepository 
+} from "../../../../core/di/di";
 
 export const useWaBotStore = defineStore("wabot", () => {
   // --- STATE ---
@@ -18,11 +20,11 @@ export const useWaBotStore = defineStore("wabot", () => {
   const isLoading = ref(false);
   const isSending = ref(false);
 
-  // --- DEPENDENCIES ---
-  const repository = new WaBotRepository();
-  const registerUseCase = new RegisterBotUseCase(repository);
-  const getGroupsUseCase = new GetGroupsUseCase(repository);
-  const sendMessageUseCase = new SendMessageUseCase(repository);
+  // --- DEPENDENCIES (Injected) ---
+  const repositoryInstance = waBotRepository;
+  const registerUseCaseInstance = registerBotUseCase;
+  const getGroupsUseCaseInstance = getGroupsUseCase;
+  const sendMessageUseCaseInstance = sendMessageUseCase;
 
   // --- ACTIONS ---
 
@@ -84,12 +86,13 @@ export const useWaBotStore = defineStore("wabot", () => {
   }
 
   // 3. Connect/Generate Key (Ke Railway)
+  // 3. Connect/Generate Key (Ke Railway)
   async function connectBot(url, appName, secret) {
     isLoading.value = true;
     try {
       // Normalisasi URL
       const cleanUrl = url.replace(/\/$/, "");
-      const key = await registerUseCase.execute(cleanUrl, appName, secret);
+      const key = await registerUseCaseInstance.execute(cleanUrl, appName, secret);
 
       // Simpan URL & Secret & Key ke DB Kainest
       await saveConfigToDb(cleanUrl, secret, key);
@@ -114,7 +117,7 @@ export const useWaBotStore = defineStore("wabot", () => {
 
     isLoading.value = true;
     try {
-      const result = await getGroupsUseCase.execute(
+      const result = await getGroupsUseCaseInstance.execute(
         baseUrl.value,
         apiKey.value
       );
@@ -132,7 +135,7 @@ export const useWaBotStore = defineStore("wabot", () => {
   async function sendMessage(target, message, isGroup) {
     isSending.value = true;
     try {
-      await sendMessageUseCase.execute(baseUrl.value, apiKey.value, {
+      await sendMessageUseCaseInstance.execute(baseUrl.value, apiKey.value, {
         phone: target,
         message,
         isGroup,
@@ -155,7 +158,7 @@ export const useWaBotStore = defineStore("wabot", () => {
     isLoading.value = true;
     try {
       // Panggil Repository, bukan Axios langsung
-      const keys = await repository.getAllApiKeys(
+      const keys = await repositoryInstance.getAllApiKeys(
         baseUrl.value,
         adminSecret.value
       );

@@ -48,9 +48,10 @@
 
 <script>
 import { ref } from 'vue'
-import Notifications from '../components/DropdownNotifications.vue'
+import DropdownNotifications from '../components/DropdownNotifications.vue'
+import DropdownHelp from '../components/DropdownHelp.vue'
+import DropdownProfile from '../features/profile/presentation/components/DropdownProfile.vue'
 import ThemeToggle from '../components/ThemeToggle.vue'
-import UserMenu from '../components/DropdownProfile.vue'
 
 export default {
   name: 'Header',
@@ -59,9 +60,10 @@ export default {
     'variant',
   ],
   components: {
-    Notifications,
+    Notifications: DropdownNotifications,
+    Help: DropdownHelp,
+    UserMenu: DropdownProfile,
     ThemeToggle,
-    UserMenu,
   }
 }
 </script>

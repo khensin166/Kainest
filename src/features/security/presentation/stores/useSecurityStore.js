@@ -1,8 +1,8 @@
+// src/features/security/presentation/stores/useSecurityStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
-import { SecurityRepository } from "../../data/repository/SecurityRepository";
-import { ChangePasswordUseCase } from "../../domain/use-case/ChangePasswordUseCase";
+import { changePasswordUseCase } from "../../../../core/di/di";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 import { IncorrectPasswordFailure } from "../../../../core/error/failure";
 
@@ -11,16 +11,15 @@ export const useSecurityStore = defineStore("security", () => {
   const isLoading = ref(false); 
   const modalStore = useModalStore();
 
-  // Menggunakan Repository dan UseCase dari fitur 'security'
-  const repository = new SecurityRepository();
-  const changePasswordUseCase = new ChangePasswordUseCase(repository);
+  // Menggunakan UseCase yang di-inject
+  const changePasswordUseCaseInstance = changePasswordUseCase;
 
   /**
    * Aksi untuk mengganti password
    */
   async function updatePassword(passwords) {
     isLoading.value = true;
-    const result = await changePasswordUseCase.execute(passwords);
+    const result = await changePasswordUseCaseInstance.execute(passwords);
     isLoading.value = false;
 
     if (result.left) {

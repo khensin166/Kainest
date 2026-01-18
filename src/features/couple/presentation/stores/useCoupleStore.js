@@ -1,9 +1,11 @@
+// src/features/couple/presentation/stores/useCoupleStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
-import { CoupleRepository } from "../../data/repository/CoupleRepository";
-import { GetCoupleStatusUseCase } from "../../domain/use-case/GetCoupleStatusUseCase";
-import { ConnectCoupleUseCase } from "../../domain/use-case/ConnectCoupleUseCase";
+import { 
+  getCoupleStatusUseCase, 
+  connectCoupleUseCase 
+} from "../../../../core/di/di";
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
 export const useCoupleStore = defineStore("couple", () => {
@@ -11,16 +13,17 @@ export const useCoupleStore = defineStore("couple", () => {
   const isLoading = ref(false);
   
   const modalStore = useModalStore();
-  const repository = new CoupleRepository();
-  const getCoupleStatusUseCase = new GetCoupleStatusUseCase(repository);
-  const connectCoupleUseCase = new ConnectCoupleUseCase(repository);
+  
+  // === USE CASES (Injected) ===
+  const getCoupleStatusUseCaseInstance = getCoupleStatusUseCase;
+  const connectCoupleUseCaseInstance = connectCoupleUseCase;
 
   /**
    * Mengambil status koneksi saat ini
    */
   async function fetchCoupleStatus() {
     isLoading.value = true;
-    const result = await getCoupleStatusUseCase.execute();
+    const result = await getCoupleStatusUseCaseInstance.execute();
     isLoading.value = false;
 
     if (result.right) {
@@ -39,7 +42,7 @@ export const useCoupleStore = defineStore("couple", () => {
    */
   async function connectToPartner(invitationCode) {
     isLoading.value = true;
-    const result = await connectCoupleUseCase.execute(invitationCode);
+    const result = await connectCoupleUseCaseInstance.execute(invitationCode);
     isLoading.value = false;
 
     if (result.right) {

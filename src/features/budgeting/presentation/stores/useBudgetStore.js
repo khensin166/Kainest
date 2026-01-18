@@ -3,33 +3,28 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
 // --- Dependencies Injection ---
-import { GetDashboardSummaryUseCase } from "../../domain/use-case/GetDashboardSummaryUseCase";
-import { GetAiAdviceUseCase } from "../../domain/use-case/GetAiAdviceUseCase";
-import { CreateTransactionUseCase } from "../../domain/use-case/CreateTransactionUseCase";
-import { GetCategoriesUseCase } from "../../domain/use-case/GetCategoriesUseCase";
-import { BudgetRepository } from "../../data/repository/BudgetRepository";
-import { GetSpendingTrendUseCase } from "../../domain/use-case/GetSpendingTrendUseCase";
-import { GetTransactionsListUseCase } from "../../domain/use-case/GetTransactionsListUseCase";
-import { GetTransactionDetailUseCase } from "../../domain/use-case/GetTransactionDetailUseCase";
-import { UpdateTransactionUseCase } from "../../domain/use-case/UpdateTransactionUseCase";
-import { DeleteTransactionUseCase } from "../../domain/use-case/DeleteTransactionUseCase";
+import { 
+  getDashboardSummaryUseCase, 
+  getAiAdviceUseCase, 
+  createTransactionUseCase, 
+  getCategoriesUseCase, 
+  getSpendingTrendUseCase, 
+  getTransactionsListUseCase, 
+  getTransactionDetailUseCase, 
+  updateTransactionUseCase, 
+  deleteTransactionUseCase 
+} from "../../../../core/di/di";
 
-const budgetRepository = new BudgetRepository();
-const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(
-  budgetRepository
-);
-const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
-const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
-const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
-const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
-const getTransactionsListUseCase = new GetTransactionsListUseCase(
-  budgetRepository
-);
-const getTransactionDetailUseCase = new GetTransactionDetailUseCase(
-  budgetRepository
-);
-const updateTransactionUseCase = new UpdateTransactionUseCase(budgetRepository);
-const deleteTransactionUseCase = new DeleteTransactionUseCase(budgetRepository);
+// No more manual instantiation - Clean! ✨
+const getDashboardSummaryUseCaseInstance = getDashboardSummaryUseCase;
+const getAiAdviceUseCaseInstance = getAiAdviceUseCase;
+const createTransactionUseCaseInstance = createTransactionUseCase;
+const getCategoriesUseCaseInstance = getCategoriesUseCase;
+const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
+const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
+const getTransactionDetailUseCaseInstance = getTransactionDetailUseCase;
+const updateTransactionUseCaseInstance = updateTransactionUseCase;
+const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -134,7 +129,7 @@ export const useBudgetStore = defineStore("budget", () => {
     isLoadingSummary.value = true;
     errorSummary.value = null;
 
-    const result = await getDashboardSummaryUseCase.execute();
+    const result = await getDashboardSummaryUseCaseInstance.execute();
 
     // (Cek properti 'right' karena failure.js lama)
     if (result.right) {
@@ -157,7 +152,7 @@ export const useBudgetStore = defineStore("budget", () => {
     );
     if (categoryIndex === -1) return;
 
-    const result = await getAiAdviceUseCase.execute(categoryId);
+    const result = await getAiAdviceUseCaseInstance.execute(categoryId);
 
     if (result.right) {
       const adviceData = result.right;
@@ -175,7 +170,7 @@ export const useBudgetStore = defineStore("budget", () => {
     console.log("⚡ [STORE ACTION] fetchAllCategories dipanggil!");
     isLoadingCategories.value = true;
 
-    const result = await getCategoriesUseCase.execute();
+    const result = await getCategoriesUseCaseInstance.execute();
 
     if (result.right) {
       categoriesList.value = result.right;
@@ -190,7 +185,7 @@ export const useBudgetStore = defineStore("budget", () => {
     console.log("⚡ [STORE ACTION] fetchSpendingTrend dipanggil!");
     isLoadingTrend.value = true;
 
-    const result = await getSpendingTrendUseCase.execute();
+    const result = await getSpendingTrendUseCaseInstance.execute();
 
     if (result.right) {
       trendDataList.value = result.right;
@@ -206,7 +201,7 @@ export const useBudgetStore = defineStore("budget", () => {
    */
   async function submitTransaction(transactionData) {
     isTransactionSubmitting.value = true;
-    const result = await createTransactionUseCase.execute(transactionData);
+    const result = await createTransactionUseCaseInstance.execute(transactionData);
     isTransactionSubmitting.value = false;
 
     if (result.right) {
@@ -222,17 +217,28 @@ export const useBudgetStore = defineStore("budget", () => {
    * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
    */
   async function fetchTransactions(params = {}, forceRefresh = false) {
-    if (transactionsList.value.length > 0 && !forceRefresh) {
-      console.log("⚡ Menggunakan data cache di Store (Tidak request API)");
+    const finalParams = { page: 1, limit: 10, ...params };
+
+    // Validasi Cache:
+    // Gunakan cache hanya jika:
+    // 1. Tidak dipaksa refresh (!forceRefresh)
+    // 2. Data sudah ada (transactionsList.length > 0)
+    // 3. Halaman yang diminta SAMA dengan halaman yang tersimpan (params.page == meta.currentPage)
+    // 4. Tidak ada filter pencarian/tanggal yang aktif (opsional, tapi aman untuk re-fetch jika filter berubah)
+    const isSamePage = transactionsMeta.value?.currentPage === finalParams.page;
+
+    if (
+      transactionsList.value.length > 0 && 
+      !forceRefresh && 
+      isSamePage
+    ) {
+      console.log("⚡ Menggunakan data cache di Store (Page sama & tidak force)");
       return;
     }
 
-    console.log("🌐 Mengambil data baru dari API...");
-    isLoadingTransactions.value = true;
+    console.log("🌐 Mengambil data baru dari API...", finalParams);
 
-    const finalParams = { page: 1, limit: 10, ...params };
-
-    const result = await getTransactionsListUseCase.execute(finalParams);
+    const result = await getTransactionsListUseCaseInstance.execute(finalParams);
 
     if (result.right) {
       transactionsList.value = result.right.transactions;
@@ -248,7 +254,7 @@ export const useBudgetStore = defineStore("budget", () => {
    */
   async function fetchTransactionById(id) {
     isLoadingTransactions.value = true;
-    const result = await getTransactionDetailUseCase.execute(id);
+    const result = await getTransactionDetailUseCaseInstance.execute(id);
     isLoadingTransactions.value = false;
 
     if (result.right) {
@@ -267,7 +273,7 @@ export const useBudgetStore = defineStore("budget", () => {
    */
   async function updateTransaction(id, updateData) {
     isTransactionSubmitting.value = true;
-    const result = await updateTransactionUseCase.execute(id, updateData);
+    const result = await updateTransactionUseCaseInstance.execute(id, updateData);
     isTransactionSubmitting.value = false;
 
     if (result.right) {
@@ -287,7 +293,7 @@ export const useBudgetStore = defineStore("budget", () => {
   async function deleteTransaction(id) {
     isDeletingTransactionId.value = id;
 
-    const result = await deleteTransactionUseCase.execute(id);
+    const result = await deleteTransactionUseCaseInstance.execute(id);
 
     isDeletingTransactionId.value = null;
 
