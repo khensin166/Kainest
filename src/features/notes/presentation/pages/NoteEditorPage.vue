@@ -12,8 +12,7 @@
                 class="w-full text-4xl font-bold bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-800 dark:text-gray-100 mb-6 p-0" />
 
             <!-- Editor Container -->
-            <div id="editorjs-container" 
-                class="min-h-[500px] w-full
+            <div id="editorjs-container" class="min-h-[500px] w-full
                        bg-gray-50 dark:bg-gray-900 
                        rounded-xl border border-gray-200 dark:border-gray-700/60 
                        pt-6 px-4 md:px-6 shadow-sm">
@@ -21,21 +20,21 @@
 
             <!-- Action Buttons -->
             <div class="mt-8 flex justify-between items-end sticky bottom-6 z-10">
-                <div class="flex gap-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-2 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-                    <button @click="onSave" :disabled="noteStore.isLoadingNote"
-                        class="px-6 py-2.5 rounded-lg font-medium text-white transition-all
+                <div
+                    class="flex gap-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-2 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                    <button @click="onSave" :disabled="noteStore.isLoadingNote" class="px-6 py-2.5 rounded-lg font-medium text-white transition-all
                                bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed">
                         {{ noteStore.isLoadingNote ? 'Menyimpan...' : 'Simpan Note' }}
                     </button>
-                    
-                    <button @click="openShareModal" 
+
+                    <button @click="openShareModal"
                         class="px-5 py-2.5 rounded-lg font-medium transition-colors
                                text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
                         Bagikan
                     </button>
                 </div>
 
-                <button v-if="isEditing" @click="onDelete" 
+                <button v-if="isEditing" @click="onDelete"
                     class="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
                     Hapus
                 </button>
@@ -83,23 +82,24 @@ const closeShareModal = () => isShareModalOpen.value = false;
 // Inisialisasi Editor.js
 onMounted(async () => {
     const noteId = route.params.id;
-    let initialData = {}; 
+    let initialData = {};
 
     if (isEditing.value) {
         try {
             await noteStore.fetchNoteById(noteId);
             // Safety check
             if (!noteStore.currentNote) throw new Error("Note not found");
-            
+
             title.value = noteStore.currentNote.title;
-            initialData = noteStore.currentNote.content; 
+            // Penting: Clone data untuk menghilangkan Proxy Vue yang bisa membuat Editor.js error
+            initialData = JSON.parse(JSON.stringify(noteStore.currentNote.content));
         } catch (error) {
             console.error("Error loading note:", error);
-            router.push('/app/notes'); 
+            router.push('/app/notes');
             return;
         }
     } else {
-        noteStore.currentNote = null; 
+        noteStore.currentNote = null;
         title.value = '';
     }
 
@@ -108,7 +108,7 @@ onMounted(async () => {
         holder: 'editorjs-container',
         data: initialData,
         placeholder: 'Mulai tulis catatan Anda...',
-        
+
         tools: {
             header: {
                 class: Header,
@@ -122,8 +122,11 @@ onMounted(async () => {
             list: {
                 class: List,
                 inlineToolbar: true,
+                config: {
+                    defaultStyle: 'unordered'
+                }
             },
-            image: { 
+            image: {
                 class: ImageTool,
                 config: {
                     uploader: {
@@ -136,7 +139,7 @@ onMounted(async () => {
         },
         // Callback ketika editor siap
         onReady: () => {
-             editorInstance.value = editor;
+            editorInstance.value = editor;
         },
     });
 });
@@ -163,14 +166,14 @@ const onSave = async () => {
 
         if (isEditing.value) {
             // --- UPDATE NOTE YANG ADA ---
-             if (!noteStore.currentNote || !noteStore.currentNote.id) {
+            if (!noteStore.currentNote || !noteStore.currentNote.id) {
                 console.error("ID Note tidak ditemukan saat update");
                 return;
-             }
+            }
 
             await noteStore.updateNoteContent(noteStore.currentNote.id, {
                 title: title.value,
-                content: outputData 
+                content: outputData
             });
             // Opsional: Balik ke list atau tetap di sini? 
             // User request: "saya tidak kembali ke halaman list"
@@ -184,10 +187,10 @@ const onSave = async () => {
                 content: outputData,
                 shareWithPartner: false
             });
-            
+
             if (newNote && newNote.id) {
-               // Redirect ke list atau mode edit? User minta "kembali ke halaman list"
-               router.push('/app/notes');
+                // Redirect ke list atau mode edit? User minta "kembali ke halaman list"
+                router.push('/app/notes');
             }
         }
     } catch (error) {
@@ -200,7 +203,7 @@ const onDelete = async () => {
     if (confirm('Apakah Anda yakin ingin menghapus note ini selamanya?')) {
         try {
             await noteStore.deleteNote(noteStore.currentNote.id);
-            router.push('/app/notes'); 
+            router.push('/app/notes');
         } catch (error) {
             console.error('Gagal menghapus:', error);
         }
@@ -217,35 +220,46 @@ const onDelete = async () => {
 /* 1. Perlebar Area Konten */
 .ce-block__content,
 .ce-toolbar__content {
-  max-width: 100% !important; /* Gunakan full width dari container */
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+    max-width: 100% !important;
+    /* Gunakan full width dari container */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* 2. Styling Typography untuk Header */
 /* Editor.js biasanya merender h1, h2 dst. Kita paksa styling Tailwind-ish */
 .ce-header {
-  font-weight: 800 !important;
-  color: inherit !important;
-  padding-bottom: 0.5rem !important;
-  margin-top: 1rem !important;
+    font-weight: 800 !important;
+    color: inherit !important;
+    padding-bottom: 0.5rem !important;
+    margin-top: 1rem !important;
 }
 
-h1.ce-header { font-size: 2.25rem !important; }
-h2.ce-header { font-size: 1.875rem !important; }
-h3.ce-header { font-size: 1.5rem !important; }
+h1.ce-header {
+    font-size: 2.25rem !important;
+}
+
+h2.ce-header {
+    font-size: 1.875rem !important;
+}
+
+h3.ce-header {
+    font-size: 1.5rem !important;
+}
 
 /* 3. Styling Paragraph */
 .ce-paragraph {
-  font-size: 1.125rem !important; /* text-lg */
-  line-height: 1.75 !important;
-  color: inherit !important;
+    font-size: 1.125rem !important;
+    /* text-lg */
+    line-height: 1.75 !important;
+    color: inherit !important;
 }
 
 /* 4. Fix warna text untuk Dark Mode secara manual jika inherit gagal */
 .dark .ce-header,
 .dark .ce-paragraph {
-  color: #e5e7eb !important; /* gray-200 */
+    color: #e5e7eb !important;
+    /* gray-200 */
 }
 
 /* 5. Block Tunes & Popover (Dark Mode Overrides) */
@@ -256,9 +270,12 @@ h3.ce-header { font-size: 1.5rem !important; }
 .dark .ce-conversion-toolbar,
 .dark .ce-settings,
 .dark .ce-toolbar__settings-btn {
-    background-color: #1f2937 !important; /* bg-gray-800 */
-    border-color: #374151 !important; /* border-gray-700 */
-    color: #e5e7eb !important; /* text-gray-200 */
+    background-color: #1f2937 !important;
+    /* bg-gray-800 */
+    border-color: #374151 !important;
+    /* border-gray-700 */
+    color: #e5e7eb !important;
+    /* text-gray-200 */
 }
 
 /* Item di dalam popover (Text & Icon) */
@@ -285,7 +302,8 @@ h3.ce-header { font-size: 1.5rem !important; }
 .dark .ce-toolbar__settings-btn:hover,
 .dark .ce-toolbar__plus:hover,
 .dark .ce-settings__button:hover {
-    background-color: #374151 !important; /* bg-gray-700 */
+    background-color: #374151 !important;
+    /* bg-gray-700 */
     color: #ffffff !important;
 }
 
@@ -293,14 +311,16 @@ h3.ce-header { font-size: 1.5rem !important; }
 .dark .ce-popover-item--active,
 .dark .ce-inline-tool--active,
 .dark .ce-conversion-tool--active {
-    background-color: #4b5563 !important; /* bg-gray-600 */
+    background-color: #4b5563 !important;
+    /* bg-gray-600 */
     color: #ffffff !important;
 }
 
 /* Search Input di Toolbox */
-.dark .cdx-search-field, 
+.dark .cdx-search-field,
 .dark .ce-popover__search {
-    background-color: #111827 !important; /* bg-gray-900 */
+    background-color: #111827 !important;
+    /* bg-gray-900 */
     color: #e5e7eb !important;
     border-color: #374151 !important;
 }
@@ -319,8 +339,10 @@ h3.ce-header { font-size: 1.5rem !important; }
 
 /* Plus button background fix */
 .dark .ce-toolbar__plus {
-    color: #9ca3af !important; /* gray-400 */
+    color: #9ca3af !important;
+    /* gray-400 */
 }
+
 .dark .ce-toolbar__plus:hover {
     color: #e5e7eb !important;
 }
