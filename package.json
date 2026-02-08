@@ -33,7 +33,8 @@
     "vue": "^3.2.20",
     "vue-chartjs": "^5.3.3",
     "vue-flatpickr-component": "^11.0.3",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",

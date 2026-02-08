@@ -12,7 +12,8 @@ import {
   getTransactionsListUseCase, 
   getTransactionDetailUseCase, 
   updateTransactionUseCase, 
-  deleteTransactionUseCase 
+  deleteTransactionUseCase,
+  setupBudgetUseCase
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -22,9 +23,8 @@ const createTransactionUseCaseInstance = createTransactionUseCase;
 const getCategoriesUseCaseInstance = getCategoriesUseCase;
 const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
 const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
-const getTransactionDetailUseCaseInstance = getTransactionDetailUseCase;
-const updateTransactionUseCaseInstance = updateTransactionUseCase;
 const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
+const setupBudgetUseCaseInstance = setupBudgetUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -306,6 +306,24 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
+  /**
+   * BARU: Setup Budget Configuration
+   */
+  async function setupBudget(data) {
+    isLoadingSummary.value = true;
+    const result = await setupBudgetUseCaseInstance.execute(data);
+    
+    if (result.right) {
+      // Refresh data setelah setup berhasil
+      await fetchDashboardSummary();
+      isLoadingSummary.value = false;
+      return { success: true };
+    } else {
+      isLoadingSummary.value = false;
+      return { success: false, message: result.left?.message };
+    }
+  }
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -345,5 +363,6 @@ export const useBudgetStore = defineStore("budget", () => {
     fetchTransactionById,
     updateTransaction,
     deleteTransaction,
+    setupBudget,
   };
 });

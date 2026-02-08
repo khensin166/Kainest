@@ -87,4 +87,13 @@ export class BudgetRemoteSource {
     const response = await apiClient.delete(`/budget/transactions/${id}`);
     return response.data;
   }
+  /**
+   * BARU: POST /api/budget/setup
+   * Mengatur konfigurasi budget (Salary, Rent, Saving %)
+   * @param {object} data - { salary, rent, savingPercent }
+   */
+  async setupBudget(data) {
+    const response = await apiClient.post("/budget/setup", data);
+    return response.data;
+  }
 }

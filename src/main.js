@@ -7,6 +7,7 @@ import { useAuthStore } from "./features/auth/presentation/stores/authStore";
 
 // Impor CSS Tailwind Anda
 import './css/style.css'
+import 'vue3-toastify/dist/index.css';
 
 async function startApp() {
   const app = createApp(App);

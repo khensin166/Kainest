@@ -30,5 +30,15 @@ export class RateLimitFailure extends Failure {
 export class GeneralFailure extends Failure {}
 
 // Fungsi helper untuk Either
-export const left = (failure) => ({ left: failure, right: null });
-export const right = (data) => ({ left: null, right: data });
+// Fungsi helper untuk Either
+export const left = (failure) => ({
+  left: failure,
+  right: null,
+  fold: (onLeft, onRight) => onLeft(failure),
+});
+
+export const right = (data) => ({
+  left: null,
+  right: data,
+  fold: (onLeft, onRight) => onRight(data),
+});

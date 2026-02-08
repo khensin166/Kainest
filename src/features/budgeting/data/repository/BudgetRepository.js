@@ -260,4 +260,23 @@ export class BudgetRepository {
       );
     }
   }
+  /**
+   * BARU: Setup Budget Configuration
+   */
+  async setupBudget(data) {
+    try {
+      const response = await this.remoteSource.setupBudget(data);
+      if (response.success) {
+        return right(true);
+      } else {
+        return left(
+          new ServerFailure(response.message || "Gagal menyimpan konfigurasi budget.")
+        );
+      }
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message)
+      );
+    }
+  }
 }

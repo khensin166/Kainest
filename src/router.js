@@ -66,7 +66,7 @@ const routes = [
       {
         path: "todos",
         name: "TodoList",
-        component: TodoListPage,
+        component: () => import('./features/todos/presentation/pages/TodoPage.vue'),
       },
       {
         path: "notes", // Daftar semua notes

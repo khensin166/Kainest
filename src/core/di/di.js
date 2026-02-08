@@ -22,6 +22,7 @@ import { UpdateTransactionUseCase } from "../../features/budgeting/domain/use-ca
 import { DeleteTransactionUseCase } from "../../features/budgeting/domain/use-cases/DeleteTransactionUseCase";
 import { GetSpendingTrendUseCase } from "../../features/budgeting/domain/use-cases/GetSpendingTrendUseCase";
 import { GetAiAdviceUseCase } from "../../features/budgeting/domain/use-cases/GetAiAdviceUseCase";
+import { SetupBudgetUseCase } from "../../features/budgeting/domain/use-cases/SetupBudgetUseCase";
 
 import { GetNotesUseCase } from "../../features/notes/domain/use-cases/GetNotesUseCase";
 import { GetNoteByIdUseCase } from "../../features/notes/domain/use-cases/GetNoteByIdUseCase";
@@ -66,6 +67,7 @@ export const updateTransactionUseCase = new UpdateTransactionUseCase(budgetRepos
 export const deleteTransactionUseCase = new DeleteTransactionUseCase(budgetRepository);
 export const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
 export const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
+export const setupBudgetUseCase = new SetupBudgetUseCase(budgetRepository);
 
 export const getNotesUseCase = new GetNotesUseCase(noteRepository);
 export const getNoteByIdUseCase = new GetNoteByIdUseCase(noteRepository);
