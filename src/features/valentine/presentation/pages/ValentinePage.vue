@@ -31,7 +31,10 @@
                         <!-- =========================== -->
                         <!-- STANDARD CARD CONTENT       -->
                         <!-- =========================== -->
-                        <div v-if="card.type !== 'ask-out'" class="w-full h-full flex flex-col">
+                        <!-- =========================== -->
+                        <!-- STANDARD CARD CONTENT       -->
+                        <!-- =========================== -->
+                        <div v-if="card.type === 'standard'" class="w-full h-full flex flex-col">
                             <!-- Image Area -->
                             <div
                                 class="w-full flex-1 bg-pink-200 rounded-md overflow-hidden flex items-center justify-center mb-4 relative">
@@ -53,7 +56,7 @@
                         <!-- =========================== -->
                         <!-- SPECIAL ASK-OUT CARD CONTENT -->
                         <!-- =========================== -->
-                        <div v-else class="w-full h-full flex flex-col relative">
+                        <div v-else-if="card.type === 'ask-out'" class="w-full h-full flex flex-col relative">
                             <!-- Helper Text (Absolute Top) -->
                             <div class="absolute top-0 right-0 text-xs text-gray-300">
                                 *Jawab jujur!
@@ -92,9 +95,43 @@
                             </div>
                         </div>
 
+                        <!-- =========================== -->
+                        <!-- STATS CONTENT (NEW)         -->
+                        <!-- =========================== -->
+                        <div v-else-if="card.type === 'stats'"
+                            class="w-full h-full flex flex-col items-center justify-center p-4">
+                            <div class="text-6xl mb-4">⏳</div>
+                            <h2 class="text-2xl font-bold text-pink-500 mb-2">Kita Udah Bareng</h2>
+
+                            <div class="bg-pink-50 p-4 rounded-xl w-full border border-pink-100 my-4">
+                                <p class="text-lg font-mono text-gray-700 font-bold text-center leading-relaxed">
+                                    {{ timeTogether }}
+                                </p>
+                            </div>
+
+                            <p class="text-gray-500 text-sm opacity-80 mt-2">
+                                Dan masih akan terus berlanjut... ❤️
+                            </p>
+
+                            <div class="absolute bottom-4 right-4 text-red-500">❤️</div>
+                        </div>
+
                     </div>
                 </transition-group>
             </div>
+
+            <!-- Music & Menu Controls -->
+            <div class="absolute top-4 right-4 z-50 flex gap-2">
+                <!-- Music Toggle -->
+                <button @click="toggleMusic"
+                    class="bg-white/80 p-2 rounded-full shadow-sm text-pink-400 hover:bg-white transition backdrop-blur-sm">
+                    <span v-if="isMusicPlaying">🔊</span>
+                    <span v-else>🔇</span>
+                </button>
+            </div>
+
+            <!-- Hidden Youtube Player -->
+            <div id="bg-music" class="hidden"></div>
 
             <!-- Navigation & Action -->
             <div class="mt-8 flex flex-col items-center gap-6">
@@ -142,9 +179,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import confetti from 'canvas-confetti';
 
 // =========================================
 // STATE: DATA
@@ -160,10 +198,91 @@ const cards = ref([
     { id: 7, type: 'standard', image: 'Stiker 9 (SFILE.MOBI).gif', text: 'Jangan sedih-sedih ya', subtext: 'Nanti cantiknya ilang hlo' },
     { id: 8, type: 'standard', image: 'Stiker 8 (SFILE.MOBI).gif', text: 'Semangat terus ya!', subtext: 'Aku selalu dukung kamu' },
     { id: 9, type: 'standard', image: 'Stiker 10 (SFILE.MOBI).gif', text: 'Happy Valentine!', subtext: 'Love you forever! 🌹' },
+    { id: 'stats', type: 'stats', text: 'Perjalanan Kita', subtext: 'Udah sejauh ini lho...' }, // KARTU STATISTIK BARU (INDEX TERAKHIR)
 ]);
 
 const currentIndex = ref(0);
-const isAskCardSolved = ref(false); // Apakah kartu tanya jawab sudah berhasil?
+const isAskCardSolved = ref(false);
+
+// =========================================
+// STATE: TIMER / STATS
+// =========================================
+const startDate = new Date('2024-05-04T00:00:00'); // 04 Mei 2024
+const timeTogether = ref('');
+
+const updateTimer = () => {
+    const now = new Date();
+    const diff = now - startDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    timeTogether.value = `${days} Hari, ${hours} Jam, ${minutes} Menit, ${seconds} Detik`;
+};
+
+let timerInterval;
+
+// =========================================
+// STATE: MUSIC (YouTube Iframe)
+// =========================================
+const isMusicPlaying = ref(false);
+const player = ref(null);
+
+// Load YouTube Iframe API
+const loadYoutubeAPI = () => {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = () => {
+        player.value = new window.YT.Player('bg-music', {
+            height: '0',
+            width: '0',
+            videoId: 'mJE0ROBWPvY', // ID Video dari URL: https://youtu.be/mJE0ROBWPvY
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'loop': 1,
+                'playlist': 'mJE0ROBWPvY'
+            },
+            events: {
+                'onReady': onPlayerReady,
+            }
+        });
+    };
+};
+
+const onPlayerReady = (event) => {
+    // Autoplay sering diblokir browser, jadi kita set volume kecil dulu atau tunggu interaksi user
+    event.target.setVolume(50);
+    // event.target.playVideo(); // Coba autoplay
+    isMusicPlaying.value = true;
+};
+
+const toggleMusic = () => {
+    if (!player.value) return;
+
+    if (isMusicPlaying.value) {
+        player.value.pauseVideo();
+        isMusicPlaying.value = false;
+    } else {
+        player.value.playVideo();
+        isMusicPlaying.value = true;
+    }
+};
+
+onMounted(() => {
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+    loadYoutubeAPI();
+});
+
+onUnmounted(() => {
+    clearInterval(timerInterval);
+});
 
 // =========================================
 // STATE: ASK OUT GAME
@@ -243,13 +362,28 @@ const handleYesClick = () => {
             top: pos.top,
             left: pos.left,
         };
-        toast.warning("Eits! Cluenya tekan 2 kali  😝", {
+        toast.warning("Eits! Cluenya tekan2 kali 😝", {
             autoClose: 2000,
             position: toast.POSITION.TOP_CENTER,
         });
     } else {
         // SUCCESS!
         isAskCardSolved.value = true;
+
+        // 1. Confetti Effect
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#ff69b4', '#ff1493', '#ffb6c1'] // Pink themes
+        });
+
+        // 2. Play Music if not playing (Interaction required for audio)
+        if (player.value && !isMusicPlaying.value) {
+            player.value.playVideo();
+            isMusicPlaying.value = true;
+        }
+
         // Langsung lanjut ke slide berikutnya
         nextCard();
     }
