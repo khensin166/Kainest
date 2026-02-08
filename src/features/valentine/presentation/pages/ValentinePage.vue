@@ -143,6 +143,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 // =========================================
 // STATE: DATA
@@ -241,7 +243,10 @@ const handleYesClick = () => {
             top: pos.top,
             left: pos.left,
         };
-        alert("Eits! Tekan 'Enggak' dulu dong 2 kali 😝");
+        toast.warning("Eits! Cluenya tekan 2 kali  😝", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+        });
     } else {
         // SUCCESS!
         isAskCardSolved.value = true;
