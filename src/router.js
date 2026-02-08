@@ -17,6 +17,7 @@ import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vu
 import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
+import ValentinePage from "./features/valentine/presentation/pages/ValentinePage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -47,6 +48,13 @@ const routes = [
     path: "/share/notes/:id",
     name: "SharedNote",
     component: SharedNotePage,
+  },
+  
+  // ✅ ROUTE VALENTINE (PUBLIK)
+  {
+    path: "/valentine",
+    name: "Valentine",
+    component: ValentinePage,
   },
 
   // Halaman terproteksi yang menggunakan DashboardLayout
