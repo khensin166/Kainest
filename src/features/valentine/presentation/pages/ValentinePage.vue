@@ -96,6 +96,47 @@
                         </div>
 
                         <!-- =========================== -->
+                        <!-- CLOCK VOICE CARD (NEW)      -->
+                        <!-- =========================== -->
+                        <div v-else-if="card.type === 'clock'"
+                            class="w-full h-full flex flex-col items-center justify-center bg-pink-50 rounded-lg overflow-hidden relative">
+                            <h2 class="text-xl font-bold text-pink-500 mb-8 z-10">Putar Jarumnya 🕰️</h2>
+
+                            <!-- Clock Face -->
+                            <div ref="clockFace"
+                                class="w-64 h-64 rounded-full bg-white border-4 border-pink-300 shadow-xl relative flex items-center justify-center cursor-pointer touch-none"
+                                @mousedown="startDrag" @touchstart="startDrag" @mousemove="onDrag" @touchmove="onDrag"
+                                @mouseup="stopDrag" @mouseleave="stopDrag" @touchend="stopDrag">
+
+                                <!-- Center Point -->
+                                <div class="w-4 h-4 bg-pink-500 rounded-full z-20"></div>
+
+                                <!-- Hand (Jarum) -->
+                                <div class="absolute w-2 h-32 bg-pink-400 origin-bottom rounded-full z-10"
+                                    :style="{ transform: `translateY(-50%) rotate(${rotation}deg)` }">
+                                    <div
+                                        class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-pink-600 rounded-full">
+                                    </div>
+                                </div>
+
+                                <!-- Decor Indicators -->
+                                <div v-for="n in 12" :key="n" class="absolute w-1 h-3 bg-gray-300"
+                                    :style="{ transform: `rotate(${n * 30}deg) translateY(-110px)` }">
+                                </div>
+                            </div>
+
+                            <p class="text-sm text-gray-400 mt-8 z-10 animate-pulse">
+                                <span v-if="isPlayingVoice">Dengerin baik-baik ya... 🔊</span>
+                                <span v-else>Putar terus buat dengerin ❤️</span>
+                            </p>
+
+                            <!-- Hidden Audio -->
+                            <audio ref="voiceAudio" loop>
+                                <source src="/images/valentine/notes-valentine.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+
+                        <!-- =========================== -->
                         <!-- STATS CONTENT (NEW)         -->
                         <!-- =========================== -->
                         <div v-else-if="card.type === 'stats'"
@@ -189,7 +230,7 @@ import confetti from 'canvas-confetti';
 // =========================================
 const cards = ref([
     { id: 1, type: 'standard', image: 'Stiker 17 (SFILE.MOBI).gif', text: 'Hai Sayang! 👋', subtext: 'Ada pesan buat butett inih...' },
-    { id: 'ask', type: 'ask-out', text: 'Butett sayang abang gak?', subtext: '' }, // KARTU SPESIAL (INDEX 1)
+    { id: 'ask', type: 'ask-out', text: 'Butett sayang abang gak?', subtext: '' },
     { id: 2, type: 'standard', image: 'Stiker 18 (SFILE.MOBI).gif', text: 'Butett tau gak?', subtext: '' },
     { id: 3, type: 'standard', image: 'Stiker 21 (SFILE.MOBI).gif', text: 'Setiap lihat dirimu...', subtext: 'Hatiku rasanya seneng banget eaaa...' },
     { id: 4, type: 'standard', image: 'Stiker 20 (SFILE.MOBI).gif', text: 'Makasih ya...', subtext: 'Udah selalu ada buat Abangg' },
@@ -197,12 +238,74 @@ const cards = ref([
     { id: 6, type: 'standard', image: 'Stiker 15 (SFILE.MOBI).gif', text: 'Tapi aslinya...', subtext: 'Abang sayang kali sama Butett! ❤️' },
     { id: 7, type: 'standard', image: 'Stiker 9 (SFILE.MOBI).gif', text: 'Jangan sedih-sedih ya', subtext: 'Nanti cantiknya ilang hlo' },
     { id: 8, type: 'standard', image: 'Stiker 8 (SFILE.MOBI).gif', text: 'Semangat terus ya!', subtext: 'Abang selalu dukung Butett' },
-    { id: 9, type: 'standard', image: 'Stiker 10 (SFILE.MOBI).gif', text: 'Happy Valentine!', subtext: 'Love you forever! 🌹' },
-    { id: 'stats', type: 'stats', text: 'Perjalanan Kita', subtext: 'Udah sejauh ini lho...' }, // KARTU STATISTIK BARU (INDEX TERAKHIR)
+    { id: 'clock', type: 'clock', text: '', subtext: '' }, // KARTU JAM INTERAKTIF
+    { id: 'stats', type: 'stats', text: 'Perjalanan Kiteniii', subtext: 'Udah sejauh ini lho...' },
 ]);
 
 const currentIndex = ref(0);
 const isAskCardSolved = ref(false);
+
+// =========================================
+// STATE: CLOCK INTERACTIVE
+// =========================================
+const clockFace = ref(null);
+const voiceAudio = ref(null);
+const rotation = ref(0);
+const isDragging = ref(false);
+const isPlayingVoice = ref(false);
+let lastAngle = 0;
+
+const startDrag = (e) => {
+    isDragging.value = true;
+    updateRotation(e);
+};
+
+const stopDrag = () => {
+    isDragging.value = false;
+    if (voiceAudio.value) {
+        voiceAudio.value.pause();
+        isPlayingVoice.value = false;
+    }
+};
+
+const onDrag = (e) => {
+    if (!isDragging.value) return;
+    e.preventDefault();
+    updateRotation(e);
+};
+
+const updateRotation = (e) => {
+    if (!clockFace.value) return;
+
+    const rect = clockFace.value.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Support mouse & touch
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const deltaX = clientX - centerX;
+    const deltaY = clientY - centerY;
+
+    const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
+
+    // Deteksi perputaran
+    if (Math.abs(angle - lastAngle) > 2) {
+        if (voiceAudio.value && voiceAudio.value.paused) {
+            voiceAudio.value.play().catch(e => console.log("Audio play failed", e));
+            isPlayingVoice.value = true;
+
+            if (player.value && isMusicPlaying.value) {
+                player.value.pauseVideo();
+                isMusicPlaying.value = false;
+            }
+        }
+    }
+
+    rotation.value = angle;
+    lastAngle = angle;
+};
 
 // =========================================
 // STATE: TIMER / STATS
