@@ -188,15 +188,15 @@ import confetti from 'canvas-confetti';
 // STATE: DATA
 // =========================================
 const cards = ref([
-    { id: 1, type: 'standard', image: 'Stiker 17 (SFILE.MOBI).gif', text: 'Hai Sayang! 👋', subtext: 'Ada pesan buat kamu nih...' },
-    { id: 'ask', type: 'ask-out', text: 'Kamu sayang aku gak?', subtext: '' }, // KARTU SPESIAL (INDEX 1)
-    { id: 2, type: 'standard', image: 'Stiker 18 (SFILE.MOBI).gif', text: 'Kamu tau gak?', subtext: '' },
-    { id: 3, type: 'standard', image: 'Stiker 21 (SFILE.MOBI).gif', text: 'Setiap lihat kamu...', subtext: 'Hatiku rasanya seneng banget' },
-    { id: 4, type: 'standard', image: 'Stiker 20 (SFILE.MOBI).gif', text: 'Makasih ya...', subtext: 'Udah selalu ada buat aku' },
-    { id: 5, type: 'standard', image: 'Stiker 12 (SFILE.MOBI).gif', text: 'Maaf kalau aku nyebelin', subtext: 'Kadang suka bikin emosi ✌️' },
-    { id: 6, type: 'standard', image: 'Stiker 15 (SFILE.MOBI).gif', text: 'Tapi aslinya...', subtext: 'Aku sayang banget sama kamu! ❤️' },
+    { id: 1, type: 'standard', image: 'Stiker 17 (SFILE.MOBI).gif', text: 'Hai Sayang! 👋', subtext: 'Ada pesan buat butett inih...' },
+    { id: 'ask', type: 'ask-out', text: 'Butett sayang abang gak?', subtext: '' }, // KARTU SPESIAL (INDEX 1)
+    { id: 2, type: 'standard', image: 'Stiker 18 (SFILE.MOBI).gif', text: 'Butett tau gak?', subtext: '' },
+    { id: 3, type: 'standard', image: 'Stiker 21 (SFILE.MOBI).gif', text: 'Setiap lihat dirimu...', subtext: 'Hatiku rasanya seneng banget eaaa...' },
+    { id: 4, type: 'standard', image: 'Stiker 20 (SFILE.MOBI).gif', text: 'Makasih ya...', subtext: 'Udah selalu ada buat Abangg' },
+    { id: 5, type: 'standard', image: 'Stiker 12 (SFILE.MOBI).gif', text: 'Maaf kalau abang nyebelin', subtext: 'Kadang suka bikin emosi ✌️:)' },
+    { id: 6, type: 'standard', image: 'Stiker 15 (SFILE.MOBI).gif', text: 'Tapi aslinya...', subtext: 'Abang sayang kali sama Butett! ❤️' },
     { id: 7, type: 'standard', image: 'Stiker 9 (SFILE.MOBI).gif', text: 'Jangan sedih-sedih ya', subtext: 'Nanti cantiknya ilang hlo' },
-    { id: 8, type: 'standard', image: 'Stiker 8 (SFILE.MOBI).gif', text: 'Semangat terus ya!', subtext: 'Aku selalu dukung kamu' },
+    { id: 8, type: 'standard', image: 'Stiker 8 (SFILE.MOBI).gif', text: 'Semangat terus ya!', subtext: 'Abang selalu dukung Butett' },
     { id: 9, type: 'standard', image: 'Stiker 10 (SFILE.MOBI).gif', text: 'Happy Valentine!', subtext: 'Love you forever! 🌹' },
     { id: 'stats', type: 'stats', text: 'Perjalanan Kita', subtext: 'Udah sejauh ini lho...' }, // KARTU STATISTIK BARU (INDEX TERAKHIR)
 ]);
@@ -207,7 +207,7 @@ const isAskCardSolved = ref(false);
 // =========================================
 // STATE: TIMER / STATS
 // =========================================
-const startDate = new Date('2024-05-04T00:00:00'); // 04 Mei 2024
+const startDate = new Date('2025-05-04T00:00:00'); // 04 Mei 2024
 const timeTogether = ref('');
 
 const updateTimer = () => {
