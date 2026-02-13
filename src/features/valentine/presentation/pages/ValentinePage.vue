@@ -100,38 +100,58 @@
                         <!-- =========================== -->
                         <div v-else-if="card.type === 'clock'"
                             class="w-full h-full flex flex-col items-center justify-center bg-pink-50 rounded-lg overflow-hidden relative">
-                            <h2 class="text-xl font-bold text-pink-500 mb-8 z-10">Putar Jarumnya 🕰️</h2>
-
-                            <!-- Clock Face -->
-                            <div ref="clockFace"
-                                class="w-64 h-64 rounded-full bg-white border-4 border-pink-300 shadow-xl relative flex items-center justify-center cursor-pointer touch-none"
-                                @mousedown="startDrag" @touchstart="startDrag" @mousemove="onDrag" @touchmove="onDrag"
-                                @mouseup="stopDrag" @mouseleave="stopDrag" @touchend="stopDrag">
-
-                                <!-- Center Point -->
-                                <div class="w-4 h-4 bg-pink-500 rounded-full z-20"></div>
-
-                                <!-- Hand (Jarum) -->
-                                <div class="absolute w-2 h-32 bg-pink-400 origin-bottom rounded-full z-10"
-                                    :style="{ transform: `translateY(-50%) rotate(${rotation}deg)` }">
+                            <!-- MUSIC BOX VISUAL -->
+                            <div class="relative flex flex-col items-center">
+                                <!-- Box Body -->
+                                <div
+                                    class="w-48 h-40 bg-rose-200 rounded-lg border-4 border-rose-300 shadow-xl flex items-center justify-center relative z-0">
                                     <div
-                                        class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-pink-600 rounded-full">
+                                        class="w-32 h-24 bg-rose-100/50 rounded flex flex-col items-center justify-center gap-2">
+                                        <div class="flex gap-1">
+                                            <div class="w-1 h-12 bg-gray-300 rounded-full"></div>
+                                            <div class="w-1 h-10 bg-gray-300 rounded-full"></div>
+                                            <div class="w-1 h-14 bg-gray-300 rounded-full"></div>
+                                            <div class="w-1 h-11 bg-gray-300 rounded-full"></div>
+                                        </div>
+                                        <span class="text-[10px] text-rose-400 font-bold tracking-widest">LOVE
+                                            SONG</span>
                                     </div>
+                                    <!-- Keyhole -->
+                                    <div class="absolute bottom-4 w-4 h-6 bg-rose-400 rounded-full"></div>
                                 </div>
 
-                                <!-- Decor Indicators -->
-                                <div v-for="n in 12" :key="n" class="absolute w-1 h-3 bg-gray-300"
-                                    :style="{ transform: `rotate(${n * 30}deg) translateY(-110px)` }">
+                                <!-- Rotating Handle/Crank (This is the interactive part) -->
+                                <!-- Re-using 'card-clock-face' class for logic compatibility, effectively the 'touch zone' -->
+                                <div class="card-clock-face absolute top-10 right-[-40px] w-32 h-32 flex items-center justify-center cursor-pointer touch-none z-10"
+                                    @mousedown="startDrag" @touchstart="startDrag" @mousemove="onDrag"
+                                    @touchmove="onDrag" @mouseup="stopDrag" @mouseleave="stopDrag" @touchend="stopDrag">
+
+                                    <!-- The Crank Visual -->
+                                    <div class="w-full h-full relative"
+                                        :style="{ transform: `rotate(${rotation}deg)` }">
+                                        <!-- Arm -->
+                                        <div
+                                            class="absolute top-[50%] left-[50%] w-16 h-4 bg-gray-400 rounded-full origin-left transform -translate-y-1/2 border-2 border-gray-500 shadow-md">
+                                        </div>
+                                        <!-- Knob (Handle Grip) -->
+                                        <div
+                                            class="absolute top-[50%] right-[-10px] w-8 h-8 bg-rose-500 rounded-full transform -translate-y-1/2 shadow-lg border-2 border-rose-600">
+                                        </div>
+                                        <!-- Axis -->
+                                        <div
+                                            class="absolute top-[50%] left-[50%] w-6 h-6 bg-gray-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 border-2 border-gray-600">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <p class="text-sm text-gray-400 mt-8 z-10 animate-pulse">
-                                <span v-if="isPlayingVoice">Dengerin baik-baik ya... 🔊</span>
-                                <span v-else>Putar terus buat dengerin ❤️</span>
+                            <p class="text-sm text-gray-500 mt-12 font-bold z-10 animate-pulse text-center">
+                                <span v-if="isPlayingVoice">🎶 Sedang memutar... 🎶</span>
+                                <span v-else>Putar tuasnya buat dengerin ❤️</span>
                             </p>
 
                             <!-- Hidden Audio -->
-                            <audio ref="voiceAudio" loop>
+                            <audio class="card-audio-voice" loop>
                                 <source src="/images/valentine/notes-valentine.mp3" type="audio/mpeg">
                             </audio>
                         </div>
@@ -248,8 +268,10 @@ const isAskCardSolved = ref(false);
 // =========================================
 // STATE: CLOCK INTERACTIVE
 // =========================================
-const clockFace = ref(null);
-const voiceAudio = ref(null);
+// =========================================
+// STATE: CLOCK INTERACTIVE
+// =========================================
+// Hapus ref clockFace & voiceAudio karena kita pakai querySelector selector
 const rotation = ref(0);
 const isDragging = ref(false);
 const isPlayingVoice = ref(false);
@@ -258,30 +280,51 @@ let lastAngle = 0;
 const startDrag = (e) => {
     isDragging.value = true;
     updateRotation(e);
+
+    // Attach window listeners
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('touchend', stopDrag);
 };
 
 const stopDrag = () => {
     isDragging.value = false;
-    if (voiceAudio.value) {
-        voiceAudio.value.pause();
+
+    const audioEl = document.querySelector('.card-audio-voice');
+    if (audioEl && !audioEl.paused) {
+        audioEl.pause();
         isPlayingVoice.value = false;
+
+        // Resume background music (optional)
+        // if (player.value && !isMusicPlaying.value) {
+        //    player.value.playVideo();
+        //    isMusicPlaying.value = true;
+        // }
     }
+
+    window.removeEventListener('mousemove', onDrag);
+    window.removeEventListener('mouseup', stopDrag);
+    window.removeEventListener('touchmove', onDrag);
+    window.removeEventListener('touchend', stopDrag);
 };
 
 const onDrag = (e) => {
     if (!isDragging.value) return;
-    e.preventDefault();
+    if (e.type === 'touchmove') e.preventDefault();
     updateRotation(e);
 };
 
 const updateRotation = (e) => {
-    if (!clockFace.value) return;
+    // DIRECT DOM SELECTOR
+    const clockEl = document.querySelector('.card-clock-face');
 
-    const rect = clockFace.value.getBoundingClientRect();
+    if (!clockEl) return;
+
+    const rect = clockEl.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    // Support mouse & touch
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -290,10 +333,10 @@ const updateRotation = (e) => {
 
     const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
 
-    // Deteksi perputaran
     if (Math.abs(angle - lastAngle) > 2) {
-        if (voiceAudio.value && voiceAudio.value.paused) {
-            voiceAudio.value.play().catch(e => console.log("Audio play failed", e));
+        const audioEl = document.querySelector('.card-audio-voice');
+        if (audioEl && audioEl.paused) {
+            audioEl.play().catch(err => console.error("Play failed", err));
             isPlayingVoice.value = true;
 
             if (player.value && isMusicPlaying.value) {
