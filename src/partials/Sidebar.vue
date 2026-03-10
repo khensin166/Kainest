@@ -201,6 +201,11 @@ export default {
             path: "/app/wabot-api",
             iconComponent: ChatBubbleBottomCenterTextIcon,
           },
+          {
+            name: "Backup Chat",
+            path: "/app/wabot-backup",
+            iconComponent: ArchiveBoxIcon,
+          },
         ],
       },
       {

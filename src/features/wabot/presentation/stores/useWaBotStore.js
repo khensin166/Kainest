@@ -17,6 +17,7 @@ export const useWaBotStore = defineStore("wabot", () => {
 
   const apiKeysList = ref([]); // State untuk list key
   const groups = ref([]);
+  const backupTargets = ref([]); // State untuk Backup Targets
   const isLoading = ref(false);
   const isSending = ref(false);
 
@@ -189,6 +190,72 @@ export const useWaBotStore = defineStore("wabot", () => {
     apiKey.value = "";
     localStorage.removeItem("wabot_api_key");
     groups.value = [];
+    backupTargets.value = [];
+  }
+
+  // 8. ACTION BARU: Fech Backup Targets
+  async function fetchBackupTargets() {
+    if (!baseUrl.value || !apiKey.value) return;
+    isLoading.value = true;
+    try {
+      const response = await fetch(`${baseUrl.value}/api/backup-targets`, {
+        headers: {
+          "x-api-key": apiKey.value
+        }
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        backupTargets.value = data.data;
+      }
+    } catch (error) {
+      console.error("Gagal fetch backup targets:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // 9. ACTION BARU: Add Backup Target
+  async function addBackupTarget(sessionId, chatId, chatName) {
+    if (!baseUrl.value || !apiKey.value) return;
+    try {
+      const response = await fetch(`${baseUrl.value}/api/backup-targets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey.value
+        },
+        body: JSON.stringify({ session_id: sessionId, chat_id: chatId, chat_name: chatName })
+      });
+      const data = await response.json();
+      if (data.status === "error") throw new Error(data.message);
+      
+      await fetchBackupTargets(); // refresh list
+      return true;
+    } catch (error) {
+      alert("Gagal menambah backup: " + error.message);
+      return false;
+    }
+  }
+
+  // 10. ACTION BARU: Remove Backup Target
+  async function removeBackupTarget(id) {
+    if (!baseUrl.value || !apiKey.value) return;
+    try {
+      const response = await fetch(`${baseUrl.value}/api/backup-targets/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-api-key": apiKey.value
+        }
+      });
+      const data = await response.json();
+      if (data.status === "error") throw new Error(data.message);
+      
+      await fetchBackupTargets(); // refresh list
+      return true;
+    } catch (error) {
+      alert("Gagal menghapus backup: " + error.message);
+      return false;
+    }
   }
 
   return {
@@ -197,6 +264,7 @@ export const useWaBotStore = defineStore("wabot", () => {
     adminSecret,
     groups,
     apiKeysList, // Export ini
+    backupTargets, // Export ini
     isLoading,
     isSending,
     loadConfig,
@@ -205,6 +273,9 @@ export const useWaBotStore = defineStore("wabot", () => {
     sendMessage,
     fetchApiKeysList, // Export ini
     selectApiKey, // Export ini
+    fetchBackupTargets, // Export ini
+    addBackupTarget, // Export ini
+    removeBackupTarget, // Export ini
     logout,
   };
 });

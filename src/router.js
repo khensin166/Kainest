@@ -131,6 +131,11 @@ const routes = [
         name: "wabot-api",
         component: () => import('./features/wabot/presentation/pages/WaBotApiPage.vue'),
       },
+      {
+        path: "wabot-backup",
+        name: "wabot-backup",
+        component: () => import('./features/wabot/presentation/pages/WaBackupPage.vue'),
+      },
     ],
   },
 
