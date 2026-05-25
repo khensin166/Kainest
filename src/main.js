@@ -30,5 +30,5 @@ async function startApp() {
   app.mount("#app");
 }
 
-// Jalankan fungsi async untuk memulai aplikasi
+// Jalankan fungsi async untuk memulai aplikasi ken
 startApp();
