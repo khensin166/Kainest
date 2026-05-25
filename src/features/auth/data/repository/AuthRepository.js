@@ -87,6 +87,31 @@ export class AuthRepository extends IAuthRepository {
   }
 
   /**
+   * Menangani inisiasi login sosial
+   */
+  async socialLogin(provider, callbackURL) {
+    try {
+      const response = await this.remoteSource.socialLogin(provider, callbackURL);
+      if (response && response.url) {
+        return right(response.url);
+      } else {
+        return left(new ServerFailure("Gagal mendapatkan URL otorisasi."));
+      }
+    } catch (error) {
+      if (error.response) {
+        const message = error.response.data?.message || "Social login gagal.";
+        return left(new ServerFailure(message));
+      } else if (error.request) {
+        return left(new NetworkFailure());
+      } else {
+        return left(
+          new ServerFailure(error.message || "Gagal melakukan inisiasi social login.")
+        );
+      }
+    }
+  }
+
+  /**
    * Mendapatkan user saat ini dengan memvalidasi token di localStorage.
    */
   async getCurrentUser() {

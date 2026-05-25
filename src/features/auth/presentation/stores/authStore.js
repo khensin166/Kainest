@@ -6,7 +6,8 @@ import {
   loginUserUseCase, 
   registerUserUseCase, 
   getCurrentUserUseCase, 
-  logoutUserUseCase 
+  logoutUserUseCase,
+  socialLoginUseCase
 } from "../../../../core/di/di"; // DIP: Injected dependencies
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
@@ -163,6 +164,33 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function loginSocial(provider, callbackUrl) {
+    isLoading.value = true;
+    error.value = null;
+
+    const result = await socialLoginUseCase.execute(provider, callbackUrl);
+
+    if (result.left) {
+      const failure = result.left;
+      const message = mapFailureToMessage(failure);
+      error.value = message;
+      isLoading.value = false;
+
+      modalStore.openModal({
+        newTitle: "Login Gagal",
+        newMessage: message,
+        newStatus: "error",
+      });
+
+      throw new Error(message);
+    } else {
+      // Sukses, redirect URL
+      const authorizationUrl = result.right;
+      window.location.href = authorizationUrl;
+      // Jangan set isLoading false agar indikator loading tetap berjalan hingga pindah halaman
+    }
+  }
+
   async function logout() {
     isLoading.value = true;
     await logoutUseCase.execute();
@@ -189,6 +217,7 @@ export const useAuthStore = defineStore("auth", () => {
     error,
     isAuthReady, // <-- Tambahkan ini
     login,
+    loginSocial,
     logout,
     initializeAuth,
     register,

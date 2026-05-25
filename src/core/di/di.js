@@ -12,6 +12,7 @@ import { RegisterUserUseCase } from "../../features/auth/domain/use-cases/Regist
 import { GetCurrentUserUseCase } from "../../features/auth/domain/use-cases/GetCurrentUserUseCase";
 import { LogoutUserUseCase } from "../../features/auth/domain/use-cases/LogoutUserUseCase";
 import { GetProfileUseCase } from "../../features/auth/domain/use-cases/GetProfileUseCase";
+import { SocialLoginUseCase } from "../../features/auth/domain/use-cases/SocialLoginUseCase";
 
 import { GetDashboardSummaryUseCase } from "../../features/budgeting/domain/use-cases/GetDashboardSummaryUseCase";
 import { GetCategoriesUseCase } from "../../features/budgeting/domain/use-cases/GetCategoriesUseCase";
@@ -57,6 +58,7 @@ export const registerUserUseCase = new RegisterUserUseCase(authRepository);
 export const getCurrentUserUseCase = new GetCurrentUserUseCase(authRepository);
 export const logoutUserUseCase = new LogoutUserUseCase(authRepository);
 export const getProfileUseCase = new GetProfileUseCase(authRepository);
+export const socialLoginUseCase = new SocialLoginUseCase(authRepository);
 
 export const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(budgetRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);

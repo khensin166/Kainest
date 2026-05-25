@@ -111,7 +111,6 @@ import { ref } from "vue";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline";
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 import { useRouter } from "vue-router";
-import api from "@/lib/apiClient";
 
 // State untuk form input
 const email = ref("");
@@ -143,22 +142,10 @@ const handleLogin = async () => {
 // Fungsi untuk menangani login sosial (Google & GitHub)
 const handleSocialLogin = async (provider) => {
   try {
-    auth.isLoading = true; // Set state loading dari store jika memungkinkan
     const callbackUrl = `${window.location.origin}/app/dashboard`;
-    const response = await api.post("/auth/sign-in/social", {
-      provider: provider,
-      callbackURL: callbackUrl,
-    });
-
-    if (response.data && response.data.url) {
-      window.location.href = response.data.url;
-    } else {
-      console.error("Gagal mendapatkan URL otorisasi dari server");
-    }
+    await auth.loginSocial(provider, callbackUrl);
   } catch (error) {
     console.error("Error saat inisiasi social login:", error);
-  } finally {
-    auth.isLoading = false;
   }
 };
 </script>

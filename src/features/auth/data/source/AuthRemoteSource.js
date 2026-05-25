@@ -19,6 +19,14 @@ export class AuthRemoteSource {
     return response.data;
   }
 
+  async socialLogin(provider, callbackURL) {
+    const response = await api.post("/auth/sign-in/social", {
+      provider,
+      callbackURL,
+    });
+    return response.data; // { url: "...", redirect: true }
+  }
+
   async getProfile() {
     // Panggil endpoint /profile untuk data LENGKAP, BUKAN /auth/me
     const response = await api.get("/profile");
