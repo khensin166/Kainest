@@ -91,13 +91,8 @@ export class AuthRepository extends IAuthRepository {
    */
   async getCurrentUser() {
     try {
-      // 1. Cek apakah token ada
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        return right(null); // Tidak ada user yang login, ini bukan error.
-      }
-
-      // 2. Token ada, panggil /auth/me untuk validasi dan ambil profil
+      // Coba panggil /profile untuk mengambil profil. Jika user memiliki cookie session yang valid, ini akan berhasil.
+      // Jika tidak, API akan merespon 401 dan ditangani di block catch.
       const profileData = await this.remoteSource.getProfile();
 
       // 3. Buat UserEntity 

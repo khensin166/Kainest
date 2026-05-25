@@ -85,6 +85,40 @@
           {{ auth.isLoading ? "Memproses..." : "Login" }}
         </button>
 
+        <!-- Separator -->
+        <div class="relative flex py-2 items-center">
+          <div class="flex-grow border-t border-[var(--color-gray-200)]"></div>
+          <span class="flex-shrink mx-4 text-[var(--color-gray-400)] text-xs">Atau masuk dengan</span>
+          <div class="flex-grow border-t border-[var(--color-gray-200)]"></div>
+        </div>
+
+        <!-- Tombol Social Login -->
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            @click="handleSocialLogin('google')"
+            class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[var(--color-gray-200)] rounded-lg text-sm font-medium text-[var(--color-gray-700)] hover:bg-[var(--color-gray-50)] transition-colors"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 15.01 1 12 1 7.24 1 3.2 3.74 1.25 7.75l3.85 2.99C6.01 7.27 8.78 5.04 12 5.04z"/>
+              <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46c-.28 1.48-1.12 2.73-2.38 3.58l3.7 2.87c2.16-1.99 3.41-4.92 3.41-8.6z"/>
+              <path fill="#FBBC05" d="M5.1 10.74c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.25 3.17C.45 4.77 0 6.58 0 8.5s.45 3.73 1.25 5.33l3.85-3.09z"/>
+              <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.7-2.87c-1.18.79-2.69 1.26-4.26 1.26-3.22 0-5.99-2.23-6.9-5.7l-3.85 2.99C3.2 20.26 7.24 23 12 23z"/>
+            </svg>
+            Google
+          </button>
+          <button
+            type="button"
+            @click="handleSocialLogin('github')"
+            class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[var(--color-gray-200)] rounded-lg text-sm font-medium text-[var(--color-gray-700)] hover:bg-[var(--color-gray-50)] transition-colors"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+            GitHub
+          </button>
+        </div>
+
         <!-- Pesan Error dari Store (jika ada) -->
         <p
           v-if="auth.error"
@@ -141,6 +175,13 @@ const handleLogin = async () => {
     // jadi kita hanya perlu mencatatnya di console untuk debugging.
     console.error("Gagal login dari komponen:", error.message);
   }
+};
+
+// Fungsi untuk menangani login sosial (Google & GitHub)
+const handleSocialLogin = (provider) => {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://staging-kainest-be.kenantomfie.site";
+  const callbackUrl = `${window.location.origin}/app/dashboard`;
+  window.location.href = `${apiBaseUrl}/auth/login/social?provider=${provider}&callbackURL=${encodeURIComponent(callbackUrl)}`;
 };
 </script>
 
