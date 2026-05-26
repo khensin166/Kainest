@@ -1,5 +1,4 @@
-import { left, right } from "@/core/utils/either";
-import { ServerFailure } from "@/core/error/failures";
+import { left, right, ServerFailure } from "../../../../core/error/failure";
 
 export class AdminRepository {
   constructor(remoteSource) {
