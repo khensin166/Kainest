@@ -22,5 +22,6 @@ export function mapUserFromApi(apiUser) {
     invitationCode: apiUser.profile?.invitationCode,
     role: apiUser.role,
     permissions: apiUser.permissions,
+    // Tes
   });
 }
