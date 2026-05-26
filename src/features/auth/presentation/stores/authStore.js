@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 // import { AuthRepository } from "../../data/repository/AuthRepository"; // DIP: Removed direct dependency
 import { 
@@ -19,6 +19,16 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Status untuk menandakan apakah pengecekan auth awal sudah selesai
   const isAuthReady = ref(false);
+
+  // RBAC Getters & Methods
+  const isAdmin = computed(() => {
+    return user.value?.role === "admin";
+  });
+
+  const hasPermission = (permission) => {
+    if (isAdmin.value) return true; // Admin has all permissions
+    return user.value?.permissions?.includes(permission) || false;
+  };
 
   const modalStore = useModalStore();
   
@@ -216,6 +226,8 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading,
     error,
     isAuthReady, // <-- Tambahkan ini
+    isAdmin, // RBAC
+    hasPermission, // RBAC
     login,
     loginSocial,
     logout,

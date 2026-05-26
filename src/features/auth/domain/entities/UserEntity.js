@@ -13,6 +13,9 @@ export class UserEntity {
     displayName,
     avatarUrl,
     invitationCode,
+    // RBAC
+    role,
+    permissions,
   }) {
     this.id = id;
     this.email = email;
@@ -26,6 +29,10 @@ export class UserEntity {
     this.displayName = displayName;
     this.avatarUrl = avatarUrl;
     this.invitationCode = invitationCode;
+
+    // RBAC
+    this.role = role || "user";
+    this.permissions = permissions || [];
   }
 
   // Opsional: Helper getter agar lebih mudah di UI

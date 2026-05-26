@@ -135,6 +135,14 @@ const routes = [
         path: "wabot-backup",
         name: "wabot-backup",
         component: () => import('./features/wabot/presentation/pages/WaBackupPage.vue'),
+        meta: { requiredPermission: "wabot" } // Contoh penggunaan permission
+      },
+      // --- ADMIN ROUTES ---
+      {
+        path: "admin/users",
+        name: "UserManagement",
+        component: () => import('./features/admin/presentation/pages/UserManagementPage.vue'),
+        meta: { requiresAdmin: true } // Hanya admin
       },
     ],
   },
@@ -163,9 +171,24 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+  
+  // Ambil requiredPermission dari meta (jika ada)
+  let requiredPermission = null;
+  to.matched.forEach((record) => {
+    if (record.meta.requiredPermission) {
+      requiredPermission = record.meta.requiredPermission;
+    }
+  });
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: "Login" });
+  } else if (requiresAuth && requiresAdmin && !authStore.isAdmin) {
+    // Akses ditolak jika butuh admin tapi user bukan admin
+    next({ name: "Forbidden" });
+  } else if (requiresAuth && requiredPermission && !authStore.hasPermission(requiredPermission)) {
+    // Akses ditolak jika butuh permission tertentu tapi user tidak punya
+    next({ name: "Forbidden" });
   } else if (
     (to.name === "Login" ||
       to.name === "Register" ||

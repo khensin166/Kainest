@@ -20,5 +20,7 @@ export function mapUserFromApi(apiUser) {
     displayName: apiUser.profile?.displayName,
     avatarUrl: apiUser.profile?.avatarUrl,
     invitationCode: apiUser.profile?.invitationCode,
+    role: apiUser.role,
+    permissions: apiUser.permissions,
   });
 }

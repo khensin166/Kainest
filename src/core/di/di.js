@@ -5,6 +5,8 @@ import { NoteRepository } from "../../features/notes/data/repository/NoteReposit
 import { CoupleRepository } from "../../features/couple/data/repository/CoupleRepository";
 import { WaBotRepository } from "../../features/wabot/data/repository/WaBotRepository";
 import { SecurityRepository } from "../../features/security/data/repository/SecurityRepository";
+import { AdminRepository } from "../../features/admin/data/repository/AdminRepository";
+import { AdminRemoteSource } from "../../features/admin/data/source/AdminRemoteSource";
 
 // Import Use Cases
 import { LoginUserUseCase } from "../../features/auth/domain/use-cases/LoginUserUseCase";
@@ -42,6 +44,9 @@ import { SendMessageUseCase } from "../../features/wabot/domain/use-cases/SendMe
 
 import { ChangePasswordUseCase } from "../../features/security/domain/use-cases/ChangePasswordUseCase";
 
+import { GetUsersUseCase } from "../../features/admin/domain/use-cases/GetUsersUseCase";
+import { UpdateUserAccessUseCase } from "../../features/admin/domain/use-cases/UpdateUserAccessUseCase";
+
 // --- Singleton Instances ---
 
 // 1. Repositories
@@ -51,6 +56,9 @@ const noteRepository = new NoteRepository();
 const coupleRepository = new CoupleRepository();
 const waBotRepository = new WaBotRepository();
 const securityRepository = new SecurityRepository();
+
+const adminRemoteSource = new AdminRemoteSource();
+const adminRepository = new AdminRepository(adminRemoteSource);
 
 // 2. Use Cases (Injected with Repository)
 export const loginUserUseCase = new LoginUserUseCase(authRepository);
@@ -88,5 +96,8 @@ export const sendMessageUseCase = new SendMessageUseCase(waBotRepository);
 
 export const changePasswordUseCase = new ChangePasswordUseCase(securityRepository);
 
+export const getUsersUseCase = new GetUsersUseCase(adminRepository);
+export const updateUserAccessUseCase = new UpdateUserAccessUseCase(adminRepository);
+
 // Export repository if needed elsewhere (though relying on use cases is better)
-export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository };
+export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository, adminRepository };
