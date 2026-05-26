@@ -18,10 +18,9 @@ export function mapUserFromApi(apiUser) {
     updatedAt: apiUser.updatedAt,
     profileId: apiUser.profile?.id,
     displayName: apiUser.profile?.displayName,
-    avatarUrl: apiUser.profile?.avatarUrl,
+    avatarUrl: apiUser.profile?.avatarUrl || apiUser.image,
     invitationCode: apiUser.profile?.invitationCode,
     role: apiUser.role,
     permissions: apiUser.permissions,
-    // Tes
   });
 }

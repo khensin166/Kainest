@@ -193,7 +193,7 @@ export default {
             requiredPermission: "budgeting",
           },
           {
-            name: "transactions",
+            name: "Transactions",
             path: "/app/transactions",
             iconComponent: ReceiptRefundIcon,
             requiredPermission: "budgeting",
