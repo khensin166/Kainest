@@ -112,30 +112,27 @@ export class AuthRepository extends IAuthRepository {
   }
 
   /**
-   * Mendapatkan user saat ini dengan memvalidasi token di localStorage.
+   * Mendapatkan user saat ini.
+   * Mendukung dua mode auth:
+   * 1. Token di localStorage (email/password login)
+   * 2. Session cookie (social login via better-auth)
    */
   async getCurrentUser() {
     try {
-      // 1. Cek apakah token ada
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        return right(null); // Tidak ada user yang login, ini bukan error.
-      }
-
-      // 2. Token ada, panggil /auth/me untuk validasi dan ambil profil
+      // Langsung panggil /profile — browser akan otomatis mengirim session cookie
+      // jika ada (dari social login), atau Authorization header dari interceptor
+      // jika ada token di localStorage (dari email/password login).
       const profileData = await this.remoteSource.getProfile();
 
-      // 3. Buat UserEntity 
+      // Buat UserEntity dari data profil
       const userEntity = mapUserFromApi(profileData);
 
       return right(userEntity);
     } catch (error) {
-      // Jika error.response.status adalah 401/403, token tidak valid.
-      // Interceptor kita akan menghapus token, tapi di sini kita
-      // anggap saja user tidak terautentikasi.
+      // Jika 401/403, user memang tidak terautentikasi — bukan error
       if (error.response && [401, 403].includes(error.response.status)) {
-        localStorage.removeItem("authToken"); // Hapus token mati
-        return right(null); // Bukan error, hanya tidak login
+        localStorage.removeItem("authToken"); // Bersihkan token mati jika ada
+        return right(null);
       }
       // Error lain (misal server down) adalah Failure
       return left(

@@ -152,9 +152,16 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard yang sudah disederhanakan
-router.beforeEach((to, from, next) => {
+// Navigation guard - menunggu inisialisasi auth selesai sebelum membuat keputusan
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+
+  // Jika auth belum diinisialisasi, tunggu selesai dulu
+  // Ini penting untuk social login callback agar sesi cookie sempat dibaca
+  if (!authStore.isAuthReady) {
+    await authStore.initializeAuth();
+  }
+
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isAuthenticated) {
