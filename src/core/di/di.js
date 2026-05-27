@@ -26,6 +26,12 @@ import { DeleteTransactionUseCase } from "../../features/budgeting/domain/use-ca
 import { GetSpendingTrendUseCase } from "../../features/budgeting/domain/use-cases/GetSpendingTrendUseCase";
 import { GetAiAdviceUseCase } from "../../features/budgeting/domain/use-cases/GetAiAdviceUseCase";
 import { SetupBudgetUseCase } from "../../features/budgeting/domain/use-cases/SetupBudgetUseCase";
+import { GetPocketsUseCase } from "../../features/budgeting/domain/use-cases/GetPocketsUseCase";
+import { UpsertPocketUseCase } from "../../features/budgeting/domain/use-cases/UpsertPocketUseCase";
+import { DeletePocketUseCase } from "../../features/budgeting/domain/use-cases/DeletePocketUseCase";
+import { BulkSetupPocketsUseCase } from "../../features/budgeting/domain/use-cases/BulkSetupPocketsUseCase";
+import { UpdateCategoryKeywordsUseCase } from "../../features/budgeting/domain/use-cases/UpdateCategoryKeywordsUseCase";
+import { ClassifyTransactionUseCase } from "../../features/budgeting/domain/use-cases/ClassifyTransactionUseCase";
 
 import { GetNotesUseCase } from "../../features/notes/domain/use-cases/GetNotesUseCase";
 import { GetNoteByIdUseCase } from "../../features/notes/domain/use-cases/GetNoteByIdUseCase";
@@ -78,6 +84,12 @@ export const deleteTransactionUseCase = new DeleteTransactionUseCase(budgetRepos
 export const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
 export const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
 export const setupBudgetUseCase = new SetupBudgetUseCase(budgetRepository);
+export const getPocketsUseCase = new GetPocketsUseCase(budgetRepository);
+export const upsertPocketUseCase = new UpsertPocketUseCase(budgetRepository);
+export const deletePocketUseCase = new DeletePocketUseCase(budgetRepository);
+export const bulkSetupPocketsUseCase = new BulkSetupPocketsUseCase(budgetRepository);
+export const updateCategoryKeywordsUseCase = new UpdateCategoryKeywordsUseCase(budgetRepository);
+export const classifyTransactionUseCase = new ClassifyTransactionUseCase(budgetRepository);
 
 export const getNotesUseCase = new GetNotesUseCase(noteRepository);
 export const getNoteByIdUseCase = new GetNoteByIdUseCase(noteRepository);

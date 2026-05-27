@@ -58,3 +58,10 @@ Each feature contains three layers:
 - **Use Composition API**: Always use `<script setup>` for Vue components.
 - **Respect Clean Architecture**: Vue components should interact with Pinia stores or Use Cases, NOT directly with API sources (`AuthRemoteSource`, etc.).
 - **No Circular Dependencies**: Be careful when importing stores inside Axios interceptors. Use dynamic imports if needed (e.g., `const { useAuthStore } = await import(...)`).
+
+## 🔄 Recent Updates
+- **Performance Optimization**: Configured `manualChunks` in `vite.config.js` to split vendor dependencies (Vue, Pinia, Axios) from application code, drastically reducing the main chunk size for faster initial load.
+- **Better Auth Integration**: Fixed API endpoints to match Better Auth's standard routes (`/auth/sign-in/email`, `/auth/sign-up/email`, `/auth/sign-out`) and updated response parsing to handle `user` objects instead of legacy `success` flags.
+- **Onboarding Flow**: Implemented an enforced onboarding modal in `DashboardLayout.vue` for new users to set their `displayName` and optionally `phoneNumber` upon their first successful login.
+- **Admin UI Polish**: Revamped the `UserManagementPage` to match the application's clean design system, adding custom `<select>` styling and conditional "Simpan" logic for access changes.
+- **Profile Image Upload**: Integrated frontend-direct Cloudinary uploading using a secure signature fetched from the backend.

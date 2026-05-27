@@ -96,4 +96,42 @@ export class BudgetRemoteSource {
     const response = await apiClient.post("/budget/setup", data);
     return response.data;
   }
+
+  // ==========================================
+  // 💰 POCKET (KANTONG) ENDPOINTS
+  // ==========================================
+
+  async getPockets() {
+    const response = await apiClient.get("/budget/pockets");
+    return response.data;
+  }
+
+  async upsertPocket(data) { 
+    const response = await apiClient.put("/budget/pockets", data);
+    return response.data;
+  }
+
+  async deletePocket(categoryId) {
+    const response = await apiClient.delete(`/budget/pockets/${categoryId}`);
+    return response.data;
+  }
+
+  async bulkSetupPockets(data) {
+    const response = await apiClient.post("/budget/pockets/setup", data);
+    return response.data;
+  }
+
+  async updateCategoryKeywords(categoryId, keywords) {
+    const response = await apiClient.patch(`/budget/categories/${categoryId}/keywords`, { keywords });
+    return response.data;
+  }
+
+  // ==========================================
+  // 🤖 AI CLASSIFICATION ENDPOINT
+  // ==========================================
+
+  async classifyTransaction(text) {
+    const response = await apiClient.post("/budget/classify", { text });
+    return response.data;
+  }
 }

@@ -7,7 +7,7 @@ import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
-import BudgetSetupModal from '../components/BudgetSetupModal.vue';
+import PocketManagementModal from '../components/PocketManagementModal.vue';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
@@ -21,15 +21,14 @@ const openTransactionModal = () => {
   selectedTransactionToEdit.value = null; // RESET state edit
   console.log("🔓 openTransactionModal dipanggil. isTransactionModalOpen = true");
   isTransactionModalOpen.value = true;
-  isTransactionModalOpen.value = true;
 };
 
-const isSetupModalOpen = ref(false);
-const openSetupModal = () => {
-  isSetupModalOpen.value = true;
+const isPocketModalOpen = ref(false);
+const openPocketModal = () => {
+  isPocketModalOpen.value = true;
 };
-const closeSetupModal = () => {
-  isSetupModalOpen.value = false;
+const closePocketModal = () => {
+  isPocketModalOpen.value = false;
 };
 
 // Fungsi ini yang akan kita "provide"
@@ -72,13 +71,12 @@ onActivated(() => {
         </h1>
       </div>
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-        <button @click="openSetupModal"
-          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400">
-          <span class="sr-only">Settings</span>
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16">
-            <path
-              d="M11.7.2l-.4.3c-.4.3-.9.4-1.3.1l-.3-.4c-.3-.4 0-1 .5-1.3l.4-.3c.4-.3.9-.4 1.3-.1l.3.4c.3.5 0 1-.5 1.3zm3.7 3.5l-.3.3c-.3.4-.4.9-.1 1.3l.4.3c.4.3 1 0 1.3-.5l.3-.3c.3-.4.4-.9.1-1.3l-.4-.3c-.5-.4-1.1-.1-1.3.5zM2 11.2l.3.4c.3.4.9.4 1.3.1l.4-.3c.4-.3 0-1-.5-1.3l-.3-.4c-.3-.4-.9-.4-1.3-.1l-.4.3c-.4.4 0 1 .5 1.3zm12.3 2.1l-.4.3c-.4.3-.9.4-1.3.1l-.3-.4c-.3-.4 0-1 .5-1.3l.4-.3c.4-.3.9-.4 1.3-.1l.3.4c.4.3 0 1-.5 1.3zM1.7 5.2l.4.3c.5.4 1 .1 1.3-.5l.3-.3c.3-.4.1-1-.3-1.3l-.4-.3c-.5-.4-1-.1-1.3.5l-.3.3c-.3.4-.1 1 .3 1.3zM8 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" />
+        <button @click="openPocketModal"
+          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
+          <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
           </svg>
+          <span class="hidden xs:block">Kelola Kantong</span>
         </button>
         <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
           <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -150,10 +148,10 @@ onActivated(() => {
         </template>
       </BaseModal>
 
-      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true">
-        <template #header>Konfigurasi Budget</template>
+      <BaseModal :isOpen="isPocketModalOpen" @close="closePocketModal" size="2xl" :hideFooter="true">
+        <template #header>Kelola Kantong (Pocket)</template>
         <template #body>
-          <BudgetSetupModal @close="closeSetupModal" />
+          <PocketManagementModal @close="closePocketModal" />
         </template>
       </BaseModal>
     </div>
