@@ -25,7 +25,7 @@ export class AuthRepository extends IAuthRepository {
       // 1. Panggil API /auth/login
       const response = await this.remoteSource.login(email, password);
 
-      if (!response.success || !response.token) {
+      if (!response.user || !response.token) {
         throw new Error(
           response.message || "Token tidak diterima dari server."
         );
@@ -146,11 +146,12 @@ export class AuthRepository extends IAuthRepository {
    */
   async logout() {
     try {
+      await this.remoteSource.logout();
       localStorage.removeItem("authToken");
       return right(true); // Sukses
     } catch (error) {
       return left(
-        new ServerFailure(error.message || "Gagal menghapus sesi lokal.")
+        new ServerFailure(error.response?.data?.message || error.message || "Gagal menghapus sesi lokal.")
       );
     }
   }
