@@ -47,11 +47,12 @@ const closeSetupModal = () => {
 };
 
 const checkAndForceSetup = () => {
-  // Jika data sudah diload dan kategori masih kosong, force setup!
-  if (budgetStore.hasData && budgetStore.budgetCategories.length === 0) {
+  // Jika data sudah diload dan salary masih 0, force setup!
+  // Karena sekarang budget default tidak dibuat, kita tidak bisa ngecek berdasarkan panjang kategori.
+  if (budgetStore.hasData && budgetStore.salary === 0) {
     isSetupForced.value = true;
     isSetupModalOpen.value = true;
-  } else if (budgetStore.hasData && budgetStore.budgetCategories.length > 0) {
+  } else if (budgetStore.hasData && budgetStore.salary > 0) {
     isSetupForced.value = false;
     isSetupModalOpen.value = false;
   }

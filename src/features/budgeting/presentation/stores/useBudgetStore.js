@@ -61,6 +61,7 @@ export const useBudgetStore = defineStore("budget", () => {
   // =========================================
   // 🧠 GETTERS
   // =========================================
+  const salary = computed(() => summaryData.value?.salary || 0);
   const budgetCategories = computed(() => summaryData.value?.categories || []);
   const totalRemaining = computed(
     () => summaryData.value?.totals?.remaining || 0
@@ -441,6 +442,7 @@ export const useBudgetStore = defineStore("budget", () => {
     errorPockets,
 
     // Getters
+    salary,
     budgetCategories,
     totalRemaining,
     currentPeriodMonth,
