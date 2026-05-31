@@ -30,6 +30,7 @@ export class BudgetRepository {
         // 🔑 KUNCI PERBAIKAN: Bungkus data dengan right()
         // Kita kembalikan objek data lengkap (totals + categories) agar Store bisa pakai keduanya
         return right({
+          salary: response.data.salary,
           month: response.data.month,
           totals: response.data.totals,
           categories: entities,

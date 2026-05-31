@@ -16,6 +16,24 @@
                         placeholder="Contoh: 6000000" required :disabled="budgetStore.isLoadingSummary" />
                 </div>
 
+                <!-- Input Saving Percent -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Target Tabungan (%) <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input v-model="savingPercentInput" type="number"
+                            class="form-input w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500 pr-8"
+                            placeholder="Contoh: 20" required min="0" max="100"
+                            :disabled="budgetStore.isLoadingSummary" />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span class="text-gray-500 dark:text-gray-400">%</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Persentase ini akan otomatis dibuatkan sebagai Kantong "Tabungan" yang bisa Anda edit kapan saja.
+                    </p>
+                </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
@@ -51,20 +69,19 @@ const budgetStore = useBudgetStore();
 
 // State lokal form
 const salary = ref('');
+const savingPercentInput = ref(20); // Default 20%
 
 const handleSubmit = async () => {
     // Validasi sederhana
-    if (!salary.value) {
-        toast.warning('Mohon isi pemasukan / gaji Anda.');
+    if (!salary.value || savingPercentInput.value === '') {
+        toast.warning('Mohon isi semua data yang diwajibkan.');
         return;
     }
 
-    // Karena user ingin kos dan tabungan diatur di kantong saja,
-    // kita set default rent = 0 dan saving = 0 untuk melewati validasi awal backend.
     const payload = {
         salary: Number(salary.value),
         rent: 0,
-        savingPercent: 0
+        savingPercent: Number(savingPercentInput.value) / 100
     };
 
     const result = await budgetStore.setupBudget(payload);
