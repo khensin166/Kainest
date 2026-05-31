@@ -18,6 +18,23 @@
     </div>
 
     <form @submit.prevent="handleSubmit">
+      <!-- Blueprint Recommendations -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Rekomendasi (Blueprint) Cepat
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button type="button" @click="applyBlueprint('503020')" class="p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:border-violet-400 hover:ring-1 hover:ring-violet-400 text-left transition-all">
+            <h4 class="font-medium text-sm text-gray-800 dark:text-gray-200">Aturan 50-30-20</h4>
+            <p class="text-xs text-gray-500 mt-1">Ideal: 50% Pokok, 30% Hiburan, 20% Tabungan.</p>
+          </button>
+          <button type="button" @click="applyBlueprint('hemat')" class="p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:border-violet-400 hover:ring-1 hover:ring-violet-400 text-left transition-all">
+            <h4 class="font-medium text-sm text-gray-800 dark:text-gray-200">Mahasiswa Kos (Hemat)</h4>
+            <p class="text-xs text-gray-500 mt-1">Fokus: 70% Pokok, 10% Hiburan, 20% Tabungan.</p>
+          </button>
+        </div>
+      </div>
+
       <div class="space-y-6">
         <div v-for="(pocket, index) in pocketsData" :key="index" class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
           <div class="flex justify-between items-center mb-3">
@@ -155,6 +172,70 @@ const getCategoryName = (id) => {
 const getCategoryIcon = (id) => {
   const cat = availableCategories.value.find(c => c.id === id);
   return cat ? cat.icon : '💼';
+};
+
+const findCategoryByName = (keywords) => {
+  if (!availableCategories.value) return null;
+  for (const keyword of keywords) {
+    const found = availableCategories.value.find(c => c.name.toLowerCase().includes(keyword.toLowerCase()));
+    if (found) return found.id;
+  }
+  return null;
+};
+
+const applyBlueprint = (type) => {
+  pocketsData.value = []; // Clear existing
+
+  if (type === '503020') {
+    const plan = [
+      { names: ['makan', 'food'], percent: 25 },
+      { names: ['tempat tinggal', 'kos', 'sewa', 'rent'], percent: 15 },
+      { names: ['transport'], percent: 10 },
+      { names: ['hiburan', 'entertainment'], percent: 20 },
+      { names: ['belanja', 'shopping'], percent: 10 },
+      { names: ['tabungan', 'investasi', 'saving'], percent: 20 },
+    ];
+
+    plan.forEach(item => {
+      const catId = findCategoryByName(item.names);
+      if (catId) {
+        pocketsData.value.push({
+          categoryId: catId,
+          limitType: 'percentage',
+          percentage: item.percent,
+          limitAmount: null,
+          keywordsInput: ''
+        });
+      }
+    });
+    toast.success("Blueprint 50-30-20 diterapkan! Anda bisa menyesuaikannya di bawah.");
+  } 
+  else if (type === 'hemat') {
+    const plan = [
+      { names: ['makan', 'food'], percent: 40 },
+      { names: ['tempat tinggal', 'kos', 'sewa', 'rent'], percent: 30 },
+      { names: ['hiburan', 'entertainment'], percent: 10 },
+      { names: ['tabungan', 'investasi', 'saving'], percent: 20 },
+    ];
+
+    plan.forEach(item => {
+      const catId = findCategoryByName(item.names);
+      if (catId) {
+        pocketsData.value.push({
+          categoryId: catId,
+          limitType: 'percentage',
+          percentage: item.percent,
+          limitAmount: null,
+          keywordsInput: ''
+        });
+      }
+    });
+    toast.success("Blueprint Mahasiswa Hemat diterapkan!");
+  }
+  
+  if (pocketsData.value.length === 0) {
+    addPocket(); // fallback
+  }
 };
 
 const totalPercentage = computed(() => {
