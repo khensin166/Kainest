@@ -142,12 +142,18 @@ const handleLogin = async () => {
 // Fungsi untuk menangani login sosial (Google & GitHub)
 const handleSocialLogin = async (provider) => {
   try {
-    const callbackUrl = `${window.location.origin}/app/dashboard`;
+    // callbackUrl mengarah ke backend /auth/social-callback (bukan frontend langsung).
+    // Kenapa: setelah OAuth selesai, browser request ke backend (same-domain = cookie valid).
+    // Backend baca session → redirect ke /app/auth-callback#token=<token>.
+    // Frontend baca token dari URL hash → simpan localStorage → pakai Bearer.
+    const backendUrl = import.meta.env.VITE_API_BASE_URL_STG;
+    const callbackUrl = `${backendUrl}/auth/social-callback`;
     await auth.loginSocial(provider, callbackUrl);
   } catch (error) {
     console.error("Error saat inisiasi social login:", error);
   }
 };
+
 </script>
 
 <style scoped>

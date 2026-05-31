@@ -18,6 +18,7 @@ import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
 import ValentinePage from "./features/valentine/presentation/pages/ValentinePage.vue";
+import AuthCallbackPage from "./features/auth/presentation/pages/AuthCallbackPage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -57,7 +58,15 @@ const routes = [
     component: ValentinePage,
   },
 
-  // Halaman terproteksi yang menggunakan DashboardLayout
+  // ✅ ROUTE CALLBACK SOCIAL LOGIN (PUBLIK)
+  // Menerima token dari URL hash (#token=...) setelah OAuth selesai.
+  // Tidak pakai requiresAuth karena user belum login saat halaman ini dimuat.
+  {
+    path: "/app/auth-callback",
+    name: "AuthCallback",
+    component: AuthCallbackPage,
+  },
+
   {
     // ✅ PATH DIUBAH MENJADI '/app'
     path: "/app",

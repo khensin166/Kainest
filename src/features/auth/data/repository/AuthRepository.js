@@ -116,9 +116,28 @@ export class AuthRepository extends IAuthRepository {
    * Mendukung dua mode auth:
    * 1. Token di localStorage (email/password login)
    * 2. Session cookie (social login via better-auth)
+   * 
+   * Jika berhasil via cookie (social login), token akan diambil dan disimpan
+   * ke localStorage agar request berikutnya menggunakan Bearer token.
    */
   async getCurrentUser() {
     try {
+      // Jika belum ada token di localStorage (misal: setelah social login callback),
+      // coba ambil token dari sesi aktif (via cookie) terlebih dahulu
+      const existingToken = localStorage.getItem("authToken");
+      if (!existingToken) {
+        try {
+          const sessionToken = await this.remoteSource.getSessionToken();
+          if (sessionToken) {
+            localStorage.setItem("authToken", sessionToken);
+            console.log("[Auth] Token berhasil diambil dari sesi cookie dan disimpan ke localStorage.");
+          }
+        } catch (sessionError) {
+          // Tidak ada sesi aktif, lanjutkan tanpa token
+          console.log("[Auth] Tidak ada sesi cookie aktif.");
+        }
+      }
+
       // Langsung panggil /profile — browser akan otomatis mengirim session cookie
       // jika ada (dari social login), atau Authorization header dari interceptor
       // jika ada token di localStorage (dari email/password login).
@@ -140,6 +159,7 @@ export class AuthRepository extends IAuthRepository {
       );
     }
   }
+
 
   /**
    * Logout user dengan menghapus token dari localStorage.

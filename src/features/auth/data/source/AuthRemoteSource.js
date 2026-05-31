@@ -1,5 +1,8 @@
 // src/features/auth/data/source/AuthRemoteSource.js
 import api from "@/lib/apiClient";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL_STG;
 
 export class AuthRemoteSource {
   async login(email, password) {
@@ -25,6 +28,20 @@ export class AuthRemoteSource {
       callbackURL,
     });
     return response.data; // { url: "...", redirect: true }
+  }
+
+  /**
+   * Mengambil sesi aktif dari Better Auth via cookie.
+   * Dipakai setelah social login callback untuk mendapatkan token
+   * dan menyimpannya ke localStorage agar interceptor bisa mengirimnya sebagai Bearer.
+   * Menggunakan axios mentah agar cookie dikirim tanpa Authorization header yang mungkin kosong.
+   */
+  async getSessionToken() {
+    const response = await axios.get(`${API_BASE_URL}/auth/get-session`, {
+      withCredentials: true, // Penting: kirim cookie session
+    });
+    // Better Auth mengembalikan { session: { token: "..." }, user: {...} }
+    return response.data?.session?.token || null;
   }
 
   async getProfile() {
