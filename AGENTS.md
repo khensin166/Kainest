@@ -1,99 +1,176 @@
-# 🤖 Kainest Frontend - Software Requirements Specification (SRS) & Guidelines
+# 🤖 Kainest Frontend — Software Requirements Specification (SRS) & Agent Guidelines
 
-Dokumen ini mendefinisikan spesifikasi kebutuhan perangkat lunak (SRS), arsitektur, standar UI/UX, manajemen state, perbaikan sistem terbaru, serta rencana pengembangan masa depan untuk **Kainest Frontend**. Dokumen ini ditujukan bagi pengembang dan AI Agent yang bekerja pada repositori ini.
+Dokumen ini mendefinisikan spesifikasi kebutuhan perangkat lunak (SRS), arsitektur, standar UI/UX, manajemen state, perubahan sistem terbaru, serta rencana pengembangan masa depan untuk **Kainest Frontend**. Dokumen ini bersifat _living document_ dan ditujukan bagi pengembang serta AI Agent yang bekerja pada repositori ini.
+
+> **PENTING UNTUK AGENT**: Selalu baca dokumen ini terlebih dahulu sebelum melakukan perubahan apapun pada kode. Patuhi aturan arsitektur, konvensi DI, dan pola response yang sudah ditetapkan.
 
 ---
 
 ## 1. PENDAHULUAN (SYSTEM OVERVIEW)
-Kainest Frontend adalah aplikasi web (Single Page Application) responsif yang dibangun menggunakan **Vue 3** dengan **Composition API** dan **Vite** sebagai build tool. 
-Aplikasi ini berfungsi sebagai antarmuka pengguna untuk mengelola keuangan personal dan pasangan, mencakup dashboard status anggaran, manajemen "Kantong" pengeluaran (Budget Pocket) berbasis persentase/nominal, pengelolaan transaksi harian, visualisasi tren pengeluaran, serta antarmuka AI asisten finansial.
+
+Kainest Frontend adalah aplikasi web (Single Page Application / SPA) responsif yang dibangun menggunakan **Vue 3 (Composition API)** dengan **Vite** sebagai build tool.
+
+Aplikasi ini menyediakan antarmuka pengguna untuk:
+- Dashboard ringkasan keuangan bulanan (status kantong, pengeluaran vs alokasi)
+- Pengelolaan "Kantong" Budget (Pocket) berbasis persentase atau nominal Rupiah
+- Pengelolaan & riwayat transaksi harian
+- Pembuatan kategori kantong kustom oleh user
+- Visualisasi tren pengeluaran harian (grafik)
+- Antarmuka AI asisten finansial (Kenin)
 
 ---
 
 ## 2. ARSITEKTUR & STRUKTUR SISTEM (ARCHITECTURAL SPECIFICATION)
-Proyek ini mengadopsi **Clean Architecture** (Domain-Driven Design) yang terbagi secara modular berdasarkan fitur di bawah direktori `src/features/`.
+
+Proyek ini mengadopsi **Feature-Based Clean Architecture** (Domain-Driven Design) yang tersusun secara modular di bawah `src/features/`.
 
 ### 2.1 Struktur Folder Utama
+
 ```text
 src/
-├── core/                  # Utilitas inti, injeksi dependensi manual (di/di.js), definisi error
-├── features/              # Modul fitur terisolasi (auth, budgeting, notes, dll.)
-├── layouts/               # Layout Vue global (contoh: DashboardLayout.vue)
-├── lib/                   # Integrasi pihak ketiga (Axios API Client)
-├── pages/                 # Root views/pages aplikasi
-├── router.js              # Konfigurasi Vue Router & Navigation Guards
-└── main.js                # Entry point aplikasi
+├── core/
+│   └── di/di.js             # Pusat Dependency Injection manual — WAJIB diperbarui saat menambah Use Case baru
+├── features/                # Modul fitur terisolasi
+│   ├── auth/
+│   ├── budgeting/
+│   ├── notes/
+│   ├── todos/
+│   ├── profile/
+│   ├── couple/
+│   ├── security/
+│   ├── wabot/
+│   └── admin/
+├── layouts/                 # Layout Vue global (DashboardLayout.vue, dll.)
+├── components/              # Komponen UI global (forms, modals, dll.)
+├── lib/
+│   └── apiClient.js         # Axios singleton dengan interceptor token otomatis
+├── router.js                # Vue Router & Navigation Guards (RBAC)
+└── main.js                  # Entry point aplikasi
 ```
 
-### 2.2 Lapisan Modul Fitur (Feature Layers)
-Setiap fitur dibagi menjadi tiga lapisan terpisah untuk menjaga pemisahan tanggung jawab (Separation of Concerns):
-1. **Presentation Layer (`presentation/`)**:
-   - `pages/`: Halaman utama Vue (contoh: `BudgetDashboardPage.vue`).
-   - `components/`: Komponen UI spesifik fitur (contoh: `PocketManagementModal.vue`).
-   - `stores/`: State management menggunakan **Pinia** (contoh: `usePocketStore.js`).
-2. **Domain Layer (`domain/`)**:
-   - `use-cases/`: Logika bisnis client-side (contoh: `BulkSetupPocketsUseCase.js`).
-   - `repository/`: Definsi interface repository.
-3. **Data Layer (`data/`)**:
-   - `repository/`: Implementasi konkret dari repository interface.
-   - `source/`: Sumber data remote (Axios API request).
-   - `mappers/`: Pemetaan data dari format API ke domain entity.
+### 2.2 Lapisan Modul Fitur (`features/budgeting/` sebagai contoh)
 
-### 2.3 Dependency Injection (DI) Manual
-- Pengelolaan dependensi diatur secara terpusat di `src/core/di/di.js`.
-- **Aturan**: Setiap Use Case atau Repository baru **wajib didaftarkan di `di.js`** sebelum digunakan di dalam Pinia Store atau Komponen Vue.
+| Lapisan | Lokasi | Tanggung Jawab |
+|---|---|---|
+| **Presentation** | `presentation/pages/` | Halaman utama Vue |
+| **Presentation** | `presentation/components/` | Komponen UI spesifik fitur |
+| **Presentation** | `presentation/stores/` | State management via **Pinia** |
+| **Domain** | `domain/use-cases/` | Logika bisnis client-side — agnostik terhadap API & framework |
+| **Data** | `data/repository/` | Implementasi konkret repository (memanggil Remote Source) |
+| **Data** | `data/source/` | Axios HTTP request ke backend API |
+| **Data** | `data/mappers/` | Pemetaan data dari format API ke domain entity |
 
-### 2.4 Standar Penanganan Response (Either Pattern)
-- Komunikasi antar layer menggunakan pola **Either** (`right` untuk sukses, `left` untuk gagal).
-- **ATURAN PENTING**: Jangan memanggil `.isRight()` atau `.isLeft()` sebagai fungsi (misal: `result.isRight()`), karena akan menyebabkan error runtime. Lakukan pengecekan properti secara langsung:
-  ```javascript
-  const result = await getPocketsUseCase.execute();
-  if (result.right) {
-    // sukses
-  } else {
-    // gagal (result.left)
-  }
-  ```
+### 2.3 Dependency Injection (DI) Manual — Aturan Wajib
+
+Semua dependensi dikelola secara terpusat di **`src/core/di/di.js`**.
+
+> **ATURAN AGENT**: Setiap Use Case atau Repository baru **WAJIB** didaftarkan di `di.js` sebelum bisa digunakan di Pinia Store atau komponen Vue. Kegagalan mendaftarkan di sini adalah penyebab paling umum error `is not a function` atau `undefined`.
+
+Pola penambahan:
+```javascript
+// 1. Import class baru
+import { CreateCategoryUseCase } from "../../features/budgeting/domain/use-cases/CreateCategoryUseCase";
+
+// 2. Buat singleton instance
+export const createCategoryUseCase = new CreateCategoryUseCase(budgetRepository);
+```
+
+### 2.4 Standar Penanganan Response (Either Pattern) — Aturan Wajib
+
+Komunikasi antar layer menggunakan pola **Either** (`right` untuk sukses, `left` untuk gagal).
+
+> **ATURAN AGENT**: **JANGAN** memanggil `.isRight()` atau `.isLeft()` sebagai fungsi. Ini akan menyebabkan runtime error. Lakukan pengecekan properti secara langsung:
+
+```javascript
+const result = await createCategoryUseCase.execute(name, icon);
+
+if (result.right) {
+  // Sukses — data ada di result.right
+  console.log(result.right);
+} else {
+  // Gagal — pesan error ada di result.left.message
+  console.error(result.left.message);
+}
+```
 
 ---
 
-## 3. STANDAR UI/UX & DESAIN SISTEM (UI/UX SPECIFICATION)
+## 3. STANDAR UI/UX & DESAIN SISTEM
+
 Aplikasi ini mengutamakan visual premium dan kemudahan interaksi.
-1. **Gunakan Komponen Existing**: Selalu prioritaskan penggunaan komponen UI yang sudah terdaftar secara global atau lokal, seperti `DropdownSelect.vue` untuk memilih opsi kategori/tipe limit, guna menjaga konsistensi visual.
-2. **Responsif & Layout Aman**:
-   - Cegah pemotongan (cropping) layout form atau modal dengan memberikan lebar modal yang dinamis (misal: `size="2xl"` pada pembungkus `BaseModal.vue` untuk form konfigurasi yang lebar).
-   - Pastikan area form memiliki scrollbar internal yang aman menggunakan kelas utility Tailwind (`max-h-[85vh] overflow-y-auto`).
-3. **Mikro-Animasi & State Loading**: Berikan feedback visual yang jelas pada tombol submit (`disabled` dan teks berubah menjadi "Menyimpan...") selama proses API berlangsung.
+
+### 3.1 Komponen Global
+
+Selalu prioritaskan penggunaan komponen UI yang sudah terdaftar secara global sebelum membuat komponen baru:
+- **`DropdownSelect.vue`** — Untuk semua dropdown pilihan (kategori, tipe limit, dll.)
+- **`BaseModal.vue`** — Pembungkus semua modal dialog
+
+### 3.2 Responsif & Layout Aman
+
+- Gunakan `max-h-[85vh] overflow-y-auto` pada konten modal agar scroll internal tersedia dan konten tidak terpotong.
+- Gunakan `size="2xl"` atau ukuran yang sesuai pada `BaseModal.vue` untuk form dengan banyak kolom.
+
+### 3.3 Loading & Feedback State
+
+Selalu berikan feedback visual yang jelas pada elemen interaktif:
+- Tombol submit: `disabled` saat loading + ganti teks menjadi `"Menyimpan..."`.
+- Gunakan variabel reaktif `isLoading`, `isSubmitting`, `isCreating` sesuai konteks.
 
 ---
 
 ## 4. INTEGRASI STATE & FITUR UTAMA (STATE MANAGEMENT)
-### 4.1 Modul Budget Pockets (`usePocketStore.js`)
-State management untuk "Kantong" pengeluaran diatur oleh `usePocketStore.js` dengan fungsi-fungsi utama:
-- `fetchPockets()`: Mengambil daftar kantong user.
-- `upsertPocket(data)`: Membuat/memperbarui satu kantong.
-- `deletePocket(categoryId)`: Menghapus kantong berdasarkan kategori.
-- `bulkSetupPockets(data)`: Mengatur konfigurasi kantong secara massal.
-- `updateKeywords(categoryId, keywords)`: Menyimpan kata kunci pencocokan transaksi AI ke database.
 
-### 4.2 Alur Otorisasi & RBAC (`authStore.js`)
-- `UserEntity` menyimpan status `role` dan array `permissions`.
+### 4.1 Budget Store (`useBudgetStore.js`)
+
+State management terpusat untuk seluruh fitur keuangan. Fungsi-fungsi utama:
+
+| Action | Deskripsi |
+|---|---|
+| `fetchDashboardSummary()` | Mengambil ringkasan bulanan dari `/budget/summary` |
+| `fetchAllCategories()` | Mengambil semua kategori (global + kustom user) — hasil di-cache |
+| `createCategory(name, icon)` | 🆕 Membuat kategori kustom baru, lalu otomatis me-refresh `categoriesList` |
+| `fetchPockets()` | Mengambil daftar kantong budget user |
+| `upsertPocket(data)` | Membuat atau memperbarui satu kantong |
+| `deletePocket(categoryId)` | Menghapus kantong |
+| `bulkSetupPockets(data)` | Setup massal kantong (onboarding / manajemen) |
+| `updateKeywords(categoryId, keywords)` | Menyimpan kata kunci klasifikasi AI ke database |
+| `submitTransaction(data)` | Catat transaksi baru |
+| `fetchTransactions(params)` | List riwayat transaksi dengan pagination & filter |
+| `updateTransaction(id, data)` | Perbarui transaksi |
+| `deleteTransaction(id)` | Hapus transaksi |
+
+### 4.2 Manajemen Kantong & Kategori Kustom (`PocketManagementModal.vue`) 🆕
+
+Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang tersedia:
+
+- **Blueprint Cepat**: Tombol "50-30-20" dan "Mahasiswa Hemat" untuk konfigurasi kantong sekali klik.
+- **Form Kantong**: Menambah/menghapus kantong, memilih kategori, mengatur tipe limit (persentase atau nominal).
+- **Pembuatan Kategori Kustom**: Tombol "Buat Kategori Kustom Sendiri" membuka form inline untuk membuat kategori baru dengan nama dan emoji icon. Setelah berhasil dibuat, kategori langsung muncul di dropdown dan otomatis ditambahkan sebagai kantong baru.
+
+### 4.3 Alur Otorisasi & RBAC (`authStore.js`)
+
+- `UserEntity` menyimpan `role` dan array `permissions`.
 - `authStore.js` menyediakan getter `isAdmin` dan method `hasPermission(module_name)`.
-- Router Guard mengecek properti `meta.requiresAdmin` atau `meta.requiredPermission` sebelum mengizinkan navigasi halaman.
+- Router Guard membaca `meta.requiresAdmin` atau `meta.requiredPermission` sebelum mengizinkan navigasi.
 
 ---
 
-## 5. PERBAIKAN & FITUR YANG SUDAH DILAKUKAN (RECENT FIXES & FEATURES)
-1. **Perbaikan Runtime Error (`result.isRight` Bug)**: Mengoreksi bug pemanggilan fungsi `.isRight()` di store dan komponen frontend. Logika pengecekan kini langsung membaca properti `.right` dan `.left`.
-2. **Refactoring Komponen "Kelola Kantong"**: 
-   - Membuat komponen `PocketManagementModal.vue` untuk menggantikan `BudgetSetupModal.vue` yang sudah usang (tidak lagi memaksa konsep budget statis ala "Anak Kos").
-   - Integrasi penuh dengan komponen `DropdownSelect.vue` untuk pemilihan kategori dan tipe batas (persentase/nominal).
-3. **Perbaikan Layout & Kategori Dropdown**: Menyelesaikan masalah binding kategori di mana data tidak terpanggil saat memilih opsi, serta memperbaiki pemotongan konten pada layar resolusi sedang.
-4. **Optimasi Chunking Bundle**: Membagi library vendor utama (Vue, Pinia, Axios) ke dalam chunk terpisah di file `vite.config.js` untuk meningkatkan kecepatan muat halaman pertama.
+## 5. PERUBAHAN & FITUR YANG SUDAH DILAKUKAN (CHANGELOG)
+
+| # | Fitur / Perbaikan | Deskripsi Singkat |
+|---|---|---|
+| 1 | **Kategori Kustom User** 🆕 | Ditambahkan `CreateCategoryUseCase.js`, endpoint baru `POST /budget/categories`, dan form inline di `PocketManagementModal.vue`. User bisa membuat kategori kantong sendiri dengan emoji + nama. |
+| 2 | **Refactoring `PocketManagementModal.vue`** | Menggantikan `BudgetSetupModal.vue` yang usang. Integrasi `DropdownSelect.vue`, sistem blueprint cepat (50-30-20 & Mahasiswa Hemat), form kategori kustom. Dihapus: input "Biaya Sewa/Kos" dan "Target Tabungan (%)" karena kini dikelola lewat sistem Pocket. |
+| 3 | **Dashboard Hanya Tampilkan Pocket User** | Perbaikan endpoint summary agar hanya mengembalikan kategori yang ada di `pocketsSnapshot` (kantong user), bukan semua kategori sistem. |
+| 4 | **Perbaikan Runtime Error (Either Pattern)** | Mengoreksi bug `.isRight()` di seluruh store dan komponen. Pengecekan kini menggunakan `.right` dan `.left` secara langsung. |
+| 5 | **Optimasi Bundle Chunking** | Library vendor (Vue, Pinia, Axios) dipisah ke chunk terpisah di `vite.config.js` untuk mempercepat muat halaman pertama. |
+| 6 | **Pendaftaran DI Lengkap** | `di.js` diperbarui dengan `CreateCategoryUseCase` dan semua Use Case terbaru lainnya. |
 
 ---
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)
-1. **PWA Quick Input Widget**: Menyediakan antarmuka widget input cepat (Quick Input) pada layar utama ponsel (PWA) agar pengguna dapat menulis pengeluaran instan berbasis AI tanpa masuk ke dashboard utama.
-2. **Visualisasi Alokasi vs Realisasi (Progress Tracker)**: Grafik visual dinamis pada dashboard utama untuk membandingkan alokasi persentase kantong dengan persentase pengeluaran riil saat ini secara real-time.
-3. **AI Categorization Approval Prompt**: Dialog konfirmasi otomatis setelah pengguna memasukkan teks pengeluaran AI, menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan secara permanen.
+
+1. **PWA Quick Input Widget**: Widget input cepat berbasis AI di layar utama ponsel (PWA) agar pengguna dapat mencatat pengeluaran tanpa membuka dashboard.
+2. **Visualisasi Alokasi vs Realisasi**: Grafik dinamis yang membandingkan alokasi persentase kantong dengan realisasi pengeluaran bulan berjalan secara real-time.
+3. **AI Categorization Approval Prompt**: Dialog konfirmasi setelah input teks AI — menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan permanen.
+4. **Halaman Riwayat Keuangan Bulanan**: Halaman baru yang menampilkan data historis dari tabel `MonthlyFinancialHistory` dalam bentuk timeline atau tabel perbandingan antar bulan.
