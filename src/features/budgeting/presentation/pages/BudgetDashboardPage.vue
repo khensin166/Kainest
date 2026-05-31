@@ -8,6 +8,7 @@ import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 import PocketManagementModal from '../components/PocketManagementModal.vue';
+import BudgetSetupModal from '../components/BudgetSetupModal.vue';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
@@ -31,6 +32,31 @@ const closePocketModal = () => {
   isPocketModalOpen.value = false;
 };
 
+// State untuk Modal Setup
+const isSetupModalOpen = ref(false);
+const isSetupForced = ref(false);
+
+const closeSetupModal = () => {
+  if (!isSetupForced.value) {
+    isSetupModalOpen.value = false;
+  } else {
+    // Jika forced, saat disubmit akan tertutup karena re-check data
+    isSetupModalOpen.value = false; 
+    checkAndForceSetup();
+  }
+};
+
+const checkAndForceSetup = () => {
+  // Jika data sudah diload dan kategori masih kosong, force setup!
+  if (budgetStore.hasData && budgetStore.budgetCategories.length === 0) {
+    isSetupForced.value = true;
+    isSetupModalOpen.value = true;
+  } else if (budgetStore.hasData && budgetStore.budgetCategories.length > 0) {
+    isSetupForced.value = false;
+    isSetupModalOpen.value = false;
+  }
+};
+
 // Fungsi ini yang akan kita "provide"
 const closeTransactionModal = () => {
   console.log("🔒 closeTransactionModal dipanggil lewat Inject. isTransactionModalOpen = false");
@@ -46,18 +72,20 @@ const handleEditTransaction = (transactionData) => {
 provide('closeModalFunc', closeTransactionModal);
 
 // Panggil data saat komponen dimount (dibuka pertama kali)
-onMounted(() => {
+onMounted(async () => {
   if (!budgetStore.hasData) {
-    budgetStore.fetchDashboardSummary();
+    await budgetStore.fetchDashboardSummary();
     budgetStore.fetchSpendingTrend();
   }
+  checkAndForceSetup();
 });
 
-onActivated(() => {
+onActivated(async () => {
   console.log("👀 User kembali melihat Dashboard, cek data baru...");
 
-  budgetStore.fetchDashboardSummary();
+  await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
+  checkAndForceSetup();
 });
 </script>
 
@@ -152,6 +180,13 @@ onActivated(() => {
         <template #header>Kelola Kantong (Pocket)</template>
         <template #body>
           <PocketManagementModal @close="closePocketModal" />
+        </template>
+      </BaseModal>
+
+      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true" :preventClose="isSetupForced">
+        <template #header>Pengaturan Budget Bulanan</template>
+        <template #body>
+          <BudgetSetupModal @close="closeSetupModal" :forced="isSetupForced" />
         </template>
       </BaseModal>
     </div>

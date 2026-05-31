@@ -79,11 +79,11 @@
       </div>
 
       <div class="mt-8 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 pt-4">
-        <button type="button" class="btn bg-white dark:bg-gray-800 border-gray-200 text-gray-600" @click="$emit('close')" :disabled="pocketStore.isLoading">
+        <button type="button" class="btn bg-white dark:bg-gray-800 border-gray-200 text-gray-600" @click="$emit('close')" :disabled="budgetStore.isLoadingPockets">
           Batal
         </button>
-        <button type="submit" class="btn bg-violet-600 hover:bg-violet-700 text-white" :disabled="pocketStore.isLoading || totalPercentage > 100">
-          <span v-if="pocketStore.isLoading">Menyimpan...</span>
+        <button type="submit" class="btn bg-violet-600 hover:bg-violet-700 text-white" :disabled="budgetStore.isLoadingPockets || totalPercentage > 100">
+          <span v-if="budgetStore.isLoadingPockets">Menyimpan...</span>
           <span v-else>Simpan Kantong</span>
         </button>
       </div>
@@ -93,13 +93,11 @@
 
 <script setup>
 import { ref, computed, onMounted, defineEmits } from 'vue';
-import { usePocketStore } from '../stores/usePocketStore';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
 
 const emit = defineEmits(['close']);
-const pocketStore = usePocketStore();
 const budgetStore = useBudgetStore();
 
 // Default 1 pocket kosong
@@ -112,11 +110,11 @@ onMounted(async () => {
   }
   
   // Load existing pockets
-  await pocketStore.fetchPockets();
+  await budgetStore.fetchPockets();
   
-  if (pocketStore.pockets.length > 0) {
+  if (budgetStore.pocketsList.length > 0) {
     // Map from API
-    pocketsData.value = pocketStore.pockets.map(p => ({
+    pocketsData.value = budgetStore.pocketsList.map(p => ({
       categoryId: p.categoryId,
       limitType: p.percentage != null ? 'percentage' : 'nominal',
       percentage: p.percentage || null,
@@ -188,14 +186,14 @@ const handleSubmit = async () => {
   }
 
   // 1. Bulk Setup Pockets
-  const success = await pocketStore.bulkSetupPockets({ pockets: payload });
+  const success = await budgetStore.bulkSetupPockets({ pockets: payload });
   
   if (success) {
     // 2. Update keywords if provided
     for (const item of payload) {
       if (item._keywords && item._keywords.trim() !== '') {
         const keywordArray = item._keywords.split(',').map(k => k.trim()).filter(k => k);
-        await pocketStore.updateKeywords(item.categoryId, keywordArray);
+        await budgetStore.updateKeywords(item.categoryId, keywordArray);
       }
     }
     

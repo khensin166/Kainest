@@ -47,7 +47,7 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <button type="button"
+                <button v-if="!forced" type="button"
                     class="btn-sm border-gray-200 hover:border-gray-300 text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                     @click="$emit('close')" :disabled="budgetStore.isLoadingSummary">
                     Batal
@@ -63,9 +63,16 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, defineProps } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
+
+const props = defineProps({
+    forced: {
+        type: Boolean,
+        default: false
+    }
+});
 
 const emit = defineEmits(['close']);
 const budgetStore = useBudgetStore();

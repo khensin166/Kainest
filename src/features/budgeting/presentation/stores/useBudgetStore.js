@@ -13,7 +13,12 @@ import {
   getTransactionDetailUseCase, 
   updateTransactionUseCase, 
   deleteTransactionUseCase,
-  setupBudgetUseCase
+  setupBudgetUseCase,
+  getPocketsUseCase,
+  upsertPocketUseCase,
+  deletePocketUseCase,
+  bulkSetupPocketsUseCase,
+  updateCategoryKeywordsUseCase
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -25,6 +30,11 @@ const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
 const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
 const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
 const setupBudgetUseCaseInstance = setupBudgetUseCase;
+const getPocketsUseCaseInstance = getPocketsUseCase;
+const upsertPocketUseCaseInstance = upsertPocketUseCase;
+const deletePocketUseCaseInstance = deletePocketUseCase;
+const bulkSetupPocketsUseCaseInstance = bulkSetupPocketsUseCase;
+const updateCategoryKeywordsUseCaseInstance = updateCategoryKeywordsUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -42,6 +52,11 @@ export const useBudgetStore = defineStore("budget", () => {
   const transactionsMeta = ref(null); // Object pagination { currentPage, totalPages, ... }
   const isLoadingTransactions = ref(false);
   const isDeletingTransactionId = ref(null);
+
+  // === POCKET STATE ===
+  const pocketsList = ref([]);
+  const isLoadingPockets = ref(false);
+  const errorPockets = ref(null);
 
   // =========================================
   // 🧠 GETTERS
@@ -324,6 +339,86 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
+  // =========================================
+  // 💰 POCKET ACTIONS
+  // =========================================
+
+  async function fetchPockets() {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await getPocketsUseCaseInstance.execute();
+    if (result.right) {
+      pocketsList.value = result.right;
+    } else {
+      errorPockets.value = result.left?.message;
+      console.error("Gagal memuat daftar kantong:", errorPockets.value);
+    }
+    isLoadingPockets.value = false;
+  }
+
+  async function upsertPocket(data) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await upsertPocketUseCaseInstance.execute(data);
+    isLoadingPockets.value = false;
+    
+    if (result.right) {
+      await fetchPockets();
+      await fetchDashboardSummary(); // Refresh dashboard agar limit kategori terupdate
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function deletePocket(categoryId) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await deletePocketUseCaseInstance.execute(categoryId);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      await fetchDashboardSummary(); // Refresh dashboard
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function bulkSetupPockets(data) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await bulkSetupPocketsUseCaseInstance.execute(data);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      await fetchDashboardSummary(); // 🔥 KUNCI PERBAIKAN: Update ringkasan dasbor
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function updateKeywords(categoryId, keywords) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await updateCategoryKeywordsUseCaseInstance.execute(categoryId, keywords);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -339,6 +434,11 @@ export const useBudgetStore = defineStore("budget", () => {
     transactionsMeta,
     isLoadingTransactions,
     isDeletingTransactionId,
+
+    // Pocket State
+    pocketsList,
+    isLoadingPockets,
+    errorPockets,
 
     // Getters
     budgetCategories,
@@ -364,5 +464,12 @@ export const useBudgetStore = defineStore("budget", () => {
     updateTransaction,
     deleteTransaction,
     setupBudget,
+
+    // Pocket Actions
+    fetchPockets,
+    upsertPocket,
+    deletePocket,
+    bulkSetupPockets,
+    updateKeywords,
   };
 });
