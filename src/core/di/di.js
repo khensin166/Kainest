@@ -18,6 +18,7 @@ import { SocialLoginUseCase } from "../../features/auth/domain/use-cases/SocialL
 
 import { GetDashboardSummaryUseCase } from "../../features/budgeting/domain/use-cases/GetDashboardSummaryUseCase";
 import { GetCategoriesUseCase } from "../../features/budgeting/domain/use-cases/GetCategoriesUseCase";
+import { CreateCategoryUseCase } from "../../features/budgeting/domain/use-cases/CreateCategoryUseCase";
 import { CreateTransactionUseCase } from "../../features/budgeting/domain/use-cases/CreateTransactionUseCase";
 import { GetTransactionsListUseCase } from "../../features/budgeting/domain/use-cases/GetTransactionsListUseCase";
 import { GetTransactionDetailUseCase } from "../../features/budgeting/domain/use-cases/GetTransactionDetailUseCase";
@@ -76,6 +77,7 @@ export const socialLoginUseCase = new SocialLoginUseCase(authRepository);
 
 export const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(budgetRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
+export const createCategoryUseCase = new CreateCategoryUseCase(budgetRepository);
 export const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
 export const getTransactionsListUseCase = new GetTransactionsListUseCase(budgetRepository);
 export const getTransactionDetailUseCase = new GetTransactionDetailUseCase(budgetRepository);

@@ -8,6 +8,7 @@ import {
   getAiAdviceUseCase, 
   createTransactionUseCase, 
   getCategoriesUseCase, 
+  createCategoryUseCase,
   getSpendingTrendUseCase, 
   getTransactionsListUseCase, 
   getTransactionDetailUseCase, 
@@ -26,6 +27,7 @@ const getDashboardSummaryUseCaseInstance = getDashboardSummaryUseCase;
 const getAiAdviceUseCaseInstance = getAiAdviceUseCase;
 const createTransactionUseCaseInstance = createTransactionUseCase;
 const getCategoriesUseCaseInstance = getCategoriesUseCase;
+const createCategoryUseCaseInstance = createCategoryUseCase;
 const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
 const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
 const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
@@ -195,6 +197,18 @@ export const useBudgetStore = defineStore("budget", () => {
     }
 
     isLoadingCategories.value = false;
+  }
+
+  async function createCategory(name, icon) {
+    const result = await createCategoryUseCaseInstance.execute(name, icon);
+    if (result.right) {
+      // Reload list kategori agar langsung update di UI
+      categoriesList.value = [];
+      await fetchAllCategories();
+      return { success: true, data: result.right };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
   }
 
   async function fetchSpendingTrend() {
@@ -460,6 +474,7 @@ export const useBudgetStore = defineStore("budget", () => {
     fetchAiAdviceForCategory,
     fetchSpendingTrend,
     fetchAllCategories,
+    createCategory,
     submitTransaction,
     fetchTransactions,
     fetchTransactionById,

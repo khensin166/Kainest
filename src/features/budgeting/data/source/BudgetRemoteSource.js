@@ -43,6 +43,15 @@ export class BudgetRemoteSource {
   }
 
   /**
+   * POST /api/budget/categories
+   * Membuat kategori kustom baru
+   */
+  async createCategory(data) {
+    const response = await apiClient.post("/budget/categories", data);
+    return response.data;
+  }
+
+  /**
    * GET /api/budget/trend
    * Mengambil data transaksi harian yang diagregasi
    */

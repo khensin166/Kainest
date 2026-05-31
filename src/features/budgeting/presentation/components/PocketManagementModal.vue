@@ -93,6 +93,34 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
           Tambah Kantong Baru
         </button>
+
+        <!-- Custom Category Form -->
+        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <button v-if="!showNewCategoryForm" type="button" @click="showNewCategoryForm = true" class="text-sm font-medium text-violet-600 hover:text-violet-700 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Buat Kategori Kustom Sendiri
+          </button>
+          
+          <div v-else class="p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/20">
+            <h4 class="text-sm font-medium text-violet-800 dark:text-violet-300 mb-3">Buat Kategori Kustom</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Nama Kategori</label>
+                <input v-model="newCategoryName" type="text" class="form-input w-full text-sm rounded-lg" placeholder="Misal: Uang Kucing" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Ikon (Emoji)</label>
+                <input v-model="newCategoryIcon" type="text" class="form-input w-full text-sm rounded-lg text-center" placeholder="🐱" maxlength="2" />
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-3">
+              <button type="button" @click="showNewCategoryForm = false" class="text-xs px-3 py-1.5 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Batal</button>
+              <button type="button" @click="submitNewCategory" class="text-xs px-3 py-1.5 bg-violet-600 text-white hover:bg-violet-700 rounded-lg transition-colors" :disabled="isCreatingCategory || !newCategoryName || !newCategoryIcon">
+                {{ isCreatingCategory ? 'Menyimpan...' : 'Simpan Kategori' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-8 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 pt-4">
@@ -119,6 +147,12 @@ const budgetStore = useBudgetStore();
 
 // Default 1 pocket kosong
 const pocketsData = ref([]);
+
+// Custom Category State
+const showNewCategoryForm = ref(false);
+const newCategoryName = ref('');
+const newCategoryIcon = ref('');
+const isCreatingCategory = ref(false);
 
 onMounted(async () => {
   // Load categories if not loaded
@@ -235,6 +269,32 @@ const applyBlueprint = (type) => {
   
   if (pocketsData.value.length === 0) {
     addPocket(); // fallback
+  }
+};
+
+const submitNewCategory = async () => {
+  if (!newCategoryName.value || !newCategoryIcon.value) return;
+  
+  isCreatingCategory.value = true;
+  const result = await budgetStore.createCategory(newCategoryName.value, newCategoryIcon.value);
+  isCreatingCategory.value = false;
+  
+  if (result.success) {
+    toast.success("Kategori berhasil ditambahkan!");
+    showNewCategoryForm.value = false;
+    newCategoryName.value = '';
+    newCategoryIcon.value = '';
+    
+    // Auto-select in a new pocket
+    pocketsData.value.push({
+      categoryId: result.data.id,
+      limitType: 'percentage',
+      percentage: null,
+      limitAmount: null,
+      keywordsInput: ''
+    });
+  } else {
+    toast.error(result.message || "Gagal membuat kategori.");
   }
 };
 
