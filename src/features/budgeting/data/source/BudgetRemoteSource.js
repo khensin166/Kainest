@@ -143,4 +143,17 @@ export class BudgetRemoteSource {
     const response = await apiClient.post("/budget/classify", { text });
     return response.data;
   }
+
+  // ==========================================
+  // 📅 MONTHLY HISTORY ENDPOINT
+  // ==========================================
+
+  /**
+   * GET /api/budget/history
+   * Mengambil semua riwayat keuangan bulanan user
+   */
+  async getMonthlyHistory() {
+    const response = await apiClient.get("/budget/history");
+    return response.data;
+  }
 }

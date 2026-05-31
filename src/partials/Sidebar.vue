@@ -128,6 +128,7 @@ import {
   ReceiptRefundIcon,
   SparklesIcon,
   UsersIcon,
+  ChartBarIcon,
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -196,6 +197,12 @@ export default {
             name: "Transactions",
             path: "/app/transactions",
             iconComponent: ReceiptRefundIcon,
+            requiredPermission: "budgeting",
+          },
+          {
+            name: "Riwayat Bulanan",
+            path: "/app/history",
+            iconComponent: ChartBarIcon,
             requiredPermission: "budgeting",
           },
           {

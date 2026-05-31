@@ -19,7 +19,8 @@ import {
   upsertPocketUseCase,
   deletePocketUseCase,
   bulkSetupPocketsUseCase,
-  updateCategoryKeywordsUseCase
+  updateCategoryKeywordsUseCase,
+  getMonthlyHistoryUseCase
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -37,6 +38,7 @@ const upsertPocketUseCaseInstance = upsertPocketUseCase;
 const deletePocketUseCaseInstance = deletePocketUseCase;
 const bulkSetupPocketsUseCaseInstance = bulkSetupPocketsUseCase;
 const updateCategoryKeywordsUseCaseInstance = updateCategoryKeywordsUseCase;
+const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -59,6 +61,10 @@ export const useBudgetStore = defineStore("budget", () => {
   const pocketsList = ref([]);
   const isLoadingPockets = ref(false);
   const errorPockets = ref(null);
+
+  // === HISTORY STATE ===
+  const historyList = ref([]);
+  const isLoadingHistory = ref(false);
 
   // =========================================
   // 🧠 GETTERS
@@ -434,6 +440,22 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
+  // =========================================
+  // 📅 HISTORY ACTIONS
+  // =========================================
+
+  async function fetchMonthlyHistory() {
+    isLoadingHistory.value = true;
+    const result = await getMonthlyHistoryUseCaseInstance.execute();
+    isLoadingHistory.value = false;
+
+    if (result.right) {
+      historyList.value = result.right;
+    } else {
+      console.error("❌ Gagal memuat riwayat bulanan:", result.left?.message);
+    }
+  }
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -454,6 +476,10 @@ export const useBudgetStore = defineStore("budget", () => {
     pocketsList,
     isLoadingPockets,
     errorPockets,
+
+    // History State
+    historyList,
+    isLoadingHistory,
 
     // Getters
     salary,
@@ -488,5 +514,8 @@ export const useBudgetStore = defineStore("budget", () => {
     deletePocket,
     bulkSetupPockets,
     updateKeywords,
+
+    // History Actions
+    fetchMonthlyHistory,
   };
 });

@@ -131,6 +131,12 @@ const routes = [
         component: () => import ('./features/budgeting/presentation/pages/TransactionListPage.vue'),
       },
       {
+        path: "history",
+        name: "FinancialHistory",
+        component: () => import('./features/budgeting/presentation/pages/FinancialHistoryPage.vue'),
+        meta: { requiredPermission: "budgeting" },
+      },
+      {
         path: "wabot",
         name: "wabot",
         component: () => import('./features/wabot/presentation/pages/WaBotPage.vue'),

@@ -131,6 +131,23 @@ export class BudgetRepository {
     }
   }
 
+  /**
+   * @param {string} name 
+   * @param {string} icon 
+   * @returns {Promise<Either<Failure, any>>}
+   */
+  async createCategory(name, icon) {
+    try {
+      const response = await this.remoteSource.createCategory({ name, icon });
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Failed to create category"));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || "Server error"));
+    }
+  }
+
   async getSpendingTrend() {
     try {
       const response = await this.remoteSource.getSpendingTrend();
@@ -362,6 +379,26 @@ export class BudgetRepository {
         });
       }
       return left(new ServerFailure(response.message || "Gagal klasifikasi AI."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  // ==========================================
+  // 📅 MONTHLY HISTORY
+  // ==========================================
+
+  /**
+   * Mengambil semua riwayat keuangan bulanan user
+   * @returns {Promise<Either<Failure, Array>>}
+   */
+  async getMonthlyHistory() {
+    try {
+      const response = await this.remoteSource.getMonthlyHistory();
+      if (response.success) {
+        return right(response.data || []);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
     } catch (error) {
       return left(new ServerFailure(error.response?.data?.message || error.message));
     }
