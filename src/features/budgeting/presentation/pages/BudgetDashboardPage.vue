@@ -130,7 +130,10 @@ onActivated(async () => {
 
     <div v-else-if="budgetStore.hasData" class="grid grid-cols-12 gap-6">
 
-      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :monthName="budgetStore.currentPeriodMonth"
+      <BudgetHeroCard 
+        :totalRemaining="budgetStore.totalRemaining"
+        :unallocated="budgetStore.unallocatedBudget"
+        :monthName="budgetStore.currentPeriodMonth"
         :trendData="budgetStore.chartDataCollection" />
 
       <div

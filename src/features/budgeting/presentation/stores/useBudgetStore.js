@@ -74,6 +74,9 @@ export const useBudgetStore = defineStore("budget", () => {
   const totalRemaining = computed(
     () => summaryData.value?.totals?.remaining || 0
   );
+  const unallocatedBudget = computed(
+    () => summaryData.value?.totals?.unallocated ?? 0
+  );
   const currentPeriodMonth = computed(() => summaryData.value?.month || "-");
   const hasData = computed(
     () => !!summaryData.value && !isLoadingSummary.value
@@ -485,6 +488,7 @@ export const useBudgetStore = defineStore("budget", () => {
     salary,
     budgetCategories,
     totalRemaining,
+    unallocatedBudget,
     currentPeriodMonth,
     hasData,
     chartDataCollection,

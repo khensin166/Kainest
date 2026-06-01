@@ -7,6 +7,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  unallocated: {
+    type: Number,
+    default: 0,
+  },
   monthName: {
     type: String,
     default: 'Bulan Ini',
@@ -36,6 +40,20 @@ const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'curre
           {{ formatCurrency(totalRemaining) }}
         </div>
       </div>
+
+      <!-- Unallocated Budget Info -->
+      <div v-if="unallocated > 0" class="mt-3 flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+        </svg>
+        <span class="text-xs font-medium">Belum dialokasikan: {{ formatCurrency(unallocated) }}</span>
+      </div>
+      <div v-else-if="unallocated === 0 && totalRemaining >= 0" class="mt-3 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-xs font-medium">Semua gaji sudah dialokasikan</span>
+      </div>
     </div>
 
     <div class="mt-auto h-16 w-full relative">
@@ -56,4 +74,4 @@ const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'curre
       }" />
     </div>
   </div>
-</template>
+</template>

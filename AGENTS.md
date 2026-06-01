@@ -17,6 +17,7 @@ Aplikasi ini menyediakan antarmuka pengguna untuk:
 - Pembuatan kategori kantong kustom oleh user
 - Visualisasi tren pengeluaran harian (grafik)
 - Antarmuka AI asisten finansial (Kenin)
+- Halaman Riwayat Keuangan Bulanan (Bar Chart + Akordion per bulan dengan rincian kantong)
 
 ---
 
@@ -128,7 +129,7 @@ State management terpusat untuk seluruh fitur keuangan. Fungsi-fungsi utama:
 |---|---|
 | `fetchDashboardSummary()` | Mengambil ringkasan bulanan dari `/budget/summary` |
 | `fetchAllCategories()` | Mengambil semua kategori (global + kustom user) — hasil di-cache |
-| `createCategory(name, icon)` | 🆕 Membuat kategori kustom baru, lalu otomatis me-refresh `categoriesList` |
+| `createCategory(name, icon)` | Membuat kategori kustom baru, lalu otomatis me-refresh `categoriesList` |
 | `fetchPockets()` | Mengambil daftar kantong budget user |
 | `upsertPocket(data)` | Membuat atau memperbarui satu kantong |
 | `deletePocket(categoryId)` | Menghapus kantong |
@@ -138,6 +139,7 @@ State management terpusat untuk seluruh fitur keuangan. Fungsi-fungsi utama:
 | `fetchTransactions(params)` | List riwayat transaksi dengan pagination & filter |
 | `updateTransaction(id, data)` | Perbarui transaksi |
 | `deleteTransaction(id)` | Hapus transaksi |
+| `fetchMonthlyHistory()` | 🆕 Mengambil seluruh riwayat keuangan bulanan user dari `/budget/history` — hasilnya disimpan di `historyList` |
 
 ### 4.2 Manajemen Kantong & Kategori Kustom (`PocketManagementModal.vue`) 🆕
 
@@ -159,12 +161,15 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 
 | # | Fitur / Perbaikan | Deskripsi Singkat |
 |---|---|---|
-| 1 | **Kategori Kustom User** 🆕 | Ditambahkan `CreateCategoryUseCase.js`, endpoint baru `POST /budget/categories`, dan form inline di `PocketManagementModal.vue`. User bisa membuat kategori kantong sendiri dengan emoji + nama. |
+| 1 | **Kategori Kustom User** | Ditambahkan `CreateCategoryUseCase.js`, endpoint baru `POST /budget/categories`, dan form inline di `PocketManagementModal.vue`. User bisa membuat kategori kantong sendiri dengan emoji + nama. |
 | 2 | **Refactoring `PocketManagementModal.vue`** | Menggantikan `BudgetSetupModal.vue` yang usang. Integrasi `DropdownSelect.vue`, sistem blueprint cepat (50-30-20 & Mahasiswa Hemat), form kategori kustom. Dihapus: input "Biaya Sewa/Kos" dan "Target Tabungan (%)" karena kini dikelola lewat sistem Pocket. |
 | 3 | **Dashboard Hanya Tampilkan Pocket User** | Perbaikan endpoint summary agar hanya mengembalikan kategori yang ada di `pocketsSnapshot` (kantong user), bukan semua kategori sistem. |
 | 4 | **Perbaikan Runtime Error (Either Pattern)** | Mengoreksi bug `.isRight()` di seluruh store dan komponen. Pengecekan kini menggunakan `.right` dan `.left` secara langsung. |
 | 5 | **Optimasi Bundle Chunking** | Library vendor (Vue, Pinia, Axios) dipisah ke chunk terpisah di `vite.config.js` untuk mempercepat muat halaman pertama. |
 | 6 | **Pendaftaran DI Lengkap** | `di.js` diperbarui dengan `CreateCategoryUseCase` dan semua Use Case terbaru lainnya. |
+| 7 | **Perbaikan Bug `createCategory()` di Repository** | Method `createCategory()` hilang dari `BudgetRepository.js` frontend sehingga klik tombol tidak mengirim request ke backend. Diperbaiki dengan menambahkan method tersebut di antara `getCategories()` dan `getSpendingTrend()`. |
+| 8 | **Halaman Riwayat Keuangan Bulanan** | Halaman baru `FinancialHistoryPage.vue` di rute `/app/history` (permission: `budgeting`). Menampilkan Bar Chart perbandingan bulanan (Rencana / Aktual / Tabungan) dan Akordion kartu per bulan yang memuat rincian kantong dari `pocketsSnapshot`. Menu "Riwayat Bulanan" dengan `ChartBarIcon` ditambahkan ke `Sidebar.vue`. |
+| 9 | **`GetMonthlyHistoryUseCase.js` & DI** | Use Case baru didaftarkan di `di.js`. State `historyList`, `isLoadingHistory`, dan action `fetchMonthlyHistory()` ditambahkan ke `useBudgetStore.js`. Data source `getMonthlyHistory()` ditambahkan ke `BudgetRemoteSource.js` dan `BudgetRepository.js`. |
 
 ---
 
@@ -173,4 +178,8 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 1. **PWA Quick Input Widget**: Widget input cepat berbasis AI di layar utama ponsel (PWA) agar pengguna dapat mencatat pengeluaran tanpa membuka dashboard.
 2. **Visualisasi Alokasi vs Realisasi**: Grafik dinamis yang membandingkan alokasi persentase kantong dengan realisasi pengeluaran bulan berjalan secara real-time.
 3. **AI Categorization Approval Prompt**: Dialog konfirmasi setelah input teks AI — menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan permanen.
-4. **Halaman Riwayat Keuangan Bulanan**: Halaman baru yang menampilkan data historis dari tabel `MonthlyFinancialHistory` dalam bentuk timeline atau tabel perbandingan antar bulan.
+4. **Handbook / Panduan Fitur In-App**: Sistem onboarding atau halaman dokumentasi interaktif yang menjelaskan setiap fitur Kainest kepada pengguna baru (opsi: guided tour via Driver.js, halaman `/app/handbook`, atau tooltip kontekstual).
+5. **Pembatasan Query Default Riwayat (6/12 Bulan)**: Endpoint `GET /budget/history` saat ini mengembalikan seluruh riwayat all-time. Perlu ditambahkan parameter query opsional (misal `?limit=12`) agar default hanya 6 atau 12 bulan terakhir untuk efisiensi dan keterbacaan.
+6. **Filter Dropdown Tahun/Bulan di Halaman Riwayat**: Menambahkan komponen filter interaktif (dropdown atau range picker) di `FinancialHistoryPage.vue` agar user dapat memfilter data riwayat berdasarkan tahun atau rentang bulan tertentu.
+7. **Integrasi WhatsApp Bot (Kenin WA Bot) - Sisi Frontend**: Halaman pengaturan integrasi WhatsApp di Profile UI untuk memfasilitasi "Pairing" (menghubungkan nomor HP WhatsApp pengguna dengan akun Kainest) serta mengelola kata kunci (*keywords*) kategori untuk mendukung pencatatan transaksi yang efisien (Hybrid Routing).
+
