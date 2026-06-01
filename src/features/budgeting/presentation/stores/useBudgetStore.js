@@ -368,16 +368,13 @@ export const useBudgetStore = defineStore("budget", () => {
    * BARU: Setup Budget Configuration
    */
   async function setupBudget(data) {
-    isLoadingSummary.value = true;
     const result = await setupBudgetUseCaseInstance.execute(data);
     
     if (result.right) {
-      // Refresh data setelah setup berhasil
-      await fetchDashboardSummary();
-      isLoadingSummary.value = false;
+      // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
+      // agar tidak terjadi race condition UI saat modal ditutup.
       return { success: true };
     } else {
-      isLoadingSummary.value = false;
       return { success: false, message: result.left?.message };
     }
   }

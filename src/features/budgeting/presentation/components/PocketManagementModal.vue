@@ -455,12 +455,17 @@ const submitNewCategory = async () => {
 // ==========================================
 
 const totalPercentage = computed(() => {
-  return pocketsData.value.reduce((total, pocket) => {
+  const salary = budgetStore.salary || 1; // Cegah pembagian dengan 0
+  let total = 0;
+  pocketsData.value.forEach((pocket) => {
     if (pocket.limitType === 'percentage' && pocket.percentage) {
-      return total + Number(pocket.percentage);
+      total += Number(pocket.percentage);
+    } else if (pocket.limitType === 'nominal' && pocket.limitAmount) {
+      total += (Number(pocket.limitAmount) / salary) * 100;
     }
-    return total;
-  }, 0);
+  });
+  // Bulatkan ke maksimal 2 angka desimal untuk menghindari angka aneh (ex: 70.33333%)
+  return Math.round(total * 100) / 100;
 });
 
 const handleSubmit = async () => {

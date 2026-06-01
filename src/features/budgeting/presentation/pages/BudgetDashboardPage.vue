@@ -46,25 +46,29 @@ const closePocketModal = async (payload) => {
 const isSetupModalOpen = ref(false);
 const isSetupForced = ref(false);
 
-const closeSetupModal = () => {
-  if (!isSetupForced.value) {
-    isSetupModalOpen.value = false;
-  } else {
-    // Jika forced, saat disubmit akan tertutup karena re-check data
-    isSetupModalOpen.value = false;
+const closeSetupModal = async (payload) => {
+  isSetupModalOpen.value = false;
+  
+  await nextTick();
+
+  if (payload && payload.refresh) {
+    console.log("🔄 Me-refresh Dashboard secara background setelah modal setup tertutup...");
+    await budgetStore.fetchDashboardSummary();
+  }
+
+  if (isSetupForced.value) {
     checkAndForceSetup();
   }
 };
 
 const checkAndForceSetup = () => {
   // Jika data sudah diload dan salary masih 0, force setup!
-  // Karena sekarang budget default tidak dibuat, kita tidak bisa ngecek berdasarkan panjang kategori.
   if (budgetStore.hasData && budgetStore.salary === 0) {
     isSetupForced.value = true;
     isSetupModalOpen.value = true;
   } else if (budgetStore.hasData && budgetStore.salary > 0) {
     isSetupForced.value = false;
-    isSetupModalOpen.value = false;
+    // Jangan set isSetupModalOpen ke false di sini, agar user bisa membukanya manual
   }
 };
 
@@ -115,6 +119,13 @@ onActivated(async () => {
         </h1>
       </div>
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+        <button @click="isSetupModalOpen = true"
+          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+          <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
+            <path d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
+          </svg>
+          <span class="hidden xs:block">Atur Pemasukan</span>
+        </button>
         <button @click="openPocketModal"
           class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
           <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
