@@ -420,7 +420,8 @@ export const useBudgetStore = defineStore("budget", () => {
 
     if (result.right) {
       await fetchPockets();
-      await fetchDashboardSummary(); // 🔥 KUNCI PERBAIKAN: Update ringkasan dasbor
+      // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
+      // agar tidak terjadi race condition UI saat modal ditutup.
       return true;
     } else {
       errorPockets.value = result.left?.message;

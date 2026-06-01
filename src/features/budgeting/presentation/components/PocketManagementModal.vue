@@ -85,21 +85,23 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- Pilihan Kategori -->
+              <!-- Pilihan Kategori — pakai @update:modelValue agar bisa intercept untuk konfirmasi -->
               <div class="sm:col-span-2 relative">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Kategori</label>
-                <DropdownSelect 
-                  v-model="pocket.categoryId"
+                <DropdownSelect
+                  :modelValue="pocket.categoryId"
                   :options="availableCategories.map(c => ({ label: c.icon + ' ' + c.name, value: c.id }))"
+                  placeholder="Pilih Kategori"
                   label="Kategori"
                   class="w-full"
+                  @update:modelValue="onCategoryChange(index, $event)"
                 />
               </div>
 
               <!-- Tipe Limit -->
               <div class="relative">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Tipe Batas</label>
-                <DropdownSelect 
+                <DropdownSelect
                   v-model="pocket.limitType"
                   :options="[{label: 'Persentase (%)', value: 'percentage'}, {label: 'Nominal (Rp)', value: 'nominal'}]"
                   label="Tipe"
@@ -112,10 +114,15 @@
                 <label class="block text-xs font-medium text-gray-500 mb-1">
                   {{ pocket.limitType === 'percentage' ? 'Persentase (%)' : 'Batas Maksimal (Rp)' }}
                 </label>
-                <input v-if="pocket.limitType === 'percentage'" v-model.number="pocket.percentage" type="number" min="1" max="100" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 15" required />
+                <div v-if="pocket.limitType === 'percentage'">
+                  <input v-model.number="pocket.percentage" type="number" min="1" max="100" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 15" required />
+                  <div class="mt-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    ~ {{ formatRupiah((pocket.percentage / 100) * budgetStore.salary) }}
+                  </div>
+                </div>
                 <input v-else v-model.number="pocket.limitAmount" type="number" min="1000" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 500000" required />
               </div>
-              
+
               <!-- Kata Kunci Kustom (Optional) -->
               <div class="sm:col-span-2 mt-2">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Kata Kunci AI (Pisahkan dengan koma)</label>
@@ -136,7 +143,7 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
               Buat Kategori Kustom Sendiri
             </button>
-            
+
             <div v-else class="p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/20">
               <h4 class="text-sm font-medium text-violet-800 dark:text-violet-300 mb-3">Buat Kategori Kustom</h4>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -164,12 +171,50 @@
         <button type="button" class="btn bg-white dark:bg-gray-800 border-gray-200 text-gray-600" @click="$emit('close')" :disabled="isSubmitting">
           Batal
         </button>
-        <button type="submit" class="btn bg-violet-600 hover:bg-violet-700 text-white" :disabled="isSubmitting || totalPercentage > 100">
+        <button type="submit" class="btn text-white transition-colors" :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700'" :disabled="isSubmitting || totalPercentage > 100 || !hasChanges">
           <span v-if="isSubmitting">Menyimpan...</span>
           <span v-else>Simpan Kantong</span>
         </button>
       </div>
     </form>
+
+    <!-- ===================================================== -->
+    <!-- KONFIRMASI GANTI KATEGORI — Menggunakan BaseModal -->
+    <!-- ===================================================== -->
+    <BaseModal 
+      :isOpen="confirmDialog.show" 
+      @close="cancelCategoryChange" 
+      @confirm="confirmCategoryChange" 
+      size="sm"
+    >
+      <template #header>Ganti Kategori?</template>
+      <template #body>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Anda akan mengganti kategori kantong ini:</p>
+
+        <!-- Perbandingan Sebelum → Sesudah -->
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/40 mb-5">
+          <div class="text-center flex-1">
+            <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Sebelum</p>
+            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {{ getCategoryIcon(confirmDialog.oldId) }} {{ getCategoryName(confirmDialog.oldId) || '—' }}
+            </p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+          <div class="text-center flex-1">
+            <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Sesudah</p>
+            <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">
+              {{ getCategoryIcon(confirmDialog.newId) }} {{ getCategoryName(confirmDialog.newId) }}
+            </p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-400 dark:text-gray-500">
+          Perubahan ini baru tersimpan ke database setelah Anda menekan tombol <strong>"Simpan Kantong"</strong>.
+        </p>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -178,11 +223,12 @@ import { ref, computed, onMounted, defineEmits } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
+import BaseModal from '@/components/modals/BaseModal.vue';
 
 const emit = defineEmits(['close']);
 const budgetStore = useBudgetStore();
 
-// Default 1 pocket kosong
+// Default kosong
 const pocketsData = ref([]);
 
 // Loading state untuk keseluruhan modal
@@ -191,7 +237,7 @@ const isLoadingCategories = ref(true);
 // Blueprint section collapsible
 const isBlueprintExpanded = ref(false);
 
-// Submitting state (terpisah dari isLoadingPockets agar tidak mengganggu reaktivitas modal)
+// Submitting state (terpisah dari isLoadingPockets agar tidak memicu re-render parent)
 const isSubmitting = ref(false);
 
 // Custom Category State
@@ -200,20 +246,37 @@ const newCategoryName = ref('');
 const newCategoryIcon = ref('');
 const isCreatingCategory = ref(false);
 
+// ==========================================
+// State untuk dialog konfirmasi ganti kategori
+// ==========================================
+const confirmDialog = ref({
+  show: false,
+  index: null,   // Index kantong yang sedang diubah
+  oldId: '',     // categoryId sebelum diganti
+  newId: '',     // categoryId yang baru dipilih user
+});
+
+// State awal untuk mendeteksi perubahan
+const initialPocketsState = ref('[]');
+
+// Deteksi apakah ada perubahan
+const hasChanges = computed(() => {
+  return JSON.stringify(pocketsData.value) !== initialPocketsState.value;
+});
+
 onMounted(async () => {
   isLoadingCategories.value = true;
 
   // 1. Tunggu kategori selesai dimuat TERLEBIH DAHULU
-  //    (agar getCategoryName() bisa resolve dengan benar)
+  //    (agar getCategoryName() bisa resolve dengan benar saat pocketsData dirender)
   if (!budgetStore.categoriesList || budgetStore.categoriesList.length === 0) {
     await budgetStore.fetchAllCategories();
   }
 
   // 2. Baru load daftar pocket yang sudah tersimpan
   await budgetStore.fetchPockets();
-  
+
   if (budgetStore.pocketsList.length > 0) {
-    // Map dari API
     pocketsData.value = budgetStore.pocketsList.map(p => ({
       categoryId: p.categoryId,
       limitType: p.percentage != null ? 'percentage' : 'nominal',
@@ -222,9 +285,11 @@ onMounted(async () => {
       keywordsInput: (p.category?.keywords || []).join(', ')
     }));
   } else {
-    // Empty state — beri 1 baris kosong
     addPocket();
   }
+
+  // Simpan state awal setelah dimuat untuk referensi deteksi perubahan
+  initialPocketsState.value = JSON.stringify(pocketsData.value);
 
   isLoadingCategories.value = false;
 });
@@ -248,7 +313,17 @@ const removePocket = (index) => {
 const getCategoryName = (id) => {
   if (!id) return '';
   const cat = availableCategories.value.find(c => c.id === id);
-  return cat ? cat.name : id; // fallback ke id jika kategori tidak ditemukan
+  return cat ? cat.name : '';
+};
+
+const formatRupiah = (number) => {
+  if (!number) return 'Rp 0';
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(number);
 };
 
 const getCategoryIcon = (id) => {
@@ -266,8 +341,55 @@ const findCategoryByName = (keywords) => {
   return null;
 };
 
+// ==========================================
+// Handler konfirmasi ganti kategori
+// ==========================================
+
+/**
+ * Dipanggil saat user memilih kategori baru dari dropdown.
+ * Jika kantong sudah punya kategori sebelumnya, tampilkan dialog konfirmasi.
+ * Jika kantong baru (belum ada kategori), langsung set tanpa konfirmasi.
+ */
+const onCategoryChange = (index, newCategoryId) => {
+  const pocket = pocketsData.value[index];
+  const oldId = pocket.categoryId;
+
+  // Jika belum ada kategori sebelumnya, langsung set (tidak perlu konfirmasi)
+  if (!oldId) {
+    pocketsData.value[index].categoryId = newCategoryId;
+    return;
+  }
+
+  // Jika sama saja, tidak perlu konfirmasi
+  if (oldId === newCategoryId) return;
+
+  // Tampilkan dialog konfirmasi
+  confirmDialog.value = {
+    show: true,
+    index,
+    oldId,
+    newId: newCategoryId,
+  };
+};
+
+/** User menekan "Ya, Ganti" pada dialog */
+const confirmCategoryChange = () => {
+  const { index, newId } = confirmDialog.value;
+  pocketsData.value[index].categoryId = newId;
+  confirmDialog.value = { show: false, index: null, oldId: '', newId: '' };
+};
+
+/** User menekan "Batal" pada dialog */
+const cancelCategoryChange = () => {
+  confirmDialog.value = { show: false, index: null, oldId: '', newId: '' };
+};
+
+// ==========================================
+// Blueprint
+// ==========================================
+
 const applyBlueprint = (type) => {
-  pocketsData.value = []; // Clear existing
+  pocketsData.value = [];
 
   if (type === '503020') {
     const plan = [
@@ -278,63 +400,44 @@ const applyBlueprint = (type) => {
       { names: ['belanja', 'shopping'], percent: 10 },
       { names: ['tabungan', 'investasi', 'saving'], percent: 20 },
     ];
-
     plan.forEach(item => {
       const catId = findCategoryByName(item.names);
-      if (catId) {
-        pocketsData.value.push({
-          categoryId: catId,
-          limitType: 'percentage',
-          percentage: item.percent,
-          limitAmount: null,
-          keywordsInput: ''
-        });
-      }
+      if (catId) pocketsData.value.push({ categoryId: catId, limitType: 'percentage', percentage: item.percent, limitAmount: null, keywordsInput: '' });
     });
-    toast.success("Blueprint 50-30-20 diterapkan! Anda bisa menyesuaikannya di bawah.");
-  } 
-  else if (type === 'hemat') {
+    toast.success("Blueprint 50-30-20 diterapkan!");
+  } else if (type === 'hemat') {
     const plan = [
       { names: ['makan', 'food'], percent: 40 },
       { names: ['tempat tinggal', 'kos', 'sewa', 'rent'], percent: 30 },
       { names: ['hiburan', 'entertainment'], percent: 10 },
       { names: ['tabungan', 'investasi', 'saving'], percent: 20 },
     ];
-
     plan.forEach(item => {
       const catId = findCategoryByName(item.names);
-      if (catId) {
-        pocketsData.value.push({
-          categoryId: catId,
-          limitType: 'percentage',
-          percentage: item.percent,
-          limitAmount: null,
-          keywordsInput: ''
-        });
-      }
+      if (catId) pocketsData.value.push({ categoryId: catId, limitType: 'percentage', percentage: item.percent, limitAmount: null, keywordsInput: '' });
     });
     toast.success("Blueprint Mahasiswa Hemat diterapkan!");
   }
-  
-  if (pocketsData.value.length === 0) {
-    addPocket(); // fallback
-  }
+
+  if (pocketsData.value.length === 0) addPocket();
 };
+
+// ==========================================
+// Custom Category
+// ==========================================
 
 const submitNewCategory = async () => {
   if (!newCategoryName.value || !newCategoryIcon.value) return;
-  
+
   isCreatingCategory.value = true;
   const result = await budgetStore.createCategory(newCategoryName.value, newCategoryIcon.value);
   isCreatingCategory.value = false;
-  
+
   if (result.success) {
     toast.success("Kategori berhasil ditambahkan!");
     showNewCategoryForm.value = false;
     newCategoryName.value = '';
     newCategoryIcon.value = '';
-    
-    // Auto-select in a new pocket
     pocketsData.value.push({
       categoryId: result.data.id,
       limitType: 'percentage',
@@ -346,6 +449,10 @@ const submitNewCategory = async () => {
     toast.error(result.message || "Gagal membuat kategori.");
   }
 };
+
+// ==========================================
+// Total & Submit
+// ==========================================
 
 const totalPercentage = computed(() => {
   return pocketsData.value.reduce((total, pocket) => {
@@ -361,8 +468,7 @@ const handleSubmit = async () => {
     toast.error("Total persentase tidak boleh melebihi 100%.");
     return;
   }
-  
-  // Format payload
+
   const payload = pocketsData.value.filter(p => p.categoryId).map(p => ({
     categoryId: p.categoryId,
     percentage: p.limitType === 'percentage' ? p.percentage : null,
@@ -375,26 +481,21 @@ const handleSubmit = async () => {
     return;
   }
 
-  // Gunakan state lokal isSubmitting agar modal tidak bereaksi terhadap perubahan
-  // isLoadingPockets di store (yang bisa memicu re-render parent)
   isSubmitting.value = true;
 
-  // 1. Bulk Setup Pockets
   const success = await budgetStore.bulkSetupPockets({ pockets: payload });
-  
+
   if (success) {
-    // 2. Update keywords jika ada, tapi tidak menunggu (fire & forget)
+    // Update keywords secara fire-and-forget
     for (const item of payload) {
       if (item._keywords && item._keywords.trim() !== '') {
         const keywordArray = item._keywords.split(',').map(k => k.trim()).filter(k => k);
         budgetStore.updateKeywords(item.categoryId, keywordArray);
       }
     }
-    
     toast.success("Kantong berhasil disimpan!");
     isSubmitting.value = false;
-    // Emit close setelah semua proses utama selesai
-    emit('close');
+    emit('close', { refresh: true });
   } else {
     isSubmitting.value = false;
     toast.error("Gagal menyimpan kantong. Silakan coba lagi.");

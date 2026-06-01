@@ -1,6 +1,6 @@
 <!-- BudgetDashboard -->
 <script setup>
-import { onMounted, ref, provide, computed, onActivated } from 'vue';
+import { onMounted, ref, provide, computed, onActivated, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
@@ -28,8 +28,18 @@ const isPocketModalOpen = ref(false);
 const openPocketModal = () => {
   isPocketModalOpen.value = true;
 };
-const closePocketModal = () => {
+const closePocketModal = async (payload) => {
+  // 1. Matikan modal
   isPocketModalOpen.value = false;
+
+  // 2. Gunakan nextTick agar Vue selesai membuang modal dari DOM (mencegah glitch UI)
+  await nextTick();
+
+  // 3. Jika payload memiliki refresh: true, panggil API di background
+  if (payload && payload.refresh) {
+    console.log("🔄 Me-refresh Dashboard secara background setelah modal tertutup rapat...");
+    await budgetStore.fetchDashboardSummary();
+  }
 };
 
 // State untuk Modal Setup
@@ -41,7 +51,7 @@ const closeSetupModal = () => {
     isSetupModalOpen.value = false;
   } else {
     // Jika forced, saat disubmit akan tertutup karena re-check data
-    isSetupModalOpen.value = false; 
+    isSetupModalOpen.value = false;
     checkAndForceSetup();
   }
 };
@@ -86,7 +96,12 @@ onActivated(async () => {
 
   await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
-  checkAndForceSetup();
+
+  // Guard: jangan panggil checkAndForceSetup jika pocket modal baru saja ditutup
+  // atau sedang dalam proses close (isPocketModalOpen masih true)
+  if (!isPocketModalOpen.value) {
+    checkAndForceSetup();
+  }
 });
 </script>
 
@@ -103,7 +118,8 @@ onActivated(async () => {
         <button @click="openPocketModal"
           class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
           <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
           </svg>
           <span class="hidden xs:block">Kelola Kantong</span>
         </button>
@@ -130,11 +146,8 @@ onActivated(async () => {
 
     <div v-else-if="budgetStore.hasData" class="grid grid-cols-12 gap-6">
 
-      <BudgetHeroCard 
-        :totalRemaining="budgetStore.totalRemaining"
-        :unallocated="budgetStore.unallocatedBudget"
-        :monthName="budgetStore.currentPeriodMonth"
-        :trendData="budgetStore.chartDataCollection" />
+      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :unallocated="budgetStore.unallocatedBudget"
+        :monthName="budgetStore.currentPeriodMonth" :trendData="budgetStore.chartDataCollection" />
 
       <div
         class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">
@@ -163,8 +176,8 @@ onActivated(async () => {
         </div>
       </div>
 
-      <div class="col-span-full mt-4 mb-2">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Kategori</h2>
+      <div class="mb-6 flex justify-between items-end col-span-full">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Pocket</h2>
       </div>
 
       <BudgetCategoryCard v-for="category in budgetStore.budgetCategories" :key="category.categoryId"
@@ -183,11 +196,12 @@ onActivated(async () => {
       <BaseModal :isOpen="isPocketModalOpen" @close="closePocketModal" size="2xl" :hideFooter="true">
         <template #header>Kelola Kantong (Pocket)</template>
         <template #body>
-          <PocketManagementModal @close="closePocketModal" />
+          <PocketManagementModal v-if="isPocketModalOpen" @close="closePocketModal" />
         </template>
       </BaseModal>
 
-      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true" :preventClose="isSetupForced">
+      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true"
+        :preventClose="isSetupForced">
         <template #header>Pengaturan Budget Bulanan</template>
         <template #body>
           <BudgetSetupModal @close="closeSetupModal" :forced="isSetupForced" />
