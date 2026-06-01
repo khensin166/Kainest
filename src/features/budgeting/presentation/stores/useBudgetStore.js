@@ -31,6 +31,7 @@ const getCategoriesUseCaseInstance = getCategoriesUseCase;
 const createCategoryUseCaseInstance = createCategoryUseCase;
 const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
 const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
+const updateTransactionUseCaseInstance = updateTransactionUseCase;
 const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
 const setupBudgetUseCaseInstance = setupBudgetUseCase;
 const getPocketsUseCaseInstance = getPocketsUseCase;
@@ -244,6 +245,24 @@ export const useBudgetStore = defineStore("budget", () => {
     isTransactionSubmitting.value = false;
 
     if (result.right) {
+      fetchDashboardSummary();
+      fetchTransactions({ page: 1 }, true);
+      return { success: true };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
+  /**
+   * UPDATE: Memperbarui transaksi (Existing)
+   */
+  async function updateTransaction(id, transactionData) {
+    isTransactionSubmitting.value = true;
+    const result = await updateTransactionUseCaseInstance.execute(id, transactionData);
+    isTransactionSubmitting.value = false;
+
+    if (result.right) {
+      // Refresh list agar data terbaru tampil
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
       return { success: true };
@@ -507,9 +526,8 @@ export const useBudgetStore = defineStore("budget", () => {
     fetchAllCategories,
     createCategory,
     submitTransaction,
-    fetchTransactions,
-    fetchTransactionById,
     updateTransaction,
+    fetchTransactions,
     deleteTransaction,
     setupBudget,
 
