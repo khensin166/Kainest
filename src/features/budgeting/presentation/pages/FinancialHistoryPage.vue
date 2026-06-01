@@ -136,9 +136,23 @@
                       class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-xl"
                     >
                       <span class="text-2xl">{{ pocket.icon || '💼' }}</span>
-                      <div>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ pocket.categoryName }}</p>
-                        <p class="text-xs text-gray-400">{{ formatRupiah(pocket.limitAmount) }}</p>
+                      <div class="flex-1 w-full">
+                        <div class="flex justify-between items-center mb-1">
+                          <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ pocket.categoryName }}</p>
+                        </div>
+                        <p class="text-xs text-gray-400">
+                          <span :class="(pocket.spent || 0) > pocket.limitAmount ? 'text-red-500 font-semibold' : 'text-gray-600 dark:text-gray-300'">
+                            {{ formatRupiah(pocket.spent || 0) }}
+                          </span>
+                          / {{ formatRupiah(pocket.limitAmount) }}
+                        </p>
+                        <!-- Progress Bar (Optional) -->
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                          <div class="h-1.5 rounded-full transition-all duration-300"
+                            :class="(pocket.spent || 0) > pocket.limitAmount ? 'bg-red-500' : 'bg-violet-500'"
+                            :style="{ width: Math.min(((pocket.spent || 0) / (pocket.limitAmount || 1)) * 100, 100) + '%' }">
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

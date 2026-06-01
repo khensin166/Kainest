@@ -170,6 +170,7 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 | 7 | **Perbaikan Bug `createCategory()` di Repository** | Method `createCategory()` hilang dari `BudgetRepository.js` frontend sehingga klik tombol tidak mengirim request ke backend. Diperbaiki dengan menambahkan method tersebut di antara `getCategories()` dan `getSpendingTrend()`. |
 | 8 | **Halaman Riwayat Keuangan Bulanan** | Halaman baru `FinancialHistoryPage.vue` di rute `/app/history` (permission: `budgeting`). Menampilkan Bar Chart perbandingan bulanan (Rencana / Aktual / Tabungan) dan Akordion kartu per bulan yang memuat rincian kantong dari `pocketsSnapshot`. Menu "Riwayat Bulanan" dengan `ChartBarIcon` ditambahkan ke `Sidebar.vue`. |
 | 9 | **`GetMonthlyHistoryUseCase.js` & DI** | Use Case baru didaftarkan di `di.js`. State `historyList`, `isLoadingHistory`, dan action `fetchMonthlyHistory()` ditambahkan ke `useBudgetStore.js`. Data source `getMonthlyHistory()` ditambahkan ke `BudgetRemoteSource.js` dan `BudgetRepository.js`. |
+| 10 | **Perbaikan Caching API Pocket** | Mengatasi aggressive browser caching pada data `GET /budget/pockets` dengan menambahkan header `Cache-Control: no-cache` secara global di `apiClient.js`. Serta mengimplementasikan strict unmounting (`v-if`) pada `PocketManagementModal.vue` agar state modal ter-reset total saat ditutup. |
 
 ---
 
