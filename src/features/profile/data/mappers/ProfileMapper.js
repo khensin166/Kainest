@@ -21,6 +21,7 @@ export function mapProfileFromApi(apiResponse) {
     displayName: apiResponse.profile?.displayName,
     avatarUrl: apiResponse.profile?.avatarUrl,
     invitationCode: apiResponse.profile?.invitationCode,
+    whatsappJid: apiResponse.whatsappJid,
   });
 }
 

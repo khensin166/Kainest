@@ -67,8 +67,8 @@
                     <input id="invite_code" v-model="inputCode" class="form-input w-full uppercase" type="text"
                         placeholder="XXXX-XXXX" required />
                     <div class="flex justify-end mt-4">
-                        <button type="submit" :disabled="coupleStore.isLoading"
-                            class="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-md disabled:bg-gray-400">
+                        <button type="submit" :disabled="coupleStore.isLoading || !isDirty"
+                            class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
                             {{ coupleStore.isLoading ? 'Menghubungkan...' : 'Hubungkan' }}
                         </button>
                     </div>
@@ -91,6 +91,10 @@ const isCopied = ref(false);
 const inputCode = ref('');
 
 // --- Computed Properties ---
+
+const isDirty = computed(() => {
+    return inputCode.value.trim().length > 0;
+});
 
 // Mengambil kode undangan SAYA dari authStore
 const myInvitationCode = computed(() => {

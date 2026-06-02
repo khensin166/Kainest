@@ -20,8 +20,8 @@
         </div>
       </div>
       <div class="flex justify-end mt-6">
-        <button type="submit" :disabled="securityStore.isLoading"
-          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400">
+        <button type="submit" :disabled="securityStore.isLoading || !isDirty"
+          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
           {{ securityStore.isLoading ? 'Memproses...' : 'Simpan' }}
         </button>
       </div>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useSecurityStore } from '../../../security/presentation/stores/useSecurityStore';
 
 const securityStore = useSecurityStore();
@@ -38,6 +38,14 @@ const passwords = ref({
   currentPassword: '',
   newPassword: '',
   confirmationPassword: '',
+});
+
+const isDirty = computed(() => {
+  return (
+    passwords.value.currentPassword.trim().length > 0 &&
+    passwords.value.newPassword.trim().length > 0 &&
+    passwords.value.confirmationPassword.trim().length > 0
+  );
 });
 
 const handleChangePassword = async () => {

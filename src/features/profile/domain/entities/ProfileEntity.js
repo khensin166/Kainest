@@ -12,6 +12,7 @@ export class ProfileEntity {
     displayName,
     avatarUrl,
     invitationCode,
+    whatsappJid,
   }) {
     this.id = id;
     this.email = email;
@@ -25,5 +26,6 @@ export class ProfileEntity {
     this.displayName = displayName;
     this.avatarUrl = avatarUrl;
     this.invitationCode = invitationCode;
+    this.whatsappJid = whatsappJid;
   }
 }
