@@ -1,12 +1,13 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 // import { AuthRepository } from "../../data/repository/AuthRepository"; // DIP: Removed direct dependency
 import { 
   loginUserUseCase, 
   registerUserUseCase, 
   getCurrentUserUseCase, 
-  logoutUserUseCase 
+  logoutUserUseCase,
+  socialLoginUseCase
 } from "../../../../core/di/di"; // DIP: Injected dependencies
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
@@ -18,6 +19,16 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Status untuk menandakan apakah pengecekan auth awal sudah selesai
   const isAuthReady = ref(false);
+
+  // RBAC Getters & Methods
+  const isAdmin = computed(() => {
+    return user.value?.role === "admin";
+  });
+
+  const hasPermission = (permission) => {
+    if (isAdmin.value) return true; // Admin has all permissions
+    return user.value?.permissions?.includes(permission) || false;
+  };
 
   const modalStore = useModalStore();
   
@@ -93,7 +104,8 @@ export const useAuthStore = defineStore("auth", () => {
 
     const result = await loginUseCase.execute(
       credentials.email,
-      credentials.password
+      credentials.password,
+      credentials.rememberMe
     );
 
     if (result.left) {
@@ -163,6 +175,33 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function loginSocial(provider, callbackUrl) {
+    isLoading.value = true;
+    error.value = null;
+
+    const result = await socialLoginUseCase.execute(provider, callbackUrl);
+
+    if (result.left) {
+      const failure = result.left;
+      const message = mapFailureToMessage(failure);
+      error.value = message;
+      isLoading.value = false;
+
+      modalStore.openModal({
+        newTitle: "Login Gagal",
+        newMessage: message,
+        newStatus: "error",
+      });
+
+      throw new Error(message);
+    } else {
+      // Sukses, redirect URL
+      const authorizationUrl = result.right;
+      window.location.href = authorizationUrl;
+      // Jangan set isLoading false agar indikator loading tetap berjalan hingga pindah halaman
+    }
+  }
+
   async function logout() {
     isLoading.value = true;
     await logoutUseCase.execute();
@@ -188,7 +227,10 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading,
     error,
     isAuthReady, // <-- Tambahkan ini
+    isAdmin, // RBAC
+    hasPermission, // RBAC
     login,
+    loginSocial,
     logout,
     initializeAuth,
     register,

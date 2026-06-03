@@ -5,6 +5,8 @@ import { NoteRepository } from "../../features/notes/data/repository/NoteReposit
 import { CoupleRepository } from "../../features/couple/data/repository/CoupleRepository";
 import { WaBotRepository } from "../../features/wabot/data/repository/WaBotRepository";
 import { SecurityRepository } from "../../features/security/data/repository/SecurityRepository";
+import { AdminRepository } from "../../features/admin/data/repository/AdminRepository";
+import { AdminRemoteSource } from "../../features/admin/data/source/AdminRemoteSource";
 
 // Import Use Cases
 import { LoginUserUseCase } from "../../features/auth/domain/use-cases/LoginUserUseCase";
@@ -12,9 +14,11 @@ import { RegisterUserUseCase } from "../../features/auth/domain/use-cases/Regist
 import { GetCurrentUserUseCase } from "../../features/auth/domain/use-cases/GetCurrentUserUseCase";
 import { LogoutUserUseCase } from "../../features/auth/domain/use-cases/LogoutUserUseCase";
 import { GetProfileUseCase } from "../../features/auth/domain/use-cases/GetProfileUseCase";
+import { SocialLoginUseCase } from "../../features/auth/domain/use-cases/SocialLoginUseCase";
 
 import { GetDashboardSummaryUseCase } from "../../features/budgeting/domain/use-cases/GetDashboardSummaryUseCase";
 import { GetCategoriesUseCase } from "../../features/budgeting/domain/use-cases/GetCategoriesUseCase";
+import { CreateCategoryUseCase } from "../../features/budgeting/domain/use-cases/CreateCategoryUseCase";
 import { CreateTransactionUseCase } from "../../features/budgeting/domain/use-cases/CreateTransactionUseCase";
 import { GetTransactionsListUseCase } from "../../features/budgeting/domain/use-cases/GetTransactionsListUseCase";
 import { GetTransactionDetailUseCase } from "../../features/budgeting/domain/use-cases/GetTransactionDetailUseCase";
@@ -23,6 +27,13 @@ import { DeleteTransactionUseCase } from "../../features/budgeting/domain/use-ca
 import { GetSpendingTrendUseCase } from "../../features/budgeting/domain/use-cases/GetSpendingTrendUseCase";
 import { GetAiAdviceUseCase } from "../../features/budgeting/domain/use-cases/GetAiAdviceUseCase";
 import { SetupBudgetUseCase } from "../../features/budgeting/domain/use-cases/SetupBudgetUseCase";
+import { GetPocketsUseCase } from "../../features/budgeting/domain/use-cases/GetPocketsUseCase";
+import { UpsertPocketUseCase } from "../../features/budgeting/domain/use-cases/UpsertPocketUseCase";
+import { DeletePocketUseCase } from "../../features/budgeting/domain/use-cases/DeletePocketUseCase";
+import { BulkSetupPocketsUseCase } from "../../features/budgeting/domain/use-cases/BulkSetupPocketsUseCase";
+import { UpdateCategoryKeywordsUseCase } from "../../features/budgeting/domain/use-cases/UpdateCategoryKeywordsUseCase";
+import { ClassifyTransactionUseCase } from "../../features/budgeting/domain/use-cases/ClassifyTransactionUseCase";
+import { GetMonthlyHistoryUseCase } from "../../features/budgeting/domain/use-cases/GetMonthlyHistoryUseCase";
 
 import { GetNotesUseCase } from "../../features/notes/domain/use-cases/GetNotesUseCase";
 import { GetNoteByIdUseCase } from "../../features/notes/domain/use-cases/GetNoteByIdUseCase";
@@ -41,6 +52,9 @@ import { SendMessageUseCase } from "../../features/wabot/domain/use-cases/SendMe
 
 import { ChangePasswordUseCase } from "../../features/security/domain/use-cases/ChangePasswordUseCase";
 
+import { GetUsersUseCase } from "../../features/admin/domain/use-cases/GetUsersUseCase";
+import { UpdateUserAccessUseCase } from "../../features/admin/domain/use-cases/UpdateUserAccessUseCase";
+
 // --- Singleton Instances ---
 
 // 1. Repositories
@@ -51,15 +65,20 @@ const coupleRepository = new CoupleRepository();
 const waBotRepository = new WaBotRepository();
 const securityRepository = new SecurityRepository();
 
+const adminRemoteSource = new AdminRemoteSource();
+const adminRepository = new AdminRepository(adminRemoteSource);
+
 // 2. Use Cases (Injected with Repository)
 export const loginUserUseCase = new LoginUserUseCase(authRepository);
 export const registerUserUseCase = new RegisterUserUseCase(authRepository);
 export const getCurrentUserUseCase = new GetCurrentUserUseCase(authRepository);
 export const logoutUserUseCase = new LogoutUserUseCase(authRepository);
 export const getProfileUseCase = new GetProfileUseCase(authRepository);
+export const socialLoginUseCase = new SocialLoginUseCase(authRepository);
 
 export const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(budgetRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
+export const createCategoryUseCase = new CreateCategoryUseCase(budgetRepository);
 export const createTransactionUseCase = new CreateTransactionUseCase(budgetRepository);
 export const getTransactionsListUseCase = new GetTransactionsListUseCase(budgetRepository);
 export const getTransactionDetailUseCase = new GetTransactionDetailUseCase(budgetRepository);
@@ -68,6 +87,13 @@ export const deleteTransactionUseCase = new DeleteTransactionUseCase(budgetRepos
 export const getSpendingTrendUseCase = new GetSpendingTrendUseCase(budgetRepository);
 export const getAiAdviceUseCase = new GetAiAdviceUseCase(budgetRepository);
 export const setupBudgetUseCase = new SetupBudgetUseCase(budgetRepository);
+export const getPocketsUseCase = new GetPocketsUseCase(budgetRepository);
+export const upsertPocketUseCase = new UpsertPocketUseCase(budgetRepository);
+export const deletePocketUseCase = new DeletePocketUseCase(budgetRepository);
+export const bulkSetupPocketsUseCase = new BulkSetupPocketsUseCase(budgetRepository);
+export const updateCategoryKeywordsUseCase = new UpdateCategoryKeywordsUseCase(budgetRepository);
+export const classifyTransactionUseCase = new ClassifyTransactionUseCase(budgetRepository);
+export const getMonthlyHistoryUseCase = new GetMonthlyHistoryUseCase(budgetRepository);
 
 export const getNotesUseCase = new GetNotesUseCase(noteRepository);
 export const getNoteByIdUseCase = new GetNoteByIdUseCase(noteRepository);
@@ -86,5 +112,8 @@ export const sendMessageUseCase = new SendMessageUseCase(waBotRepository);
 
 export const changePasswordUseCase = new ChangePasswordUseCase(securityRepository);
 
+export const getUsersUseCase = new GetUsersUseCase(adminRepository);
+export const updateUserAccessUseCase = new UpdateUserAccessUseCase(adminRepository);
+
 // Export repository if needed elsewhere (though relying on use cases is better)
-export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository };
+export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository, adminRepository };

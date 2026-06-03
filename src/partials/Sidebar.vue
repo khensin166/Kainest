@@ -127,6 +127,8 @@ import {
   BanknotesIcon,
   ReceiptRefundIcon,
   SparklesIcon,
+  UsersIcon,
+  ChartBarIcon,
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -160,21 +162,25 @@ export default {
             name: "Catatan Bersama",
             path: "/app/notes",
             iconComponent: PencilSquareIcon,
+            requiredPermission: "notes",
           },
           {
             name: "To-do List Berdua",
             path: "/app/todos",
             iconComponent: DocumentTextIcon,
+            requiredPermission: "todos",
           },
           {
             name: "Galeri Kenangan",
             path: "/app/gallery",
             iconComponent: PhotoIcon,
+            requiredPermission: "gallery",
           },
           {
             name: "Kalender Cinta",
             path: "/app/calendar",
             iconComponent: CalendarDaysIcon,
+            requiredPermission: "calendar",
           },
           {
             name: "Vault Rahasia",
@@ -185,26 +191,37 @@ export default {
             name: "Budgeting",
             path: "/app/budgeting",
             iconComponent: BanknotesIcon,
+            requiredPermission: "budgeting",
           },
           {
-            name: "transactions",
+            name: "Transactions",
             path: "/app/transactions",
             iconComponent: ReceiptRefundIcon,
+            requiredPermission: "budgeting",
+          },
+          {
+            name: "Riwayat Bulanan",
+            path: "/app/history",
+            iconComponent: ChartBarIcon,
+            requiredPermission: "budgeting",
           },
           {
             name: "WhatsApp Bot",
             path: "/app/wabot",
             iconComponent: SparklesIcon,
+            requiredPermission: "wabot",
           },
           {
             name: "WhatsApp Api",
             path: "/app/wabot-api",
             iconComponent: ChatBubbleBottomCenterTextIcon,
+            requiresAdmin: true,
           },
           {
             name: "Backup Chat",
             path: "/app/wabot-backup",
             iconComponent: ArchiveBoxIcon,
+            requiredPermission: "wabot",
           },
         ],
       },
@@ -212,6 +229,12 @@ export default {
         type: "group",
         title: "Akun",
         items: [
+          {
+            name: "Manajemen User",
+            path: "/app/admin/users",
+            iconComponent: UsersIcon,
+            requiresAdmin: true,
+          },
           {
             name: "Pengaturan",
             path: "/app/settings",
@@ -222,7 +245,20 @@ export default {
     ]);
 
     const filteredMenu = computed(() => {
-      return menuConfig.value;
+      // Filter menu based on permissions and admin role
+      return menuConfig.value.map(group => {
+        if (group.type === "group") {
+          return {
+            ...group,
+            items: group.items.filter(item => {
+              if (item.requiresAdmin && !authStore.isAdmin) return false;
+              if (item.requiredPermission && !authStore.hasPermission(item.requiredPermission)) return false;
+              return true;
+            })
+          }
+        }
+        return group;
+      }).filter(group => group.type !== "group" || group.items.length > 0);
     });
 
     // Event handlers untuk sidebar mobile

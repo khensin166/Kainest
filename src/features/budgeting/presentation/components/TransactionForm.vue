@@ -61,10 +61,12 @@ const populateForm = () => {
 
     // Format tanggal untuk input type="date"
     let dateValue = props.initialData.date;
-    if (dateValue instanceof Date) {
-      dateValue = dateValue.toISOString().split('T')[0];
-    } else if (typeof dateValue === 'string' && dateValue.includes('T')) {
-      dateValue = dateValue.split('T')[0];
+    if (dateValue) {
+      if (dateValue instanceof Date) {
+        dateValue = dateValue.toISOString().substring(0, 10);
+      } else if (typeof dateValue === 'string') {
+        dateValue = dateValue.substring(0, 10);
+      }
     }
     formData.date = dateValue;
 

@@ -1,12 +1,13 @@
 <!-- BudgetDashboard -->
 <script setup>
-import { onMounted, ref, provide, computed, onActivated } from 'vue';
+import { onMounted, ref, provide, computed, onActivated, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BudgetHeroCard from '../components/BudgetHeroCard.vue';
 import BudgetCategoryCard from '../components/BudgetCategoryCard.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
+import PocketManagementModal from '../components/PocketManagementModal.vue';
 import BudgetSetupModal from '../components/BudgetSetupModal.vue';
 
 // Inisialisasi store
@@ -21,15 +22,54 @@ const openTransactionModal = () => {
   selectedTransactionToEdit.value = null; // RESET state edit
   console.log("🔓 openTransactionModal dipanggil. isTransactionModalOpen = true");
   isTransactionModalOpen.value = true;
-  isTransactionModalOpen.value = true;
 };
 
-const isSetupModalOpen = ref(false);
-const openSetupModal = () => {
-  isSetupModalOpen.value = true;
+const isPocketModalOpen = ref(false);
+const openPocketModal = () => {
+  isPocketModalOpen.value = true;
 };
-const closeSetupModal = () => {
+const closePocketModal = async (payload) => {
+  // 1. Matikan modal
+  isPocketModalOpen.value = false;
+
+  // 2. Gunakan nextTick agar Vue selesai membuang modal dari DOM (mencegah glitch UI)
+  await nextTick();
+
+  // 3. Jika payload memiliki refresh: true, panggil API di background
+  if (payload && payload.refresh) {
+    console.log("🔄 Me-refresh Dashboard secara background setelah modal tertutup rapat...");
+    await budgetStore.fetchDashboardSummary();
+  }
+};
+
+// State untuk Modal Setup
+const isSetupModalOpen = ref(false);
+const isSetupForced = ref(false);
+
+const closeSetupModal = async (payload) => {
   isSetupModalOpen.value = false;
+  
+  await nextTick();
+
+  if (payload && payload.refresh) {
+    console.log("🔄 Me-refresh Dashboard secara background setelah modal setup tertutup...");
+    await budgetStore.fetchDashboardSummary();
+  }
+
+  if (isSetupForced.value) {
+    checkAndForceSetup();
+  }
+};
+
+const checkAndForceSetup = () => {
+  // Jika data sudah diload dan salary masih 0, force setup!
+  if (budgetStore.hasData && budgetStore.salary === 0) {
+    isSetupForced.value = true;
+    isSetupModalOpen.value = true;
+  } else if (budgetStore.hasData && budgetStore.salary > 0) {
+    isSetupForced.value = false;
+    // Jangan set isSetupModalOpen ke false di sini, agar user bisa membukanya manual
+  }
 };
 
 // Fungsi ini yang akan kita "provide"
@@ -47,18 +87,25 @@ const handleEditTransaction = (transactionData) => {
 provide('closeModalFunc', closeTransactionModal);
 
 // Panggil data saat komponen dimount (dibuka pertama kali)
-onMounted(() => {
+onMounted(async () => {
   if (!budgetStore.hasData) {
-    budgetStore.fetchDashboardSummary();
+    await budgetStore.fetchDashboardSummary();
     budgetStore.fetchSpendingTrend();
   }
+  checkAndForceSetup();
 });
 
-onActivated(() => {
+onActivated(async () => {
   console.log("👀 User kembali melihat Dashboard, cek data baru...");
 
-  budgetStore.fetchDashboardSummary();
+  await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
+
+  // Guard: jangan panggil checkAndForceSetup jika pocket modal baru saja ditutup
+  // atau sedang dalam proses close (isPocketModalOpen masih true)
+  if (!isPocketModalOpen.value) {
+    checkAndForceSetup();
+  }
 });
 </script>
 
@@ -72,13 +119,20 @@ onActivated(() => {
         </h1>
       </div>
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-        <button @click="openSetupModal"
-          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400">
-          <span class="sr-only">Settings</span>
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16">
-            <path
-              d="M11.7.2l-.4.3c-.4.3-.9.4-1.3.1l-.3-.4c-.3-.4 0-1 .5-1.3l.4-.3c.4-.3.9-.4 1.3-.1l.3.4c.3.5 0 1-.5 1.3zm3.7 3.5l-.3.3c-.3.4-.4.9-.1 1.3l.4.3c.4.3 1 0 1.3-.5l.3-.3c.3-.4.4-.9.1-1.3l-.4-.3c-.5-.4-1.1-.1-1.3.5zM2 11.2l.3.4c.3.4.9.4 1.3.1l.4-.3c.4-.3 0-1-.5-1.3l-.3-.4c-.3-.4-.9-.4-1.3-.1l-.4.3c-.4.4 0 1 .5 1.3zm12.3 2.1l-.4.3c-.4.3-.9.4-1.3.1l-.3-.4c-.3-.4 0-1 .5-1.3l.4-.3c.4-.3.9-.4 1.3-.1l.3.4c.4.3 0 1-.5 1.3zM1.7 5.2l.4.3c.5.4 1 .1 1.3-.5l.3-.3c.3-.4.1-1-.3-1.3l-.4-.3c-.5-.4-1-.1-1.3.5l-.3.3c-.3.4-.1 1 .3 1.3zM8 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" />
+        <button @click="isSetupModalOpen = true"
+          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+          <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
+            <path d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
           </svg>
+          <span class="hidden xs:block">Atur Pemasukan</span>
+        </button>
+        <button @click="openPocketModal"
+          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
+          <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          <span class="hidden xs:block">Kelola Kantong</span>
         </button>
         <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
           <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -103,8 +157,8 @@ onActivated(() => {
 
     <div v-else-if="budgetStore.hasData" class="grid grid-cols-12 gap-6">
 
-      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :monthName="budgetStore.currentPeriodMonth"
-        :trendData="budgetStore.chartDataCollection" />
+      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :unallocated="budgetStore.unallocatedBudget"
+        :monthName="budgetStore.currentPeriodMonth" :trendData="budgetStore.chartDataCollection" />
 
       <div
         class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">
@@ -133,8 +187,8 @@ onActivated(() => {
         </div>
       </div>
 
-      <div class="col-span-full mt-4 mb-2">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Kategori</h2>
+      <div class="mb-6 flex justify-between items-end col-span-full">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Pocket</h2>
       </div>
 
       <BudgetCategoryCard v-for="category in budgetStore.budgetCategories" :key="category.categoryId"
@@ -150,10 +204,18 @@ onActivated(() => {
         </template>
       </BaseModal>
 
-      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true">
-        <template #header>Konfigurasi Budget</template>
+      <BaseModal :isOpen="isPocketModalOpen" @close="closePocketModal" size="2xl" :hideFooter="true">
+        <template #header>Kelola Kantong (Pocket)</template>
         <template #body>
-          <BudgetSetupModal @close="closeSetupModal" />
+          <PocketManagementModal v-if="isPocketModalOpen" @close="closePocketModal" />
+        </template>
+      </BaseModal>
+
+      <BaseModal :isOpen="isSetupModalOpen" @close="closeSetupModal" size="md" :hideFooter="true"
+        :preventClose="isSetupForced">
+        <template #header>Pengaturan Budget Bulanan</template>
+        <template #body>
+          <BudgetSetupModal @close="closeSetupModal" :forced="isSetupForced" />
         </template>
       </BaseModal>
     </div>

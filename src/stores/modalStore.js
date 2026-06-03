@@ -24,6 +24,13 @@ export const useModalStore = defineStore("modal", () => {
   const isDeleting = ref(false);
 
   // =========================================
+  // 3. STATE BARU UNTUK CONTENT MODAL (S&K, Kebijakan Privasi)
+  // =========================================
+  const isContentOpen = ref(false);
+  const contentTitle = ref("");
+  const contentBody = ref("");
+
+  // =========================================
   // ACTIONS UNTUK RESPONSE MODAL
   // =========================================
   function openModal({
@@ -42,6 +49,24 @@ export const useModalStore = defineStore("modal", () => {
   function closeModal() {
     isOpen.value = false;
     countdown.value = 0;
+  }
+
+  // =========================================
+  // ACTIONS UNTUK CONTENT MODAL
+  // =========================================
+  function openContentModal({ title, htmlBody }) {
+    contentTitle.value = title;
+    contentBody.value = htmlBody;
+    isContentOpen.value = true;
+  }
+
+  function closeContentModal() {
+    isContentOpen.value = false;
+    // Delay clearing content for animation
+    setTimeout(() => {
+      contentTitle.value = "";
+      contentBody.value = "";
+    }, 300);
   }
 
   // =========================================
@@ -85,6 +110,13 @@ export const useModalStore = defineStore("modal", () => {
     countdown,
     openModal,
     closeModal,
+    
+    isContentOpen,
+    contentTitle,
+    contentBody,
+    openContentModal,
+    closeContentModal,
+
     isDeleteOpen,
     deleteTitle,
     deleteMessage,

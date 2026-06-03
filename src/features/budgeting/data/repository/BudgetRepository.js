@@ -30,6 +30,7 @@ export class BudgetRepository {
         // 🔑 KUNCI PERBAIKAN: Bungkus data dengan right()
         // Kita kembalikan objek data lengkap (totals + categories) agar Store bisa pakai keduanya
         return right({
+          salary: response.data.salary,
           month: response.data.month,
           totals: response.data.totals,
           categories: entities,
@@ -127,6 +128,23 @@ export class BudgetRepository {
             "Terjadi kesalahan koneksi."
         )
       );
+    }
+  }
+
+  /**
+   * @param {string} name 
+   * @param {string} icon 
+   * @returns {Promise<Either<Failure, any>>}
+   */
+  async createCategory(name, icon) {
+    try {
+      const response = await this.remoteSource.createCategory({ name, icon });
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Failed to create category"));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || "Server error"));
     }
   }
 
@@ -277,6 +295,112 @@ export class BudgetRepository {
       return left(
         new ServerFailure(error.response?.data?.message || error.message)
       );
+    }
+  }
+
+  // ==========================================
+  // 💰 POCKET (KANTONG) METHODS
+  // ==========================================
+
+  async getPockets() {
+    try {
+      const response = await this.remoteSource.getPockets();
+      if (response.success) {
+        // We can just return the raw data array for now, or map to entity if needed
+        return right(response.data || []);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengambil daftar kantong."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async upsertPocket(data) {
+    try {
+      const response = await this.remoteSource.upsertPocket(data);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal menyimpan kantong."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async deletePocket(categoryId) {
+    try {
+      const response = await this.remoteSource.deletePocket(categoryId);
+      if (response.success) {
+        return right(true);
+      }
+      return left(new ServerFailure(response.message || "Gagal menghapus kantong."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async bulkSetupPockets(data) {
+    try {
+      const response = await this.remoteSource.bulkSetupPockets(data);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal menyimpan konfigurasi kantong."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async updateCategoryKeywords(categoryId, keywords) {
+    try {
+      const response = await this.remoteSource.updateCategoryKeywords(categoryId, keywords);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengupdate kata kunci."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  // ==========================================
+  // 🤖 AI CLASSIFICATION
+  // ==========================================
+
+  async classifyTransaction(text) {
+    try {
+      const response = await this.remoteSource.classifyTransaction(text);
+      if (response.success) {
+        return right({
+          categoryId: response.categoryId,
+          categoryName: response.categoryName,
+          amount: response.amount,
+          note: response.note
+        });
+      }
+      return left(new ServerFailure(response.message || "Gagal klasifikasi AI."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  // ==========================================
+  // 📅 MONTHLY HISTORY
+  // ==========================================
+
+  /**
+   * Mengambil semua riwayat keuangan bulanan user
+   * @returns {Promise<Either<Failure, Array>>}
+   */
+  async getMonthlyHistory() {
+    try {
+      const response = await this.remoteSource.getMonthlyHistory();
+      if (response.success) {
+        return right(response.data || []);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
     }
   }
 }

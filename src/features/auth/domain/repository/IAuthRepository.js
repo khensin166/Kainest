@@ -13,6 +13,9 @@ export class IAuthRepository {
   async login(email, password) {
     throw new Error("IAuthRepository.login() harus diimplementasikan");
   }
+  async socialLogin(provider, callbackURL) {
+    throw new Error("IAuthRepository.socialLogin() harus diimplementasikan");
+  }
   async getCurrentUser() {
     throw new Error("IAuthRepository.getCurrentUser() harus diimplementasikan");
   }

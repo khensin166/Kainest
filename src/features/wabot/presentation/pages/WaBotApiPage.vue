@@ -111,8 +111,13 @@
             </tbody>
           </table>
 
-          <div v-if="waStore.apiKeysList.length === 0" class="p-8 text-center text-gray-500">
-            Tidak ada API Key ditemukan.
+          <div v-if="waStore.apiKeysList.length === 0">
+            <BaseEmptyState 
+              icon="🔑"
+              title="API Key Kosong"
+              message="Tidak ada API Key ditemukan. Silakan generate baru."
+              heightClass="py-12"
+            />
           </div>
         </div>
       </div>
@@ -150,8 +155,13 @@
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 <tr v-if="waStore.groups.length === 0 && !waStore.isLoading"
                   class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                  <td colspan="3" class="px-6 py-8 text-center text-gray-500">
-                    Belum ada data grup. Pastikan bot sudah join grup & klik Refresh.
+                  <td colspan="3" class="p-0">
+                    <BaseEmptyState 
+                      icon="💬"
+                      title="Grup Kosong"
+                      message="Belum ada data grup. Pastikan bot sudah join grup & klik Refresh."
+                      heightClass="py-12"
+                    />
                   </td>
                 </tr>
                 <tr v-for="group in waStore.groups" :key="group.id"
@@ -232,6 +242,7 @@
 <script setup>
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useWaBotStore } from '../stores/useWaBotStore';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 
 const waStore = useWaBotStore();
 

@@ -68,19 +68,18 @@
     </div>
 
     <!-- EMPTY STATE -->
-    <div v-else class="text-center py-20 bg-white dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-      <div class="max-w-md mx-auto">
-        <PencilSquareIcon class="w-20 h-20 mx-auto text-gray-300 dark:text-gray-600 mb-6" />
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Belum Ada Catatan</h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-8">
-          Mulai buat catatan pribadi atau catatan bersama pasangan Anda.
-        </p>
-        <button @click="goToEditor" 
-             class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-violet-600 hover:bg-violet-700 transition-colors">
-          Buat Note Pertama Anda
-        </button>
-      </div>
-    </div>
+    <BaseEmptyState 
+      v-else 
+      icon="📒"
+      title="Belum Ada Catatan"
+      message="Mulai buat catatan pribadi atau catatan bersama pasangan Anda."
+      heightClass="py-20"
+    >
+      <button @click="goToEditor" 
+           class="mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-violet-600 hover:bg-violet-700 transition-colors">
+        Buat Note Pertama Anda
+      </button>
+    </BaseEmptyState>
   </div>
 </template>
 
@@ -91,6 +90,7 @@ import { useNoteStore } from '../stores/useNoteStore';
 import { useAuthStore } from '../../../auth/presentation/stores/authStore';
 // Impor ikon untuk Hero Empty State
 import { PencilSquareIcon } from '@heroicons/vue/24/outline';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 
 const router = useRouter();
 const noteStore = useNoteStore();

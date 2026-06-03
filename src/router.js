@@ -18,6 +18,7 @@ import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
 import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.vue";
 import ValentinePage from "./features/valentine/presentation/pages/ValentinePage.vue";
+import AuthCallbackPage from "./features/auth/presentation/pages/AuthCallbackPage.vue";
 
 const routes = [
   // Halaman publik yang tidak menggunakan layout utama
@@ -57,7 +58,15 @@ const routes = [
     component: ValentinePage,
   },
 
-  // Halaman terproteksi yang menggunakan DashboardLayout
+  // ✅ ROUTE CALLBACK SOCIAL LOGIN (PUBLIK)
+  // Menerima token dari URL hash (#token=...) setelah OAuth selesai.
+  // Tidak pakai requiresAuth karena user belum login saat halaman ini dimuat.
+  {
+    path: "/app/auth-callback",
+    name: "AuthCallback",
+    component: AuthCallbackPage,
+  },
+
   {
     // ✅ PATH DIUBAH MENJADI '/app'
     path: "/app",
@@ -122,6 +131,12 @@ const routes = [
         component: () => import ('./features/budgeting/presentation/pages/TransactionListPage.vue'),
       },
       {
+        path: "history",
+        name: "FinancialHistory",
+        component: () => import('./features/budgeting/presentation/pages/FinancialHistoryPage.vue'),
+        meta: { requiredPermission: "budgeting" },
+      },
+      {
         path: "wabot",
         name: "wabot",
         component: () => import('./features/wabot/presentation/pages/WaBotPage.vue'),
@@ -135,6 +150,14 @@ const routes = [
         path: "wabot-backup",
         name: "wabot-backup",
         component: () => import('./features/wabot/presentation/pages/WaBackupPage.vue'),
+        meta: { requiredPermission: "wabot" } // Contoh penggunaan permission
+      },
+      // --- ADMIN ROUTES ---
+      {
+        path: "admin/users",
+        name: "UserManagement",
+        component: () => import('./features/admin/presentation/pages/UserManagementPage.vue'),
+        meta: { requiresAdmin: true } // Hanya admin
       },
     ],
   },
@@ -152,13 +175,35 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard yang sudah disederhanakan
-router.beforeEach((to, from, next) => {
+// Navigation guard - menunggu inisialisasi auth selesai sebelum membuat keputusan
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+
+  // Jika auth belum diinisialisasi, tunggu selesai dulu
+  // Ini penting untuk social login callback agar sesi cookie sempat dibaca
+  if (!authStore.isAuthReady) {
+    await authStore.initializeAuth();
+  }
+
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+  
+  // Ambil requiredPermission dari meta (jika ada)
+  let requiredPermission = null;
+  to.matched.forEach((record) => {
+    if (record.meta.requiredPermission) {
+      requiredPermission = record.meta.requiredPermission;
+    }
+  });
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: "Login" });
+  } else if (requiresAuth && requiresAdmin && !authStore.isAdmin) {
+    // Akses ditolak jika butuh admin tapi user bukan admin
+    next({ name: "Forbidden" });
+  } else if (requiresAuth && requiredPermission && !authStore.hasPermission(requiredPermission)) {
+    // Akses ditolak jika butuh permission tertentu tapi user tidak punya
+    next({ name: "Forbidden" });
   } else if (
     (to.name === "Login" ||
       to.name === "Register" ||

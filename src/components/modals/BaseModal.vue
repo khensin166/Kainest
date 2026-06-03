@@ -19,16 +19,19 @@ const props = defineProps({
     type: String,
     default: 'md',
     validator: (value) => ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'].includes(value)
+  },
+  preventClose: {
+    type: Boolean,
+    default: false
   }
 });
 
 const emit = defineEmits(["close", "confirm"]);
 
-// --- FUNGSI HANDLER BARU ---
 // Fungsi ini hanya dipanggil oleh Headless UI saat klik luar/ESC
 const handleDialogClose = () => {
   // Jangan tutup jika sedang loading (opsional, tergantung kebutuhan)
-  if (props.loading) return;
+  if (props.loading || props.preventClose) return;
 
   console.log("🛑 BaseModal: Dialog @close triggered (klik luar/ESC). Emitting 'close'...");
   emit('close');

@@ -135,8 +135,13 @@
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 <tr v-if="waStore.backupTargets.length === 0 && !waStore.isLoading"
                                     class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                                        Belum ada whitelist log percakapan. Mulai tambahkan target dari sisi kiri.
+                                    <td colspan="4" class="p-0">
+                                        <BaseEmptyState 
+                                            icon="📋"
+                                            title="Belum ada Target Backup"
+                                            message="Belum ada whitelist log percakapan. Mulai tambahkan target dari sisi kiri."
+                                            heightClass="py-12"
+                                        />
                                     </td>
                                 </tr>
                                 <tr v-for="target in waStore.backupTargets" :key="target.id"
@@ -170,6 +175,7 @@
 <script setup>
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useWaBotStore } from '../stores/useWaBotStore';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 
 const waStore = useWaBotStore();
 

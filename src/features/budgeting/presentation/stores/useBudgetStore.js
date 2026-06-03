@@ -8,12 +8,19 @@ import {
   getAiAdviceUseCase, 
   createTransactionUseCase, 
   getCategoriesUseCase, 
+  createCategoryUseCase,
   getSpendingTrendUseCase, 
   getTransactionsListUseCase, 
   getTransactionDetailUseCase, 
   updateTransactionUseCase, 
   deleteTransactionUseCase,
-  setupBudgetUseCase
+  setupBudgetUseCase,
+  getPocketsUseCase,
+  upsertPocketUseCase,
+  deletePocketUseCase,
+  bulkSetupPocketsUseCase,
+  updateCategoryKeywordsUseCase,
+  getMonthlyHistoryUseCase
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -21,10 +28,18 @@ const getDashboardSummaryUseCaseInstance = getDashboardSummaryUseCase;
 const getAiAdviceUseCaseInstance = getAiAdviceUseCase;
 const createTransactionUseCaseInstance = createTransactionUseCase;
 const getCategoriesUseCaseInstance = getCategoriesUseCase;
+const createCategoryUseCaseInstance = createCategoryUseCase;
 const getSpendingTrendUseCaseInstance = getSpendingTrendUseCase;
 const getTransactionsListUseCaseInstance = getTransactionsListUseCase;
+const updateTransactionUseCaseInstance = updateTransactionUseCase;
 const deleteTransactionUseCaseInstance = deleteTransactionUseCase;
 const setupBudgetUseCaseInstance = setupBudgetUseCase;
+const getPocketsUseCaseInstance = getPocketsUseCase;
+const upsertPocketUseCaseInstance = upsertPocketUseCase;
+const deletePocketUseCaseInstance = deletePocketUseCase;
+const bulkSetupPocketsUseCaseInstance = bulkSetupPocketsUseCase;
+const updateCategoryKeywordsUseCaseInstance = updateCategoryKeywordsUseCase;
+const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -43,12 +58,25 @@ export const useBudgetStore = defineStore("budget", () => {
   const isLoadingTransactions = ref(false);
   const isDeletingTransactionId = ref(null);
 
+  // === POCKET STATE ===
+  const pocketsList = ref([]);
+  const isLoadingPockets = ref(false);
+  const errorPockets = ref(null);
+
+  // === HISTORY STATE ===
+  const historyList = ref([]);
+  const isLoadingHistory = ref(false);
+
   // =========================================
   // 🧠 GETTERS
   // =========================================
+  const salary = computed(() => summaryData.value?.salary || 0);
   const budgetCategories = computed(() => summaryData.value?.categories || []);
   const totalRemaining = computed(
     () => summaryData.value?.totals?.remaining || 0
+  );
+  const unallocatedBudget = computed(
+    () => summaryData.value?.totals?.unallocated ?? 0
   );
   const currentPeriodMonth = computed(() => summaryData.value?.month || "-");
   const hasData = computed(
@@ -181,6 +209,18 @@ export const useBudgetStore = defineStore("budget", () => {
     isLoadingCategories.value = false;
   }
 
+  async function createCategory(name, icon) {
+    const result = await createCategoryUseCaseInstance.execute(name, icon);
+    if (result.right) {
+      // Reload list kategori agar langsung update di UI
+      categoriesList.value = [];
+      await fetchAllCategories();
+      return { success: true, data: result.right };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
   async function fetchSpendingTrend() {
     console.log("⚡ [STORE ACTION] fetchSpendingTrend dipanggil!");
     isLoadingTrend.value = true;
@@ -205,6 +245,24 @@ export const useBudgetStore = defineStore("budget", () => {
     isTransactionSubmitting.value = false;
 
     if (result.right) {
+      fetchDashboardSummary();
+      fetchTransactions({ page: 1 }, true);
+      return { success: true };
+    } else {
+      return { success: false, message: result.left?.message };
+    }
+  }
+
+  /**
+   * UPDATE: Memperbarui transaksi (Existing)
+   */
+  async function updateTransaction(id, transactionData) {
+    isTransactionSubmitting.value = true;
+    const result = await updateTransactionUseCaseInstance.execute(id, transactionData);
+    isTransactionSubmitting.value = false;
+
+    if (result.right) {
+      // Refresh list agar data terbaru tampil
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
       return { success: true };
@@ -310,17 +368,111 @@ export const useBudgetStore = defineStore("budget", () => {
    * BARU: Setup Budget Configuration
    */
   async function setupBudget(data) {
-    isLoadingSummary.value = true;
     const result = await setupBudgetUseCaseInstance.execute(data);
     
     if (result.right) {
-      // Refresh data setelah setup berhasil
-      await fetchDashboardSummary();
-      isLoadingSummary.value = false;
+      // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
+      // agar tidak terjadi race condition UI saat modal ditutup.
       return { success: true };
     } else {
-      isLoadingSummary.value = false;
       return { success: false, message: result.left?.message };
+    }
+  }
+
+  // =========================================
+  // 💰 POCKET ACTIONS
+  // =========================================
+
+  async function fetchPockets() {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await getPocketsUseCaseInstance.execute();
+    if (result.right) {
+      pocketsList.value = result.right;
+    } else {
+      errorPockets.value = result.left?.message;
+      console.error("Gagal memuat daftar kantong:", errorPockets.value);
+    }
+    isLoadingPockets.value = false;
+  }
+
+  async function upsertPocket(data) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await upsertPocketUseCaseInstance.execute(data);
+    isLoadingPockets.value = false;
+    
+    if (result.right) {
+      await fetchPockets();
+      await fetchDashboardSummary(); // Refresh dashboard agar limit kategori terupdate
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function deletePocket(categoryId) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await deletePocketUseCaseInstance.execute(categoryId);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      await fetchDashboardSummary(); // Refresh dashboard
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function bulkSetupPockets(data) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await bulkSetupPocketsUseCaseInstance.execute(data);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
+      // agar tidak terjadi race condition UI saat modal ditutup.
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  async function updateKeywords(categoryId, keywords) {
+    isLoadingPockets.value = true;
+    errorPockets.value = null;
+    const result = await updateCategoryKeywordsUseCaseInstance.execute(categoryId, keywords);
+    isLoadingPockets.value = false;
+
+    if (result.right) {
+      await fetchPockets();
+      return true;
+    } else {
+      errorPockets.value = result.left?.message;
+      return false;
+    }
+  }
+
+  // =========================================
+  // 📅 HISTORY ACTIONS
+  // =========================================
+
+  async function fetchMonthlyHistory() {
+    isLoadingHistory.value = true;
+    const result = await getMonthlyHistoryUseCaseInstance.execute();
+    isLoadingHistory.value = false;
+
+    if (result.right) {
+      historyList.value = result.right;
+    } else {
+      console.error("❌ Gagal memuat riwayat bulanan:", result.left?.message);
     }
   }
 
@@ -340,9 +492,20 @@ export const useBudgetStore = defineStore("budget", () => {
     isLoadingTransactions,
     isDeletingTransactionId,
 
+    // Pocket State
+    pocketsList,
+    isLoadingPockets,
+    errorPockets,
+
+    // History State
+    historyList,
+    isLoadingHistory,
+
     // Getters
+    salary,
     budgetCategories,
     totalRemaining,
+    unallocatedBudget,
     currentPeriodMonth,
     hasData,
     chartDataCollection,
@@ -358,11 +521,21 @@ export const useBudgetStore = defineStore("budget", () => {
     fetchAiAdviceForCategory,
     fetchSpendingTrend,
     fetchAllCategories,
+    createCategory,
     submitTransaction,
-    fetchTransactions,
-    fetchTransactionById,
     updateTransaction,
+    fetchTransactions,
     deleteTransaction,
     setupBudget,
+
+    // Pocket Actions
+    fetchPockets,
+    upsertPocket,
+    deletePocket,
+    bulkSetupPockets,
+    updateKeywords,
+
+    // History Actions
+    fetchMonthlyHistory,
   };
 });

@@ -67,7 +67,7 @@ watch(() => props.modelValue, (newValue) => {
 
 <template>
     <div class="relative">
-        <flat-pickr class="form-input pl-9 font-medium w-full sm:w-[15.5rem] transition-colors duration-200" :class="[
+        <flat-pickr class="form-input pl-9 font-medium w-full transition-colors duration-200" :class="[
             isFilterActive
                 ? 'bg-violet-50 text-violet-600 border-violet-300 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-700/50' // Style saat AKTIF
                 : 'bg-white dark:bg-gray-800 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 border-gray-200 dark:border-gray-700/60' // Style DEFAULT
