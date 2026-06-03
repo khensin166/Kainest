@@ -1,6 +1,6 @@
 <!-- GetStartedPage.vue -->
 <template>
-  <div class="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4 overflow-hidden relative font-sans">
+  <div class="h-[100dvh] w-full bg-gray-900 flex flex-col items-center justify-center px-4 overflow-hidden relative font-sans">
     
     <!-- Background Ambient Gradients -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
@@ -10,7 +10,7 @@
     </div>
 
     <!-- Main Display Area -->
-    <div class="relative z-10 w-full h-screen max-h-[900px] min-h-[600px] flex flex-col items-center justify-center">
+    <div class="relative z-10 w-full h-full flex flex-col items-center justify-center">
 
       <!-- Desktop Radial Bubbles & Lines (Hidden on Mobile) -->
       <div class="hidden md:block absolute inset-0 w-full h-full pointer-events-none">
@@ -96,13 +96,13 @@
           </span>
         </button>
       </div>
+      <!-- Footer indicator -->
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 text-center text-gray-500 text-xs font-medium tracking-widest uppercase w-full">
+        By Kenan Tomfie Bukit
+      </div>
 
     </div>
 
-    <!-- Footer indicator -->
-    <div class="relative z-30 text-center mt-8 text-gray-500 text-xs font-medium tracking-widest uppercase">
-      By Kenan Tomfie Bukit
-    </div>
   </div>
 </template>
 

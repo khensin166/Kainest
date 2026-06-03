@@ -20,7 +20,7 @@ export class AuthRepository extends IAuthRepository {
   /**
    * Menangani login ke Hono API, menyimpan token, dan mengambil profil user.
    */
-  async login(email, password) {
+  async login(email, password, rememberMe = false) {
     try {
       // 1. Panggil API /auth/login
       const response = await this.remoteSource.login(email, password);
@@ -31,8 +31,12 @@ export class AuthRepository extends IAuthRepository {
         );
       }
 
-      // 2. Simpan token ke localStorage
-      localStorage.setItem("authToken", response.token);
+      // 2. Simpan token ke localStorage atau sessionStorage
+      if (rememberMe) {
+        localStorage.setItem("authToken", response.token);
+      } else {
+        sessionStorage.setItem("authToken", response.token);
+      }
 
       // Ambil data profil user (sekarang memanggil GET /profile)
       const profileData = await this.remoteSource.getProfile();
@@ -122,9 +126,8 @@ export class AuthRepository extends IAuthRepository {
    */
   async getCurrentUser() {
     try {
-      // Jika belum ada token di localStorage (misal: setelah social login callback),
-      // coba ambil token dari sesi aktif (via cookie) terlebih dahulu
-      const existingToken = localStorage.getItem("authToken");
+      // Jika belum ada token di localStorage atau sessionStorage
+      const existingToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
       if (!existingToken) {
         try {
           const sessionToken = await this.remoteSource.getSessionToken();
@@ -151,6 +154,7 @@ export class AuthRepository extends IAuthRepository {
       // Jika 401/403, user memang tidak terautentikasi — bukan error
       if (error.response && [401, 403].includes(error.response.status)) {
         localStorage.removeItem("authToken"); // Bersihkan token mati jika ada
+        sessionStorage.removeItem("authToken");
         return right(null);
       }
       // Error lain (misal server down) adalah Failure
@@ -162,12 +166,13 @@ export class AuthRepository extends IAuthRepository {
 
 
   /**
-   * Logout user dengan menghapus token dari localStorage.
+   * Logout user dengan menghapus token dari localStorage dan sessionStorage.
    */
   async logout() {
     try {
       await this.remoteSource.logout();
       localStorage.removeItem("authToken");
+      sessionStorage.removeItem("authToken");
       return right(true); // Sukses
     } catch (error) {
       return left(

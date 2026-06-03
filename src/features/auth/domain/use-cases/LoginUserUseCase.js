@@ -4,10 +4,10 @@ export class LoginUserUseCase {
     this.repository = repository;
   }
 
-  async execute(email, password) {
+  async execute(email, password, rememberMe = false) {
     if (!email || !password) {
       throw new Error("Email dan password tidak boleh kosong");
     }
-    return this.repository.login(email, password);
+    return this.repository.login(email, password, rememberMe);
   }
 }

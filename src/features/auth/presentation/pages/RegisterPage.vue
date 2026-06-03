@@ -1,18 +1,26 @@
 <!-- features\auth\presentation\pages\RegisterPage.vue -->
 <template>
   <main class="h-[100dvh] flex flex-col lg:flex-row bg-gray-900 lg:bg-gray-50 font-sans relative overflow-hidden">
-    
+
     <!-- Bagian Kiri (Desktop) & Atas (Mobile): Ilustrasi / Branding -->
-    <div class="w-full lg:w-1/2 bg-gray-900 relative flex flex-col justify-center px-6 pt-6 pb-8 lg:px-16 lg:py-0 h-[30dvh] lg:h-screen z-0">
+    <div
+      class="w-full lg:w-1/2 bg-gray-900 relative flex flex-col justify-center px-6 pt-6 pb-8 lg:px-16 lg:py-0 h-[30dvh] lg:h-screen z-0">
       <!-- Ambient Background -->
       <div class="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-        <div class="absolute top-1/4 -left-20 w-72 h-72 bg-violet-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-        <div class="absolute bottom-1/4 right-0 w-72 h-72 bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+        <div
+          class="absolute top-1/4 -left-20 w-72 h-72 bg-violet-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob">
+        </div>
+        <div
+          class="absolute bottom-1/4 right-0 w-72 h-72 bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000">
+        </div>
       </div>
 
       <!-- Mobile Back Button (Absolute) -->
-      <button @click="$router.push('/')" class="lg:hidden absolute top-6 left-6 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md z-20">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <button @click="$router.push('/')"
+        class="lg:hidden absolute top-6 left-6 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md z-20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
       </button>
 
       <div class="relative z-10 flex flex-col justify-center h-full">
@@ -24,37 +32,42 @@
 
         <!-- Mobile Header (Arrow removed) -->
         <div class="lg:hidden flex flex-col gap-3 w-full mt-6">
-            <h1 class="text-2xl font-bold text-white mb-1 leading-tight">
-              Siap mengatur hari Anda?
-            </h1>
-            <p class="text-gray-400 text-xs font-light leading-relaxed pr-2">
-              Daftar untuk menikmati pengalaman manajemen terbaik, dari keuangan hingga produktivitas.
-            </p>
-          </div>
+          <h1 class="text-2xl font-bold text-white mb-1 leading-tight">
+            Siap mengatur hari Anda?
+          </h1>
+          <p class="text-gray-400 text-xs font-light leading-relaxed pr-2">
+            Daftar untuk menikmati pengalaman manajemen terbaik, dari keuangan hingga produktivitas.
+          </p>
+        </div>
 
         <!-- Desktop Typography -->
         <div class="hidden lg:block">
           <h1 class="text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
             Satu Aplikasi.<br />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Beragam Kemudahan.</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Beragam
+              Kemudahan.</span>
           </h1>
           <p class="text-gray-400 text-lg max-w-md font-light leading-relaxed">
-            Mulai dari manajemen keuangan, berbagi tagihan, hingga merekam aktivitas bersama pasangan—semua terpusat dan terintegrasi mulus dengan WhatsApp AI.
+            Mulai dari manajemen keuangan, berbagi tagihan, hingga merekam aktivitas bersama pasangan—semua terpusat dan
+            terintegrasi mulus dengan WhatsApp AI.
           </p>
         </div>
       </div>
-      
+
       <!-- Abstract Graphic Desktop -->
       <div class="hidden lg:block absolute -bottom-32 -right-32 opacity-20 pointer-events-none">
         <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#8B5CF6" d="M45.7,-76.4C58.9,-69.3,69.1,-55.4,75.8,-40.5C82.5,-25.6,85.7,-9.6,83.4,5.4C81.1,20.4,73.3,34.4,63.1,45.4C52.9,56.4,40.3,64.4,26.4,70.5C12.5,76.6,-2.7,80.8,-17.5,78.2C-32.3,75.6,-46.7,66.2,-57.4,53.8C-68.1,41.4,-75.1,26,-78.3,10.2C-81.5,-5.6,-80.9,-21.8,-74.1,-34.7C-67.3,-47.6,-54.3,-57.2,-40.6,-63.9C-26.9,-70.6,-13.5,-74.4,1.4,-76.3C16.3,-78.2,32.5,-78.2,45.7,-76.4Z" transform="translate(100 100)" />
+          <path fill="#8B5CF6"
+            d="M45.7,-76.4C58.9,-69.3,69.1,-55.4,75.8,-40.5C82.5,-25.6,85.7,-9.6,83.4,5.4C81.1,20.4,73.3,34.4,63.1,45.4C52.9,56.4,40.3,64.4,26.4,70.5C12.5,76.6,-2.7,80.8,-17.5,78.2C-32.3,75.6,-46.7,66.2,-57.4,53.8C-68.1,41.4,-75.1,26,-78.3,10.2C-81.5,-5.6,-80.9,-21.8,-74.1,-34.7C-67.3,-47.6,-54.3,-57.2,-40.6,-63.9C-26.9,-70.6,-13.5,-74.4,1.4,-76.3C16.3,-78.2,32.5,-78.2,45.7,-76.4Z"
+            transform="translate(100 100)" />
         </svg>
       </div>
     </div>
 
     <!-- Bagian Kanan (Desktop) & Bawah (Mobile): Form Register -->
-    <div class="w-full lg:w-1/2 flex-1 flex flex-col justify-start lg:justify-center items-center relative z-10 lg:z-auto bg-white lg:bg-transparent rounded-t-[2rem] lg:rounded-none px-6 py-6 lg:p-12 mt-[-1.5rem] lg:mt-0 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] lg:shadow-none overflow-y-auto">
-      
+    <div
+      class="w-full lg:w-1/2 flex-1 flex flex-col justify-start lg:justify-center items-center relative z-10 lg:z-auto bg-white lg:bg-transparent rounded-t-[2rem] lg:rounded-none px-6 py-6 lg:p-12 mt-[-1.5rem] lg:mt-0 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] lg:shadow-none overflow-y-auto">
+
       <div class="w-full max-w-md space-y-6">
         <!-- Desktop Header Title -->
         <div class="hidden lg:block text-left mb-8">
@@ -66,10 +79,12 @@
 
         <!-- Tab Toggle (Masuk / Daftar) -->
         <div class="flex p-1.5 bg-gray-100/80 rounded-2xl w-full">
-          <button @click="$router.push('/login')" class="flex-1 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">
+          <button @click="$router.push('/login')"
+            class="flex-1 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">
             Login
           </button>
-          <button class="flex-1 py-2.5 text-sm font-bold bg-white text-gray-900 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-all">
+          <button
+            class="flex-1 py-2.5 text-sm font-bold bg-white text-gray-900 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-all">
             Register
           </button>
         </div>
@@ -123,7 +138,10 @@
                 class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded" />
             </div>
             <div class="ml-2 text-xs">
-              <label for="terms" class="text-gray-500">I agree to the <a href="#" class="text-violet-600 hover:text-violet-500 font-medium">Terms</a> and <a href="#" class="text-violet-600 hover:text-violet-500 font-medium">Privacy Policy</a></label>
+              <label for="terms" class="text-gray-500">I agree to the <a href="#" @click.prevent="showTerms"
+                  class="text-violet-600 hover:text-violet-500 font-medium">Terms</a> and <a href="#"
+                  @click.prevent="showPrivacy" class="text-violet-600 hover:text-violet-500 font-medium">Privacy
+                  Policy</a></label>
             </div>
           </div>
 
@@ -148,7 +166,9 @@
 import { ref } from "vue";
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
+import { useModalStore } from "@/stores/modalStore";
 import { useRouter } from "vue-router";
+import { termsOfService, privacyPolicy } from "@/data/legalContent";
 
 const displayName = ref("");
 const email = ref("");
@@ -157,6 +177,21 @@ const showPassword = ref(false);
 
 const auth = useAuthStore();
 const router = useRouter();
+const modalStore = useModalStore();
+
+const showTerms = () => {
+  modalStore.openContentModal({
+    title: "Ketentuan Layanan",
+    htmlBody: termsOfService
+  });
+};
+
+const showPrivacy = () => {
+  modalStore.openContentModal({
+    title: "Kebijakan Privasi",
+    htmlBody: privacyPolicy
+  });
+};
 
 const handleRegister = async () => {
   try {
@@ -171,5 +206,3 @@ const handleRegister = async () => {
   }
 };
 </script>
-
-

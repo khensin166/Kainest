@@ -104,7 +104,8 @@ export const useAuthStore = defineStore("auth", () => {
 
     const result = await loginUseCase.execute(
       credentials.email,
-      credentials.password
+      credentials.password,
+      credentials.rememberMe
     );
 
     if (result.left) {

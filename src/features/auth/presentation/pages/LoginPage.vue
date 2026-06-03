@@ -108,7 +108,7 @@
           <!-- Options Row -->
           <div class="flex items-center justify-between pt-1">
             <div class="flex items-center">
-              <input id="remember-me" name="remember-me" type="checkbox"
+              <input id="remember-me" name="remember-me" type="checkbox" v-model="rememberMe"
                 class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded" />
               <label for="remember-me" class="ml-2 block text-sm text-gray-600">
                 Remember me
@@ -191,6 +191,7 @@ import { useRouter } from "vue-router";
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
+const rememberMe = ref(false);
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -200,6 +201,7 @@ const handleLogin = async () => {
     await auth.login({
       email: email.value,
       password: password.value,
+      rememberMe: rememberMe.value,
     });
     router.push("/app/dashboard");
   } catch (error) {
