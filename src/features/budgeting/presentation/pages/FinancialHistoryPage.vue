@@ -14,13 +14,12 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="budgetStore.historyList.length === 0" class="flex flex-col items-center justify-center h-64 text-center">
-      <div class="text-5xl mb-4">📭</div>
-      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Belum ada riwayat</h3>
-      <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-        Riwayat akan muncul otomatis setiap bulan Anda menggunakan dashboard.
-      </p>
-    </div>
+    <BaseEmptyState 
+      v-else-if="budgetStore.historyList.length === 0"
+      icon="📭"
+      title="Belum ada riwayat"
+      message="Riwayat akan muncul otomatis setiap bulan Anda menggunakan dashboard."
+    />
 
     <template v-else>
       <!-- ─────────────────────────────────────────── -->
@@ -196,6 +195,7 @@ import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 import { useBudgetStore } from '../stores/useBudgetStore';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 

@@ -10,6 +10,7 @@ import { onMounted, ref, watch, computed, provide, onActivated } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import Datepicker from '@/components/forms/Datepicker.vue';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 import TransactionItem from '../components/TransactionItem.vue';
 import { debounce } from '../../../../utils/debounce';
 import { useModalStore } from '../../../../stores/modalStore';
@@ -269,10 +270,13 @@ onActivated(() => {
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
           </div>
 
-          <div v-else-if="budgetStore.transactionsList.length === 0"
-            class="flex flex-col items-center justify-center h-32 text-gray-500">
-            <p>Tidak ada transaksi yang ditemukan.</p>
-          </div>
+          <BaseEmptyState 
+            v-else-if="budgetStore.transactionsList.length === 0"
+            icon="💸"
+            title="Belum ada transaksi"
+            message="Tidak ada transaksi yang ditemukan untuk filter ini."
+            heightClass="h-32"
+          />
 
           <div v-else>
             <div v-for="(transactions, groupName) in budgetStore.groupedTransactions" :key="groupName" class="mb-4">

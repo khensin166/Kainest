@@ -37,9 +37,8 @@
 
       <!-- User Cards -->
       <div v-else class="space-y-4">
-        <div v-if="users.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
-          Belum ada user yang terdaftar.
-        </div>
+        <BaseEmptyState v-if="users.length === 0" icon="👥" title="Tidak Ada Pengguna"
+          message="Belum ada user yang terdaftar." heightClass="py-12" />
 
         <div v-for="user in users" :key="user.id"
           class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 transition-all bg-gray-50/50 dark:bg-gray-800/50"
@@ -119,6 +118,7 @@
 import { ref, onMounted } from 'vue';
 import { getUsersUseCase, updateUserAccessUseCase } from '@/core/di/di';
 import { useModalStore } from '@/stores/modalStore';
+import BaseEmptyState from '@/components/BaseEmptyState.vue';
 
 const modalStore = useModalStore();
 
