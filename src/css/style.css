@@ -8,7 +8,7 @@
 @plugin "@tailwindcss/forms" {
   strategy: base;
 }
- @plugin "daisyui";
+@plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant sidebar-expanded (&:is(.sidebar-expanded *));
