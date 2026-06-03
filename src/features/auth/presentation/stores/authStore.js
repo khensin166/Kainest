@@ -175,9 +175,12 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function loginSocial(provider, callbackUrl) {
+  async function loginSocial(provider) {
     isLoading.value = true;
     error.value = null;
+
+    const backendUrl = import.meta.env.VITE_API_BASE_URL;
+    const callbackUrl = `${backendUrl}/auth/social-callback`;
 
     const result = await socialLoginUseCase.execute(provider, callbackUrl);
 

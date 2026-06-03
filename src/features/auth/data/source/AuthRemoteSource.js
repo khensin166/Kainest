@@ -2,7 +2,7 @@
 import api from "@/lib/apiClient";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL_STG;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export class AuthRemoteSource {
   async login(email, password) {
