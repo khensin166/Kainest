@@ -211,9 +211,7 @@ const handleLogin = async () => {
 
 const handleSocialLogin = async (provider) => {
   try {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL_STG;
-    const callbackUrl = `${backendUrl}/auth/social-callback`;
-    await auth.loginSocial(provider, callbackUrl);
+    await auth.loginSocial(provider);
   } catch (error) {
     console.error("Error saat inisiasi social login:", error);
   }
