@@ -8,9 +8,15 @@ Dokumen ini mendefinisikan spesifikasi kebutuhan perangkat lunak (SRS), arsitekt
 
 ## 1. PENDAHULUAN (SYSTEM OVERVIEW)
 
-Kainest Frontend adalah aplikasi web (Single Page Application / SPA) responsif yang dibangun menggunakan **Vue 3 (Composition API)** dengan **Vite** sebagai build tool.
+Kainest Frontend adalah aplikasi web (Single Page Application / SPA) responsif yang dibangun menggunakan **Vue 3 (Composition API)** dengan **Vite** sebagai build tool. 
 
-Aplikasi ini menyediakan antarmuka pengguna untuk:
+Aplikasi ini beroperasi sebagai **Platform Multi-Layanan (Multi-Service Platform)** yang mencakup keuangan, kolaborasi, dan utilitas produktivitas:
+- **AI Budgeting:** Pengelolaan anggaran dan pencatatan transaksi terintegrasi dengan Bot WhatsApp (Groq AI).
+- **Couples & Collaboration Hub:** Daftar aktivitas, notes, kalender memori untuk pasangan atau keluarga (Couple Connect).
+- **Split Payment & Invoicing (Mendatang):** Modul pemisahan tagihan otomatis antar pengguna dan sistem penerbitan invoice/tagihan.
+- **Manajemen Finansial Lanjutan:** Dashboard keuangan, pengelolaan kantong (Pockets), dan visualisasi riwayat bulanan.
+
+Secara lebih rinci, aplikasi ini menyediakan antarmuka pengguna untuk:
 - Dashboard ringkasan keuangan bulanan (status kantong, pengeluaran vs alokasi)
 - Pengelolaan "Kantong" Budget (Pocket) berbasis persentase atau nominal Rupiah
 - Pengelolaan & riwayat transaksi harian
@@ -181,11 +187,13 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)
 
-1. **PWA Quick Input Widget**: Widget input cepat berbasis AI di layar utama ponsel (PWA) agar pengguna dapat mencatat pengeluaran tanpa membuka dashboard.
-2. **Visualisasi Alokasi vs Realisasi**: Grafik dinamis yang membandingkan alokasi persentase kantong dengan realisasi pengeluaran bulan berjalan secara real-time.
-3. **AI Categorization Approval Prompt**: Dialog konfirmasi setelah input teks AI — menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan permanen.
-4. **Handbook / Panduan Fitur In-App**: Sistem onboarding atau halaman dokumentasi interaktif yang menjelaskan setiap fitur Kainest kepada pengguna baru (opsi: guided tour via Driver.js, halaman `/app/handbook`, atau tooltip kontekstual).
-5. **Pembatasan Query Default Riwayat (6/12 Bulan)**: Endpoint `GET /budget/history` saat ini mengembalikan seluruh riwayat all-time. Perlu ditambahkan parameter query opsional (misal `?limit=12`) agar default hanya 6 atau 12 bulan terakhir untuk efisiensi dan keterbacaan.
-6. **Filter Dropdown Tahun/Bulan di Halaman Riwayat**: Menambahkan komponen filter interaktif (dropdown atau range picker) di `FinancialHistoryPage.vue` agar user dapat memfilter data riwayat berdasarkan tahun atau rentang bulan tertentu.
-7. **Integrasi WhatsApp Bot (Kenin WA Bot) - Sisi Frontend**: Halaman pengaturan integrasi WhatsApp di Profile UI untuk memfasilitasi "Pairing" (menghubungkan nomor HP WhatsApp pengguna dengan akun Kainest) serta mengelola kata kunci (*keywords*) kategori untuk mendukung pencatatan transaksi yang efisien (Hybrid Routing). Tabel `BotActiveGroup` di database backend sudah siap disinkronkan untuk fitur ini.
+1. **Split Payment & Bill Sharing**: Fitur otomatis memisahkan tagihan (patungan) setelah mencatat pengeluaran besar (misalnya makan bersama).
+2. **Sistem Invoicing**: Modul pembuatan, pelacakan, dan pengiriman invoice (tagihan pembayaran) profesional, cocok untuk pengguna freelancer atau umkm.
+3. **PWA Quick Input Widget**: Widget input cepat berbasis AI di layar utama ponsel (PWA) agar pengguna dapat mencatat pengeluaran tanpa membuka dashboard.
+4. **Visualisasi Alokasi vs Realisasi**: Grafik dinamis yang membandingkan alokasi persentase kantong dengan realisasi pengeluaran bulan berjalan secara real-time.
+5. **AI Categorization Approval Prompt**: Dialog konfirmasi setelah input teks AI — menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan permanen.
+6. **Handbook / Panduan Fitur In-App**: Sistem onboarding atau halaman dokumentasi interaktif yang menjelaskan setiap fitur Kainest kepada pengguna baru (opsi: guided tour via Driver.js, halaman `/app/handbook`, atau tooltip kontekstual).
+7. **Pembatasan Query Default Riwayat (6/12 Bulan)**: Endpoint `GET /budget/history` saat ini mengembalikan seluruh riwayat all-time. Perlu ditambahkan parameter query opsional (misal `?limit=12`) agar default hanya 6 atau 12 bulan terakhir untuk efisiensi dan keterbacaan.
+8. **Filter Dropdown Tahun/Bulan di Halaman Riwayat**: Menambahkan komponen filter interaktif (dropdown atau range picker) di `FinancialHistoryPage.vue` agar user dapat memfilter data riwayat berdasarkan tahun atau rentang bulan tertentu.
+9. **Integrasi WhatsApp Bot (Kenin WA Bot) - Sisi Frontend**: Halaman pengaturan integrasi WhatsApp di Profile UI untuk memfasilitasi "Pairing" (menghubungkan nomor HP WhatsApp pengguna dengan akun Kainest) serta mengelola kata kunci (*keywords*) kategori untuk mendukung pencatatan transaksi yang efisien (Hybrid Routing). Tabel `BotActiveGroup` di database backend sudah siap disinkronkan untuk fitur ini.
 

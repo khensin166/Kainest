@@ -31,7 +31,6 @@
               Masuk untuk menikmati pengalaman manajemen terbaik, dari keuangan hingga produktivitas.
             </p>
           </div>
-        </div>
 
         <!-- Desktop Typography -->
         <div class="hidden lg:block">
