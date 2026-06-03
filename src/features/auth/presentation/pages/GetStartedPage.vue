@@ -9,45 +9,76 @@
       <div class="absolute -bottom-40 left-20 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
     </div>
 
-    <!-- Main Content Glassmorphism Card -->
-    <div class="relative z-10 w-full max-w-lg mt-12 md:mt-0">
-      
-      <!-- Showcase Visual Area -->
-      <div class="relative w-full h-56 md:h-64 mb-8 flex items-center justify-center">
-        <!-- Center glowing orb -->
-        <div class="absolute inset-0 bg-violet-500 rounded-full animate-ping opacity-20 blur-xl w-32 h-32 m-auto"></div>
-        <div class="absolute w-24 h-24 bg-gradient-to-tr from-violet-600 to-fuchsia-500 rounded-full shadow-[0_0_40px_rgba(139,92,246,0.6)] flex items-center justify-center z-10 border-4 border-gray-900">
-           <!-- Mengganti logo gambar menjadi teks K elegan agar tidak aneh -->
-           <span class="text-xl font-black text-white tracking-tighter">Kainest</span>
+    <!-- Main Display Area -->
+    <div class="relative z-10 w-full h-screen max-h-[900px] min-h-[600px] flex flex-col items-center justify-center">
+
+      <!-- Desktop Radial Bubbles & Lines (Hidden on Mobile) -->
+      <div class="hidden md:block absolute inset-0 w-full h-full pointer-events-none">
+        
+        <!-- Background SVG Lines -->
+        <svg class="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+          <!-- Lines from center (600, 400) to the nodes -->
+          <line x1="600" y1="400" x2="600" y2="120" stroke="white" stroke-width="1" /> <!-- Top Center -->
+          <line x1="600" y1="400" x2="240" y2="224" stroke="white" stroke-width="1" /> <!-- Top Left -->
+          <line x1="600" y1="400" x2="960" y2="224" stroke="white" stroke-width="1" /> <!-- Top Right -->
+          <line x1="600" y1="400" x2="300" y2="640" stroke="white" stroke-width="1" /> <!-- Bottom Left -->
+          <line x1="600" y1="400" x2="900" y2="640" stroke="white" stroke-width="1" /> <!-- Bottom Right -->
+          
+          <!-- Concentric circles behind the main card -->
+          <circle cx="600" cy="400" r="280" fill="none" stroke="white" stroke-width="1" stroke-dasharray="4 4" />
+          <circle cx="600" cy="400" r="400" fill="none" stroke="white" stroke-width="1" />
+        </svg>
+
+        <!-- Node: Couple Connect (Top Center) -->
+        <div class="absolute top-[8%] left-1/2 -translate-x-1/2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl p-3 flex flex-col items-center justify-center z-10 w-48 float-anim float-delay-1 pointer-events-auto hover:scale-105 transition-transform shadow-xl cursor-default">
+          <div class="text-2xl mb-1">💍</div>
+          <div class="text-white text-sm font-bold">Couple Connect</div>
+          <div class="text-gray-400 text-[10px]">Track joint accounts</div>
         </div>
 
-        <!-- Floating Chips -->
-        <div class="absolute top-2 left-0 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-1">
-          <span>💰</span> AI Budgeting
+        <!-- Node: AI Budgeting (Top Left) -->
+        <div class="absolute top-[25%] left-[20%] -translate-x-1/2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl p-3 flex items-center gap-3 z-10 w-56 float-anim float-delay-2 pointer-events-auto hover:scale-105 transition-transform shadow-xl cursor-default">
+          <div class="flex-1 text-right">
+            <div class="text-white text-sm font-bold">AI Budgeting</div>
+            <div class="text-gray-400 text-[10px]">Auto-categorize transactions</div>
+          </div>
+          <div class="text-3xl">🧠</div>
         </div>
-        <div class="absolute bottom-6 right-0 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-2">
-          <span>🧾</span> Split Bill
+
+        <!-- Node: Todo List (Top Right) -->
+        <div class="absolute top-[25%] right-[20%] translate-x-1/2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl p-3 flex items-center gap-3 z-10 w-56 float-anim float-delay-3 pointer-events-auto hover:scale-105 transition-transform shadow-xl cursor-default">
+          <div class="text-3xl">📋</div>
+          <div class="flex-1 text-left">
+            <div class="text-white text-sm font-bold">Todo List</div>
+            <div class="text-gray-400 text-[10px]">Check list on smart and fast</div>
+          </div>
         </div>
-        <div class="absolute top-10 right-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-3">
-          <span>💖</span> Couple Connect
+
+        <!-- Node: Split Bill (Bottom Left) -->
+        <div class="absolute bottom-[18%] left-[25%] -translate-x-1/2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl p-3 flex items-center gap-3 z-10 w-56 float-anim float-delay-4 pointer-events-auto hover:scale-105 transition-transform shadow-xl cursor-default">
+          <div class="flex-1 text-right">
+            <div class="text-white text-sm font-bold">Split Bill</div>
+            <div class="text-gray-400 text-[10px]">Auto split bill from receipts</div>
+          </div>
+          <div class="text-3xl">💸</div>
         </div>
-        <div class="absolute bottom-12 left-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-4">
-          <span>📄</span> Invoicing
-        </div>
-        <div class="absolute -top-2 right-1/4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-2">
-          <span>✅</span> Todo List
-        </div>
-        <div class="absolute -bottom-2 left-1/4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-3">
-          <span>🔔</span> Reminder
+
+        <!-- Node: Reminder (Bottom Right) -->
+        <div class="absolute bottom-[18%] right-[25%] translate-x-1/2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl p-3 flex items-center gap-3 z-10 w-56 float-anim float-delay-1 pointer-events-auto hover:scale-105 transition-transform shadow-xl cursor-default">
+          <div class="text-3xl">🔔</div>
+          <div class="flex-1 text-left">
+            <div class="text-white text-sm font-bold">Reminder</div>
+            <div class="text-gray-400 text-[10px]">Reminder activity</div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center transform transition-all duration-700 hover:scale-[1.01]">
-        
+      <!-- Center Main Content Card -->
+      <div class="relative z-30 w-full max-w-lg bg-gray-800/70 backdrop-blur-2xl border border-gray-700/50 p-8 rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.5)] text-center transform transition-all duration-700 hover:scale-[1.01]">
         <!-- Typography -->
         <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight leading-tight">
-          Satu Platform.<br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Beragam Solusi Anda.</span>
+           Kainest Application.<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Solusi Terintegrasi Anda.</span>
         </h1>
         <p class="text-gray-300 text-sm md:text-base mb-10 leading-relaxed font-light">
           Dari pencatatan keuangan pintar hingga kolaborasi dengan pasangan, semua terpusat dan terintegrasi otomatis.
@@ -66,10 +97,11 @@
         </button>
       </div>
 
-      <!-- Footer indicator -->
-      <div class="text-center mt-8 text-gray-500 text-xs font-medium tracking-widest uppercase">
-        By Kenan Tomfie Bukit
-      </div>
+    </div>
+
+    <!-- Footer indicator -->
+    <div class="relative z-30 text-center mt-8 text-gray-500 text-xs font-medium tracking-widest uppercase">
+      By Kenan Tomfie Bukit
     </div>
   </div>
 </template>
@@ -84,36 +116,4 @@ const handleStart = () => {
 };
 </script>
 
-<style scoped>
-@keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
-}
 
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-@keyframes floatAnim {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(2deg); }
-}
-
-.float-anim {
-  animation: floatAnim 4s ease-in-out infinite;
-}
-.float-delay-1 { animation-delay: 0s; }
-.float-delay-2 { animation-delay: 1s; }
-.float-delay-3 { animation-delay: 2s; }
-.float-delay-4 { animation-delay: 3s; }
-</style>

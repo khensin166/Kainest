@@ -731,3 +731,38 @@
 :global(.dark) .status-badge {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
+
+/* Ambient Gradients & Floating Animations (Auth Pages) */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(3deg); }
+}
+
+.float-anim {
+  animation: floatAnim 4s ease-in-out infinite;
+}
+
+.float-delay-1 { animation-delay: 0s; }
+.float-delay-2 { animation-delay: 1s; }
+.float-delay-3 { animation-delay: 2s; }
+.float-delay-4 { animation-delay: 3s; }
+

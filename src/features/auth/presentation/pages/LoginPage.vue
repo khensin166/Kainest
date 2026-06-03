@@ -184,7 +184,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline";
+import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 import { useRouter } from "vue-router";
 
@@ -217,31 +217,3 @@ const handleSocialLogin = async (provider) => {
   }
 };
 </script>
-
-<style scoped>
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-</style>
