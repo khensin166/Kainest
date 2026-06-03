@@ -182,7 +182,9 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 | 13 | **Perbaikan Kalkulasi Total Persentase di Pengelolaan Kantong** | Memperbaiki kalkulasi total persentase terpakai (`totalPercentage`) di `PocketManagementModal.vue` agar nominal limit pada kantong juga ikut dikonversi secara dinamis ke bentuk persentase terhadap gaji pengguna, sehingga total persentase yang ditampilkan akurat. |
 | 14 | **Redesain & Perapian Panel Filter Riwayat Transaksi** | Mendesain ulang panel filter pada `TransactionListPage.vue` menjadi grid 3 kolom yang simetris dan responsif. Memperbarui `DropdownSelect.vue` dan `Datepicker.vue` agar mendukung opsi pelebaran penuh (`w-full`), menyelaraskan letak label, serta memindahkan tombol "Hapus Semua Filter" ke bagian footer card filter yang dinamis. Dilengkapi pula dengan lencana titik berkedip (pulsing badge dot) pada tombol header saat filter aktif. |
 | 15 | **Migrasi Skema Bot WhatsApp di Backend** | Menyelesaikan migrasi database backend dengan menambahkan tabel `BotActiveGroup` untuk mendukung penyimpanan pendaftaran grup aktif WhatsApp Bot secara dinamis guna persiapan integrasi komersialisasi. |
-
+| 16 | **Sentralisasi Empty State** | Dibuatnya komponen universal `BaseEmptyState.vue` untuk menyeragamkan UI daftar kosong di semua halaman (Todos, Notes, Transactions, History, Admin, WaBot). |
+| 17 | **Pemisahan Kredensial Environment (Staging vs Prod)** | Pembersihan `.env` frontend dan backend. Variabel OAuth (GitHub/Google) dan Better Auth diseragamkan namanya, membuang kode JWT lama di backend yang sudah menjadi *dead code*, serta memperbaiki bug `state_mismatch` dan *redirect* lintas domain dengan memastikan `FRONTEND_URL` dan `BETTER_AUTH_URL` diatur benar di Vercel. |
+| 18 | **Fitur Remember Me & Modals Global** | Implementasi penyimpanan sesi dinamis (localStorage vs sessionStorage) pada login, serta pembuatan `GlobalContentModal.vue` untuk memunculkan S&K dan Kebijakan Privasi tanpa pindah halaman. |
 ---
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)

@@ -4,7 +4,10 @@
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">WhatsApp Bot Manager</h1>
+        <div class="mb-4 sm:mb-0 flex items-center gap-3">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">WhatsApp Bot Manager</h1>
+          <PageGuide :steps="pageGuides.wabot" />
+        </div>
         <p class="text-sm text-gray-500 mt-1">Kelola koneksi dan grup WhatsApp Anda.</p>
       </div>
 
@@ -243,6 +246,8 @@
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useWaBotStore } from '../stores/useWaBotStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 const waStore = useWaBotStore();
 

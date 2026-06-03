@@ -3,7 +3,10 @@
   <div class="p-4 md:p-8 max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-8">
       <div>
+        <div class="flex items-center gap-3">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Catatan Anda</h1>
+            <PageGuide :steps="pageGuides.notes" />
+        </div>
             <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola catatan pribadi dan bersama</p>
       </div>
       <button @click="goToEditor" 
@@ -91,6 +94,8 @@ import { useAuthStore } from '../../../auth/presentation/stores/authStore';
 // Impor ikon untuk Hero Empty State
 import { PencilSquareIcon } from '@heroicons/vue/24/outline';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 const router = useRouter();
 const noteStore = useNoteStore();
