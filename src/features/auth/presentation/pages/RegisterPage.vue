@@ -10,6 +10,11 @@
         <div class="absolute bottom-1/4 right-0 w-72 h-72 bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
       </div>
 
+      <!-- Mobile Back Button (Absolute) -->
+      <button @click="$router.push('/')" class="lg:hidden absolute top-6 left-6 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md z-20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      </button>
+
       <div class="relative z-10 flex flex-col justify-center h-full">
         <!-- Desktop Logo -->
         <div class="hidden lg:flex items-center gap-3 mb-12">
@@ -17,13 +22,8 @@
           <span class="text-white text-2xl font-bold tracking-tight">Kainest</span>
         </div>
 
-        <!-- Mobile Back Button & Header -->
-        <div class="lg:hidden flex flex-col gap-3 w-full">
-          <button @click="$router.push('/')" class="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-          </button>
-          
-          <div>
+        <!-- Mobile Header (Arrow removed) -->
+        <div class="lg:hidden flex flex-col gap-3 w-full mt-6">
             <h1 class="text-2xl font-bold text-white mb-1 leading-tight">
               Siap mengatur hari Anda?
             </h1>

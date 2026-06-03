@@ -10,29 +10,47 @@
     </div>
 
     <!-- Main Content Glassmorphism Card -->
-    <div class="relative z-10 w-full max-w-lg">
-      <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl text-center transform transition-all duration-700 hover:scale-[1.02]">
-        
-        <!-- Mockup Visual / Icon -->
-        <div class="relative w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-          <div class="absolute inset-0 bg-violet-500 rounded-full animate-ping opacity-20"></div>
-          <div class="absolute inset-2 bg-gradient-to-tr from-violet-600 to-fuchsia-500 rounded-full shadow-[0_0_40px_rgba(139,92,246,0.5)]"></div>
-          <svg class="w-16 h-16 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-          </svg>
-          <!-- Floating Coin Badge -->
-          <div class="absolute -bottom-2 -right-2 bg-emerald-500 rounded-full p-2 border-2 border-gray-900 shadow-lg bounce-subtle">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
+    <div class="relative z-10 w-full max-w-lg mt-12 md:mt-0">
+      
+      <!-- Showcase Visual Area -->
+      <div class="relative w-full h-56 md:h-64 mb-8 flex items-center justify-center">
+        <!-- Center glowing orb -->
+        <div class="absolute inset-0 bg-violet-500 rounded-full animate-ping opacity-20 blur-xl w-32 h-32 m-auto"></div>
+        <div class="absolute w-24 h-24 bg-gradient-to-tr from-violet-600 to-fuchsia-500 rounded-full shadow-[0_0_40px_rgba(139,92,246,0.6)] flex items-center justify-center z-10 border-4 border-gray-900">
+           <!-- Mengganti logo gambar menjadi teks K elegan agar tidak aneh -->
+           <span class="text-xl font-black text-white tracking-tighter">Kainest</span>
         </div>
 
+        <!-- Floating Chips -->
+        <div class="absolute top-2 left-0 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-1">
+          <span>💰</span> AI Budgeting
+        </div>
+        <div class="absolute bottom-6 right-0 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-2">
+          <span>🧾</span> Split Bill
+        </div>
+        <div class="absolute top-10 right-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-3">
+          <span>💖</span> Couple Connect
+        </div>
+        <div class="absolute bottom-12 left-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-4">
+          <span>📄</span> Invoicing
+        </div>
+        <div class="absolute -top-2 right-1/4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-2">
+          <span>✅</span> Todo List
+        </div>
+        <div class="absolute -bottom-2 left-1/4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 float-anim float-delay-3">
+          <span>🔔</span> Reminder
+        </div>
+      </div>
+
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl text-center transform transition-all duration-700 hover:scale-[1.01]">
+        
         <!-- Typography -->
         <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight leading-tight">
-          Catat Pengeluaran.<br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Semudah Chatting.</span>
+          Satu Platform.<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-300">Beragam Solusi Anda.</span>
         </h1>
         <p class="text-gray-300 text-sm md:text-base mb-10 leading-relaxed font-light">
-          Biarkan AI cerdas Kainest yang merapikan keuanganmu. Cukup ketik di WhatsApp, sisanya kami yang urus.
+          Dari pencatatan keuangan pintar hingga kolaborasi dengan pasangan, semua terpusat dan terintegrasi otomatis.
         </p>
 
         <!-- CTA Button -->
@@ -50,7 +68,7 @@
 
       <!-- Footer indicator -->
       <div class="text-center mt-8 text-gray-500 text-xs font-medium tracking-widest uppercase">
-        Powered by Groq AI
+        By Kenan Tomfie Bukit
       </div>
     </div>
   </div>
@@ -86,12 +104,16 @@ const handleStart = () => {
   animation-delay: 4s;
 }
 
-@keyframes bounceSubtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
 }
 
-.bounce-subtle {
-  animation: bounceSubtle 3s ease-in-out infinite;
+.float-anim {
+  animation: floatAnim 4s ease-in-out infinite;
 }
+.float-delay-1 { animation-delay: 0s; }
+.float-delay-2 { animation-delay: 1s; }
+.float-delay-3 { animation-delay: 2s; }
+.float-delay-4 { animation-delay: 3s; }
 </style>
