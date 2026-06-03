@@ -180,4 +180,26 @@ export class AuthRepository extends IAuthRepository {
       );
     }
   }
+
+  async forgotPassword(email) {
+    try {
+      await this.remoteSource.forgotPassword(email);
+      return right(true);
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message || "Gagal mengirim email reset password.")
+      );
+    }
+  }
+
+  async resetPassword(newPassword, token) {
+    try {
+      await this.remoteSource.resetPassword(newPassword, token);
+      return right(true);
+    } catch (error) {
+      return left(
+        new ServerFailure(error.response?.data?.message || error.message || "Gagal mereset kata sandi.")
+      );
+    }
+  }
 }

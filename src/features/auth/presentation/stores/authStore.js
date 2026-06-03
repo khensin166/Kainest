@@ -7,7 +7,9 @@ import {
   registerUserUseCase, 
   getCurrentUserUseCase, 
   logoutUserUseCase,
-  socialLoginUseCase
+  socialLoginUseCase,
+  forgotPasswordUseCase,
+  resetPasswordUseCase
 } from "../../../../core/di/di"; // DIP: Injected dependencies
 import { mapFailureToMessage } from "../../../../core/error/map_failure_to_message";
 
@@ -38,6 +40,8 @@ export const useAuthStore = defineStore("auth", () => {
   const registerUseCase = registerUserUseCase;
   const getCurrentUserUseCaseInstance = getCurrentUserUseCase; // Renamed to avoid collision if needed, but simple variable assignment works
   const logoutUseCase = logoutUserUseCase;
+  const forgotPasswordUseCaseInstance = forgotPasswordUseCase;
+  const resetPasswordUseCaseInstance = resetPasswordUseCase;
 
   /**
    * PERUBAHAN BESAR: Menginisialisasi status auth saat aplikasi dimuat.
@@ -218,6 +222,66 @@ export const useAuthStore = defineStore("auth", () => {
     // router.push('/login');
   }
 
+  async function forgotPassword(email) {
+    isLoading.value = true;
+    error.value = null;
+    
+    const result = await forgotPasswordUseCaseInstance.execute(email);
+    
+    if (result.left) {
+      const failure = result.left;
+      const message = mapFailureToMessage(failure);
+      error.value = message;
+      isLoading.value = false;
+      
+      modalStore.openModal({
+        newTitle: "Gagal Mengirim Link",
+        newMessage: message,
+        newStatus: "error",
+      });
+      
+      throw new Error(message);
+    } else {
+      isLoading.value = false;
+      modalStore.openModal({
+        newTitle: "Link Terkirim!",
+        newMessage: `Kami telah mengirimkan tautan reset password ke ${email}. Silakan cek kotak masuk Anda.`,
+        newStatus: "success",
+      });
+      return true;
+    }
+  }
+
+  async function resetPassword(newPassword, token) {
+    isLoading.value = true;
+    error.value = null;
+    
+    const result = await resetPasswordUseCaseInstance.execute(newPassword, token);
+    
+    if (result.left) {
+      const failure = result.left;
+      const message = mapFailureToMessage(failure);
+      error.value = message;
+      isLoading.value = false;
+      
+      modalStore.openModal({
+        newTitle: "Gagal Mereset Kata Sandi",
+        newMessage: message,
+        newStatus: "error",
+      });
+      
+      throw new Error(message);
+    } else {
+      isLoading.value = false;
+      modalStore.openModal({
+        newTitle: "Kata Sandi Diperbarui!",
+        newMessage: "Kata sandi Anda telah berhasil direset. Silakan login menggunakan kata sandi baru Anda.",
+        newStatus: "success",
+      });
+      return true;
+    }
+  }
+
   // Aksi untuk memperbarui data user dari store lain
   function setUser(newUserData) {
     user.value = newUserData;
@@ -235,6 +299,8 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     loginSocial,
     logout,
+    forgotPassword,
+    resetPassword,
     initializeAuth,
     register,
     setUser,

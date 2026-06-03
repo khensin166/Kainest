@@ -1,5 +1,5 @@
 // File: src/core/error/map_failure_to_message.js
-import { ServerFailure, NetworkFailure } from "./failure";
+import { ServerFailure, NetworkFailure, IncorrectPasswordFailure } from "./failure";
 
 export function mapFailureToMessage(failure) {
   // Gunakan 'instanceof' untuk mengecek tipe dari Failure
@@ -8,6 +8,9 @@ export function mapFailureToMessage(failure) {
   }
   if (failure instanceof NetworkFailure) {
     return failure.message; // Tampilkan pesan error jaringan
+  }
+  if (failure instanceof IncorrectPasswordFailure) {
+    return failure.message; // Tampilkan pesan error password salah
   }
   return "Terjadi kesalahan yang tidak terduga."; // Pesan default
 }

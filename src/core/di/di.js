@@ -15,6 +15,8 @@ import { GetCurrentUserUseCase } from "../../features/auth/domain/use-cases/GetC
 import { LogoutUserUseCase } from "../../features/auth/domain/use-cases/LogoutUserUseCase";
 import { GetProfileUseCase } from "../../features/auth/domain/use-cases/GetProfileUseCase";
 import { SocialLoginUseCase } from "../../features/auth/domain/use-cases/SocialLoginUseCase";
+import { ForgotPasswordUseCase } from "../../features/auth/domain/use-cases/ForgotPasswordUseCase";
+import { ResetPasswordUseCase } from "../../features/auth/domain/use-cases/ResetPasswordUseCase";
 
 import { GetDashboardSummaryUseCase } from "../../features/budgeting/domain/use-cases/GetDashboardSummaryUseCase";
 import { GetCategoriesUseCase } from "../../features/budgeting/domain/use-cases/GetCategoriesUseCase";
@@ -75,6 +77,8 @@ export const getCurrentUserUseCase = new GetCurrentUserUseCase(authRepository);
 export const logoutUserUseCase = new LogoutUserUseCase(authRepository);
 export const getProfileUseCase = new GetProfileUseCase(authRepository);
 export const socialLoginUseCase = new SocialLoginUseCase(authRepository);
+export const forgotPasswordUseCase = new ForgotPasswordUseCase(authRepository);
+export const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
 
 export const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase(budgetRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(budgetRepository);
