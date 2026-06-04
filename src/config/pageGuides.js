@@ -17,7 +17,7 @@ export const pageGuides = {
     {
       emoji: "🔗",
       title: "3. Pairing Perangkat (Opsional)",
-      desc: "Ingin pasangan/anggota keluarga juga bisa mencatat ke akun ini? Validasi akun WA Anda terlebih dahulu, lalu minta mereka mengetik <strong>!idunik</strong> ke bot Kainest untuk mendapatkan kode penyambungan."
+      desc: "Ingin pasangan/anggota keluarga juga bisa mencatat ke akun ini? Validasi akun WA Anda terlebih dahulu, lalu minta mereka mengetik <strong>!link idunik</strong> ke bot Kainest untuk mendapatkan kode penyambungan."
     },
     {
       emoji: "👨‍👩‍👧‍👦",
