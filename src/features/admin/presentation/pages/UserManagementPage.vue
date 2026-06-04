@@ -52,7 +52,7 @@
             <div class="flex items-center gap-4 flex-1 min-w-0">
               <img class="h-10 w-10 rounded-full object-cover flex-shrink-0 shadow-sm"
                 :src="user.profile?.avatarUrl || user.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name || user.email) + '&size=40&background=6366f1&color=fff'"
-                alt="" />
+                alt="" referrerpolicy="no-referrer" />
               <div class="min-w-0">
                 <div class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
                   {{ user.profile?.displayName || user.name || "No Name" }}
@@ -136,7 +136,7 @@ const availableModules = [
   { id: 'notes', label: 'Notes' },
   { id: 'gallery', label: 'Gallery' },
   { id: 'calendar', label: 'Calendar' },
-  { id: 'budgeting', label: 'Budgeting' },
+  { id: 'budgeting', label: 'Kantong Pengeluaran' },
   { id: 'wabot', label: 'WaBot' },
 ];
 

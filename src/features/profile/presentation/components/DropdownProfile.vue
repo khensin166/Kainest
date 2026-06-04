@@ -1,16 +1,20 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../auth/presentation/stores/authStore'
 import { UserCircleIcon } from '@heroicons/vue/24/outline'
 import defaultAvatar from '@/images/user-avatar-32.png'
+import { useHeaderDropdown } from '@/stores/headerDropdownStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const dropdownOpen = ref(false)
+const { activeDropdown, toggle: _toggle, close: _close } = useHeaderDropdown('profile')
+
 const trigger = ref(null)
 const dropdown = ref(null)
+
+const dropdownOpen = computed(() => activeDropdown.value === 'profile')
 
 // Use user's avatar from API if available, otherwise use default
 const userAvatar = computed(() => {
@@ -19,14 +23,14 @@ const userAvatar = computed(() => {
 
 // --- Close on click outside ---
 const clickHandler = ({ target }) => {
-  if (!dropdownOpen.value || dropdown.value.contains(target) || trigger.value.contains(target)) return
-  dropdownOpen.value = false
+  if (!dropdownOpen.value || dropdown.value?.contains(target) || trigger.value?.contains(target)) return
+  _close()
 }
 
 // --- Close if the esc key is pressed ---
 const keyHandler = ({ keyCode }) => {
   if (!dropdownOpen.value || keyCode !== 27) return
-  dropdownOpen.value = false
+  _close()
 }
 
 onMounted(() => {
@@ -40,7 +44,7 @@ onUnmounted(() => {
 })
 
 const handleLogout = async () => {
-    dropdownOpen.value = false;
+    _close();
     await authStore.logout();
     router.push('/login');
 }
@@ -52,10 +56,10 @@ const handleLogout = async () => {
       ref="trigger"
       class="inline-flex justify-center items-center group"
       aria-haspopup="true"
-      @click.prevent="dropdownOpen = !dropdownOpen"
+      @click.stop="_toggle"
       :aria-expanded="dropdownOpen"
     >
-      <img class="w-8 h-8 rounded-full" :src="userAvatar" width="32" height="32" alt="User" />
+      <img class="w-8 h-8 rounded-full" :src="userAvatar" width="32" height="32" alt="User" referrerpolicy="no-referrer" />
       <div class="flex items-center truncate">
         <span class="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
             {{ authStore.user?.displayName || 'User' }}
@@ -76,18 +80,18 @@ const handleLogout = async () => {
       <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-1.5 rounded shadow-lg overflow-hidden mt-1 right-0">
         <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200 dark:border-slate-700">
           <div class="font-medium text-slate-800 dark:text-slate-100">{{ authStore.user?.displayName }}</div>
-          <div class="text-xs text-slate-500 dark:text-slate-400 italic">Administrator</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 italic capitalize">{{ authStore.user?.role === 'admin' ? 'Administrator' : authStore.user?.role || 'User' }}</div>
         </div>
         <ul
           ref="dropdown"
-          @focusin="dropdownOpen = true"
-          @focusout="dropdownOpen = false"
+          @focusin="_toggle"
+          @focusout="_close"
         >
           <li>
             <router-link
               class="font-medium text-sm text-violet-500 hover:text-violet-600 flex items-center py-1 px-3"
               to="/app/settings"
-              @click="dropdownOpen = false"
+              @click="_close"
             >
               Settings
             </router-link>

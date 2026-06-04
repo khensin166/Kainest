@@ -5,7 +5,7 @@
       class="relative w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
       :class="{ 'bg-gray-100 dark:bg-gray-700': dropdownOpen }"
       aria-haspopup="true"
-      @click.stop="dropdownOpen = !dropdownOpen"
+      @click.stop="toggle"
       :aria-expanded="dropdownOpen"
     >
       <span class="sr-only">Notifikasi</span>
@@ -15,6 +15,12 @@
         class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800">
       </span>
     </button>
+
+    <!-- Backdrop (mobile only) -->
+    <transition enter-active-class="transition ease-out duration-150" enter-from-class="opacity-0" enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <div v-show="dropdownOpen" class="fixed inset-0 z-20 bg-black/20 sm:hidden" @click.stop="close" />
+    </transition>
 
     <!-- Dropdown panel -->
     <transition
@@ -26,16 +32,26 @@
       leave-to-class="transform opacity-0 scale-95"
     >
       <div v-show="dropdownOpen" ref="dropdown"
-        class="origin-top-right z-10 absolute top-full right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-2 rounded-2xl shadow-xl overflow-hidden"
+        class="z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-2 rounded-2xl shadow-xl overflow-hidden w-80
+               sm:absolute sm:top-full sm:right-0 sm:mt-2 sm:origin-top-right
+               fixed left-1/2 -translate-x-1/2 top-16 sm:transform-none"
         @click.stop>
 
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700">
           <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Notifikasi</h2>
-          <span v-if="unreadCount > 0"
-            class="text-xs font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 px-2 py-0.5 rounded-full">
-            {{ unreadCount }} baru
-          </span>
+          <div class="flex items-center gap-2">
+            <span v-if="unreadCount > 0"
+              class="text-xs font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 px-2 py-0.5 rounded-full">
+              {{ unreadCount }} baru
+            </span>
+            <!-- Close button (mobile) -->
+            <button @click.stop="close" class="sm:hidden w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Loading -->
@@ -82,16 +98,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { BellIcon, BellSlashIcon, SparklesIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
+import { useHeaderDropdown } from '@/stores/headerDropdownStore';
 
-const dropdownOpen = ref(false);
+const { activeDropdown, toggle: _toggle, close: _close } = useHeaderDropdown('notifications');
+
 const trigger = ref(null);
 const dropdown = ref(null);
 const notifications = ref([]);
 const unreadCount = ref(0);
 const loading = ref(true);
+
+// Computed open state from shared store
+const dropdownOpen = computed(() => activeDropdown.value === 'notifications');
+
+const toggle = () => _toggle();
+const close = () => _close();
 
 const apiHeaders = () => {
   const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
@@ -162,12 +186,12 @@ const markRead = async (notif) => {
 const clickHandler = ({ target }) => {
   if (!dropdownOpen.value) return;
   if (!dropdown.value?.contains(target) && !trigger.value?.contains(target)) {
-    dropdownOpen.value = false;
+    close();
   }
 };
 
 const keyHandler = ({ keyCode }) => {
-  if (dropdownOpen.value && keyCode === 27) dropdownOpen.value = false;
+  if (dropdownOpen.value && keyCode === 27) close();
 };
 
 onMounted(() => {

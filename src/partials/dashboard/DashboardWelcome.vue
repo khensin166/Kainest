@@ -10,7 +10,7 @@
         <router-link to="/app/budgeting"
           class="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 transition-all">
           <PlusIcon class="w-4 h-4" />
-          Analisis Pocket
+          Analisis Kantong
         </router-link>
         <router-link to="/app/transactions"
           class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-gray-700 transition-all">

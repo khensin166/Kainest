@@ -156,7 +156,7 @@ export default {
       },
       {
         type: "group",
-        title: "Momen Kita",
+        title: "Pasangan",
         items: [
           {
             name: "Catatan Bersama",
@@ -188,24 +188,36 @@ export default {
             iconComponent: ArchiveBoxIcon,
             requiredPermission: "vault",
           },
+        ],
+      },
+      {
+        type: "group",
+        title: "Keuangan",
+        items: [
           {
-            name: "Budgeting",
+            name: "Kantong Pengeluaran",
             path: "/app/budgeting",
             iconComponent: BanknotesIcon,
             requiredPermission: "budgeting",
           },
           {
-            name: "Transactions",
+            name: "Riwayat Transaksi",
             path: "/app/transactions",
             iconComponent: ReceiptRefundIcon,
             requiredPermission: "budgeting",
           },
           {
-            name: "Riwayat Bulanan",
+            name: "Rekap Bulanan",
             path: "/app/history",
             iconComponent: ChartBarIcon,
             requiredPermission: "budgeting",
           },
+        ],
+      },
+      {
+        type: "group",
+        title: "Integrasi WhatsApp",
+        items: [
           {
             name: "WhatsApp Bot",
             path: "/app/wabot",
@@ -219,7 +231,7 @@ export default {
             requiresAdmin: true,
           },
           {
-            name: "Backup Chat",
+            name: "Cadangkan WhatsApp",
             path: "/app/wabot-backup",
             iconComponent: ArchiveBoxIcon,
             requiredPermission: "wabot",

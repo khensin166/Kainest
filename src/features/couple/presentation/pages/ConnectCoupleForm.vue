@@ -9,7 +9,7 @@
                 ❤️ Pasangan Terhubung
             </h2>
             <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg flex items-center space-x-4">
-                <img :src="partnerAvatar" alt="Partner Avatar" class="w-16 h-16 rounded-full object-cover" />
+                <img :src="partnerAvatar" alt="Partner Avatar" class="w-16 h-16 rounded-full object-cover" referrerpolicy="no-referrer" />
                 <div>
                     <p class="font-bold text-lg">{{ partnerName }}</p>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
