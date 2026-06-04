@@ -185,6 +185,8 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 | 16 | **Sentralisasi Empty State** | Dibuatnya komponen universal `BaseEmptyState.vue` untuk menyeragamkan UI daftar kosong di semua halaman (Todos, Notes, Transactions, History, Admin, WaBot). |
 | 17 | **Pemisahan Kredensial Environment (Staging vs Prod)** | Pembersihan `.env` frontend dan backend. Variabel OAuth (GitHub/Google) dan Better Auth diseragamkan namanya, membuang kode JWT lama di backend yang sudah menjadi *dead code*, serta memperbaiki bug `state_mismatch` dan *redirect* lintas domain dengan memastikan `FRONTEND_URL` dan `BETTER_AUTH_URL` diatur benar di Vercel. |
 | 18 | **Fitur Remember Me & Modals Global** | Implementasi penyimpanan sesi dinamis (localStorage vs sessionStorage) pada login, serta pembuatan `GlobalContentModal.vue` untuk memunculkan S&K dan Kebijakan Privasi tanpa pindah halaman. |
+| 19 | **Restrukturisasi Layout Dashboard & Sistem Update** | Memindahkan komponen *Aktivitas Terbaru* ke kolom utama agar fokus UI lebih dominan ke finansial. Komponen *System Updates* dan *User Feedback* kini ditarik secara dinamis via API (tidak di-hardcode lagi). |
+| 20 | **Integrasi Notifikasi Interaktif** | `DropdownNotifications.vue` di-update untuk mengambil notifikasi dari backend, mem-parsing format tanggal *relative* (seperti "2 jam lalu"), dan mendukung aksi mark-as-read yang langsung disinkronisasi ke server. |
 ---
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)

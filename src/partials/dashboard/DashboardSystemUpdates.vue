@@ -31,7 +31,7 @@
     </div>
 
     <!-- Updates List -->
-    <ul v-else class="divide-y divide-gray-50 dark:divide-gray-700/50">
+    <ul v-else class="divide-y divide-gray-50 dark:divide-gray-700/50 max-h-[400px] overflow-y-auto">
       <li v-for="update in updates" :key="update.id"
         class="flex items-start gap-3 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
         <div class="mt-0.5 w-8 h-8 rounded-xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center flex-shrink-0">
