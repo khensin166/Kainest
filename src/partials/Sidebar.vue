@@ -186,6 +186,7 @@ export default {
             name: "Vault Rahasia",
             path: "/app/vault",
             iconComponent: ArchiveBoxIcon,
+            requiredPermission: "vault",
           },
           {
             name: "Budgeting",
@@ -245,14 +246,18 @@ export default {
     ]);
 
     const filteredMenu = computed(() => {
-      // Filter menu based on permissions and admin role
+      // Eksplisit akses permissions agar Vue bisa melacak reaktivitas
+      const permissions = authStore.user?.permissions || [];
+      const role = authStore.user?.role;
+      const isAdmin = role === 'admin';
+
       return menuConfig.value.map(group => {
         if (group.type === "group") {
           return {
             ...group,
             items: group.items.filter(item => {
-              if (item.requiresAdmin && !authStore.isAdmin) return false;
-              if (item.requiredPermission && !authStore.hasPermission(item.requiredPermission)) return false;
+              if (item.requiresAdmin && !isAdmin) return false;
+              if (item.requiredPermission && !isAdmin && !permissions.includes(item.requiredPermission)) return false;
               return true;
             })
           }
