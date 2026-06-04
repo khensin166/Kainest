@@ -4,7 +4,7 @@
     <div class="mb-8">
       <div class="mb-4 sm:mb-0 flex items-center gap-3">
         <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
-          Riwayat Keuangan Bulanan
+          Rekap Bulanan
         </h1>
         <PageGuide :steps="pageGuides.history" />
       </div>

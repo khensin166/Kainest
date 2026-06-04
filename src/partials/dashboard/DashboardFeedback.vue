@@ -30,7 +30,7 @@
               <div class="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
                 <img v-if="fb.user?.profile?.avatarUrl || fb.user?.image"
                   :src="fb.user?.profile?.avatarUrl || fb.user?.image"
-                  class="w-full h-full object-cover" />
+                  class="w-full h-full object-cover" referrerpolicy="no-referrer" />
                 <span v-else class="text-xs font-bold text-violet-600 dark:text-violet-400">
                   {{ (fb.user?.profile?.displayName || fb.user?.name || '?').charAt(0).toUpperCase() }}
                 </span>
