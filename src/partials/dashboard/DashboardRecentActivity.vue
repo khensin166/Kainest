@@ -108,7 +108,7 @@ onMounted(async () => {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       withCredentials: true,
     });
-    rawTransactions.value = res.data?.transactions || res.data || [];
+    rawTransactions.value = res.data?.data || [];
   } catch (e) {
     console.warn('[RecentActivity] Gagal fetch:', e.message);
   } finally {

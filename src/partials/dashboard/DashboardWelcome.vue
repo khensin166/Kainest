@@ -84,7 +84,7 @@ const formatRupiah = (num) => {
 const stats = computed(() => [
   {
     label: 'Total Pengeluaran Bulan Ini',
-    value: formatRupiah(summaryData.value?.totalSpent ?? 0),
+    value: formatRupiah(summaryData.value?.data?.totals?.spent ?? 0),
     change: 'Bulan berjalan',
     icon: ArrowTrendingDownIcon,
     iconBg: 'bg-red-50 dark:bg-red-900/20',
@@ -93,7 +93,7 @@ const stats = computed(() => [
   },
   {
     label: 'Total Anggaran',
-    value: formatRupiah(summaryData.value?.totalBudgeted ?? 0),
+    value: formatRupiah(summaryData.value?.data?.totals?.limit ?? 0),
     change: 'Dari gaji bulan ini',
     icon: BanknotesIcon,
     iconBg: 'bg-green-50 dark:bg-green-900/20',
@@ -102,7 +102,7 @@ const stats = computed(() => [
   },
   {
     label: 'Sisa Anggaran',
-    value: formatRupiah((summaryData.value?.totalBudgeted ?? 0) - (summaryData.value?.totalSpent ?? 0)),
+    value: formatRupiah(summaryData.value?.data?.totals?.remaining ?? 0),
     change: 'Sampai akhir bulan',
     icon: SparklesIcon,
     iconBg: 'bg-violet-50 dark:bg-violet-900/20',
