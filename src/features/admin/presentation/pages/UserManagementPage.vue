@@ -3,7 +3,10 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Manajemen Pengguna</h1>
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Manajemen Pengguna</h1>
+          <PageGuide :steps="pageGuides.users" />
+        </div>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Kelola role dan hak akses pengguna</p>
       </div>
       <button @click="fetchUsers"
@@ -119,6 +122,8 @@ import { ref, onMounted } from 'vue';
 import { getUsersUseCase, updateUserAccessUseCase } from '@/core/di/di';
 import { useModalStore } from '@/stores/modalStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 const modalStore = useModalStore();
 

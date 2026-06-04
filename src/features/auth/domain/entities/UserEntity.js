@@ -13,6 +13,8 @@ export class UserEntity {
     displayName,
     avatarUrl,
     invitationCode,
+    // WhatsApp
+    whatsappJid,
     // RBAC
     role,
     permissions,
@@ -29,6 +31,7 @@ export class UserEntity {
     this.displayName = displayName;
     this.avatarUrl = avatarUrl;
     this.invitationCode = invitationCode;
+    this.whatsappJid = whatsappJid;
 
     // RBAC
     this.role = role || "user";

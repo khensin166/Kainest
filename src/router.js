@@ -39,6 +39,16 @@ const routes = [
     component: RegisterPage,
   },
   {
+    path: "/forgot-password",
+    name: "ForgotPassword",
+    component: () => import("./features/auth/presentation/pages/ForgotPasswordPage.vue"),
+  },
+  {
+    path: "/reset-password",
+    name: "ResetPassword",
+    component: () => import("./features/auth/presentation/pages/ResetPasswordPage.vue"),
+  },
+  {
     path: "/utility/403",
     name: "Forbidden",
     component: Forbidden,

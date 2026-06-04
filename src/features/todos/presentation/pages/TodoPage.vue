@@ -1,10 +1,11 @@
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <div class="sm:flex sm:justify-between sm:items-center mb-8">
-      <div class="mb-4 sm:mb-0">
+      <div class="mb-4 sm:mb-0 flex items-center gap-3">
         <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
           To-do List Berdua
         </h1>
+        <PageGuide :steps="pageGuides.todos" />
       </div>
     </div>
 
@@ -93,6 +94,8 @@ import { ref, onMounted } from 'vue';
 import { useTodoStore } from '../stores/useTodoStore';
 import { useModalStore } from '../../../../stores/modalStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 const todoStore = useTodoStore();
 const newTodoTitle = ref('');

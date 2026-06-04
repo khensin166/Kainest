@@ -20,6 +20,7 @@ export function mapUserFromApi(apiUser) {
     displayName: apiUser.profile?.displayName,
     avatarUrl: apiUser.profile?.avatarUrl || apiUser.image,
     invitationCode: apiUser.profile?.invitationCode,
+    whatsappJid: apiUser.whatsappJid,
     role: apiUser.role,
     permissions: apiUser.permissions,
   });

@@ -2,7 +2,12 @@
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Riwayat Keuangan Bulanan</h1>
+      <div class="mb-4 sm:mb-0 flex items-center gap-3">
+        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
+          Riwayat Keuangan Bulanan
+        </h1>
+        <PageGuide :steps="pageGuides.history" />
+      </div>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
         Tinjauan keuangan Anda dari bulan ke bulan — lihat pola boros dan hemat Anda dari waktu ke waktu.
       </p>
@@ -196,6 +201,8 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Lege
 import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 

@@ -129,6 +129,18 @@
                 <EyeSlashIcon v-else class="h-5 w-5" />
               </button>
             </div>
+
+            <!-- Input Confirm Password -->
+            <div class="relative">
+              <label for="confirm-password" class="sr-only">Konfirmasi Sandi</label>
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <LockClosedIcon class="h-5 w-5 text-gray-400" />
+              </div>
+              <input id="confirm-password" v-model="confirmPassword" name="confirmPassword" :type="showPassword ? 'text' : 'password'"
+                autocomplete="new-password" required
+                class="block w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all shadow-sm"
+                placeholder="Ulangi Password" />
+            </div>
           </div>
 
           <!-- Term of service -->
@@ -173,6 +185,7 @@ import { termsOfService, privacyPolicy } from "@/data/legalContent";
 const displayName = ref("");
 const email = ref("");
 const password = ref("");
+const confirmPassword = ref("");
 const showPassword = ref(false);
 
 const auth = useAuthStore();
@@ -194,12 +207,25 @@ const showPrivacy = () => {
 };
 
 const handleRegister = async () => {
+  if (password.value !== confirmPassword.value) {
+    auth.error = "Konfirmasi kata sandi tidak cocok.";
+    return;
+  }
+
   try {
     await auth.register({
       email: email.value,
       password: password.value,
       displayName: displayName.value,
     });
+    
+    // Clear form
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+    displayName.value = "";
+    showPassword.value = false;
+
     router.push("/login");
   } catch (error) {
     console.error("Gagal registrasi dari komponen:", error.message);

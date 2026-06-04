@@ -9,6 +9,9 @@ import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 import PocketManagementModal from '../components/PocketManagementModal.vue';
 import BudgetSetupModal from '../components/BudgetSetupModal.vue';
+import PageGuide from '@/components/PageGuide.vue';
+import Tooltip from '@/components/Tooltip.vue';
+import { pageGuides } from '@/config/pageGuides';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
@@ -48,7 +51,7 @@ const isSetupForced = ref(false);
 
 const closeSetupModal = async (payload) => {
   isSetupModalOpen.value = false;
-  
+
   await nextTick();
 
   if (payload && payload.refresh) {
@@ -107,40 +110,62 @@ onActivated(async () => {
     checkAndForceSetup();
   }
 });
+
 </script>
 
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
     <div class="sm:flex sm:justify-between sm:items-center mb-8">
-      <div class="mb-4 sm:mb-0">
+      <div class="mb-4 sm:mb-0 flex items-center gap-3">
         <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
           Dashboard Keuangan
         </h1>
+        <PageGuide :steps="pageGuides.dashboard" />
       </div>
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-        <button @click="isSetupModalOpen = true"
-          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
-          <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
-            <path d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
-          </svg>
-          <span class="hidden xs:block">Atur Pemasukan</span>
-        </button>
-        <button @click="openPocketModal"
-          class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
-          <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-          </svg>
-          <span class="hidden xs:block">Kelola Kantong</span>
-        </button>
-        <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
-          <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-            <path
-              d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-          </svg>
-          <span class="hidden xs:block ml-2">Catat Pengeluaran</span>
-        </button>
+
+        <Tooltip bg="dark" size="md" position="top">
+          <template #trigger>
+            <button @click="isSetupModalOpen = true"
+              class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+              <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
+                <path
+                  d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
+              </svg>
+              <span class="hidden xs:block">Atur Pemasukan</span>
+            </button>
+          </template>
+          <div class="text-sm">Tetapkan total gajimu bulan ini untuk dibagi ke dalam kantong.</div>
+        </Tooltip>
+
+        <Tooltip bg="dark" size="md" position="top">
+          <template #trigger>
+            <button @click="openPocketModal"
+              class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
+              <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+              </svg>
+              <span class="hidden xs:block">Kelola Kantong</span>
+            </button>
+          </template>
+          <div class="text-sm">Buat, edit, atau hapus kategori kantong persentase/nominal.</div>
+        </Tooltip>
+
+        <Tooltip bg="dark" size="md" position="top">
+          <template #trigger>
+            <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
+              <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                <path
+                  d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+              </svg>
+              <span class="hidden xs:block ml-2">Catat Pengeluaran</span>
+            </button>
+          </template>
+          <div class="text-sm">Input transaksi secara manual jika tidak menggunakan WaBot.</div>
+        </Tooltip>
+
       </div>
     </div>
 

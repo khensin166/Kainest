@@ -2,97 +2,182 @@
   <div class="relative inline-flex">
     <button
       ref="trigger"
-      class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full"
-      :class="{ 'bg-gray-200 dark:bg-gray-800': dropdownOpen }"
+      class="relative w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+      :class="{ 'bg-gray-100 dark:bg-gray-700': dropdownOpen }"
       aria-haspopup="true"
-      @click.prevent="dropdownOpen = !dropdownOpen"
+      @click.stop="dropdownOpen = !dropdownOpen"
       :aria-expanded="dropdownOpen"
     >
-      <span class="sr-only">Notifications</span>
-      <svg class="fill-current text-gray-500/80 dark:text-gray-400/80" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 0a7 7 0 0 0-7 7c0 1.202.308 2.33.84 3.316l-.789 2.368a1 1 0 0 0 1.265 1.265l2.595-.865a1 1 0 0 0-.632-1.898l-.698.233.3-.9a1 1 0 0 0-.104-.85A4.97 4.97 0 0 1 2 7a5 5 0 0 1 5-5 4.99 4.99 0 0 1 4.093 2.135 1 1 0 1 0 1.638-1.148A6.99 6.99 0 0 0 7 0Z" />
-        <path d="M11 6a5 5 0 0 0 0 10c.807 0 1.567-.194 2.24-.533l1.444.482a1 1 0 0 0 1.265-1.265l-.482-1.444A4.962 4.962 0 0 0 16 11a5 5 0 0 0-5-5Zm-3 5a3 3 0 0 1 6 0c0 .588-.171 1.134-.466 1.6a1 1 0 0 0-.115.82 1 1 0 0 0-.82.114A2.973 2.973 0 0 1 11 14a3 3 0 0 1-3-3Z" />                                        
-      </svg>      
-      <div class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-gray-100 dark:border-gray-900 rounded-full"></div>
+      <span class="sr-only">Notifikasi</span>
+      <BellIcon class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+      <!-- Unread Badge -->
+      <span v-if="unreadCount > 0"
+        class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800">
+      </span>
     </button>
+
+    <!-- Dropdown panel -->
     <transition
-      enter-active-class="transition ease-out duration-200 transform"
-      enter-from-class="opacity-0 -translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition ease-out duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+      enter-active-class="transition ease-out duration-100"
+      enter-from-class="transform opacity-0 scale-95"
+      enter-to-class="transform opacity-100 scale-100"
+      leave-active-class="transition ease-in duration-75"
+      leave-from-class="transform opacity-100 scale-100"
+      leave-to-class="transform opacity-0 scale-95"
     >
-      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full -mr-48 sm:mr-0 min-w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1" :class="align === 'right' ? 'right-0' : 'left-0'">
-        <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase pt-1.5 pb-2 px-4">Notifications</div>
-        <ul
-          ref="dropdown"
-          @focusin="dropdownOpen = true"
-          @focusout="dropdownOpen = false"
-        >
-          <li class="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-            <router-link class="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-700/20" to="#0" @click="dropdownOpen = false">
-              <span class="block text-sm mb-2">📣 <span class="font-medium text-gray-800 dark:text-gray-100">Edit your information in a swipe</span> Sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</span>
-              <span class="block text-xs font-medium text-gray-400 dark:text-gray-500">Feb 12, 2024</span>
-            </router-link>
-          </li>
-          <li class="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-            <router-link class="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-700/20" to="#0" @click="dropdownOpen = false">
-              <span class="block text-sm mb-2">📣 <span class="font-medium text-gray-800 dark:text-gray-100">Edit your information in a swipe</span> Sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</span>
-              <span class="block text-xs font-medium text-gray-400 dark:text-gray-500">Feb 9, 2024</span>
-            </router-link>
-          </li>
-          <li class="border-b border-gray-200 dark:border-gray-700/60 last:border-0">
-            <router-link class="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-700/20" to="#0" @click="dropdownOpen = false">
-              <span class="block text-sm mb-2">🚀<span class="font-medium text-gray-800 dark:text-gray-100">Say goodbye to paper receipts!</span> Sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</span>
-              <span class="block text-xs font-medium text-gray-400 dark:text-gray-500">Jan 24, 2024</span>
-            </router-link>
+      <div v-show="dropdownOpen" ref="dropdown"
+        class="origin-top-right z-10 absolute top-full right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-2 rounded-2xl shadow-xl overflow-hidden"
+        @click.stop>
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Notifikasi</h2>
+          <span v-if="unreadCount > 0"
+            class="text-xs font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 px-2 py-0.5 rounded-full">
+            {{ unreadCount }} baru
+          </span>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="loading" class="p-4 space-y-3">
+          <div v-for="i in 3" :key="i" class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse flex-shrink-0"></div>
+            <div class="flex-1 space-y-1.5">
+              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+              <div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="notifications.length === 0" class="py-8 text-center">
+          <div class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
+            <BellSlashIcon class="w-5 h-5 text-gray-400" />
+          </div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada notifikasi</p>
+        </div>
+
+        <!-- Notification List -->
+        <ul v-else class="max-h-72 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700/50">
+          <li v-for="notif in notifications" :key="notif.id"
+            class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer transition-colors"
+            :class="{ 'bg-violet-50/50 dark:bg-violet-900/10': !notif.isRead }"
+            @click="markRead(notif)">
+            <!-- Icon by type -->
+            <div :class="['w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', iconBg(notif.type)]">
+              <component :is="iconByType(notif.type)" :class="['w-4 h-4', iconColor(notif.type)]" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{{ notif.title }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">{{ notif.message }}</p>
+              <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">{{ formatRelative(notif.createdAt) }}</p>
+            </div>
+            <!-- Unread dot -->
+            <div v-if="!notif.isRead" class="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-1.5"></div>
           </li>
         </ul>
-      </div> 
+      </div>
     </transition>
   </div>
 </template>
 
-<script>
-import { ref, onMounted, onUnmounted } from 'vue'
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import { BellIcon, BellSlashIcon, SparklesIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
+import axios from 'axios';
 
-export default {
-  name: 'DropdownNotifications',
-  props: ['align'],
-  setup() {
+const dropdownOpen = ref(false);
+const trigger = ref(null);
+const dropdown = ref(null);
+const notifications = ref([]);
+const unreadCount = ref(0);
+const loading = ref(true);
 
-    const dropdownOpen = ref(false)
-    const trigger = ref(null)
-    const dropdown = ref(null)
+const apiHeaders = () => {
+  const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-    // close on click outside
-    const clickHandler = ({ target }) => {
-      if (!dropdownOpen.value || dropdown.value.contains(target) || trigger.value.contains(target)) return
-      dropdownOpen.value = false
-    }
+const formatRelative = (dateStr) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (mins < 2) return 'Baru saja';
+  if (mins < 60) return `${mins} mnt lalu`;
+  if (hours < 24) return `${hours} jam lalu`;
+  return `${days} hari lalu`;
+};
 
-    // close if the esc key is pressed
-    const keyHandler = ({ keyCode }) => {
-      if (!dropdownOpen.value || keyCode !== 27) return
-      dropdownOpen.value = false
-    }
+const iconByType = (type) => {
+  if (type === 'ALERT') return ExclamationTriangleIcon;
+  if (type === 'AI_INSIGHT') return SparklesIcon;
+  return InformationCircleIcon;
+};
 
-    onMounted(() => {
-      document.addEventListener('click', clickHandler)
-      document.addEventListener('keydown', keyHandler)
-    })
+const iconBg = (type) => {
+  if (type === 'ALERT') return 'bg-red-50 dark:bg-red-900/20';
+  if (type === 'AI_INSIGHT') return 'bg-violet-50 dark:bg-violet-900/20';
+  return 'bg-blue-50 dark:bg-blue-900/20';
+};
 
-    onUnmounted(() => {
-      document.removeEventListener('click', clickHandler)
-      document.removeEventListener('keydown', keyHandler)
-    })
+const iconColor = (type) => {
+  if (type === 'ALERT') return 'text-red-500';
+  if (type === 'AI_INSIGHT') return 'text-violet-500';
+  return 'text-blue-500';
+};
 
-    return {
-      dropdownOpen,
-      trigger,
-      dropdown,
-    }
+const fetchNotifications = async () => {
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const res = await axios.get(`${baseUrl}/notifications`, {
+      headers: apiHeaders(),
+      withCredentials: true,
+    });
+    notifications.value = res.data?.notifications || [];
+    unreadCount.value = res.data?.unreadCount ?? 0;
+  } catch (e) {
+    console.warn('[DropdownNotifications] Gagal fetch:', e.message);
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+const markRead = async (notif) => {
+  if (notif.isRead) return;
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    await axios.patch(`${baseUrl}/notifications/${notif.id}/read`, {}, {
+      headers: apiHeaders(),
+      withCredentials: true,
+    });
+    notif.isRead = true;
+    unreadCount.value = Math.max(0, unreadCount.value - 1);
+  } catch (e) {
+    console.warn('[DropdownNotifications] Gagal mark read:', e.message);
+  }
+};
+
+// Close on outside click
+const clickHandler = ({ target }) => {
+  if (!dropdownOpen.value) return;
+  if (!dropdown.value?.contains(target) && !trigger.value?.contains(target)) {
+    dropdownOpen.value = false;
+  }
+};
+
+const keyHandler = ({ keyCode }) => {
+  if (dropdownOpen.value && keyCode === 27) dropdownOpen.value = false;
+};
+
+onMounted(() => {
+  document.addEventListener('click', clickHandler);
+  document.addEventListener('keydown', keyHandler);
+  fetchNotifications();
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', clickHandler);
+  document.removeEventListener('keydown', keyHandler);
+});
 </script>

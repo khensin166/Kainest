@@ -62,4 +62,23 @@ export class AuthRemoteSource {
     const response = await api.post("/auth/sign-out", {});
     return response.data;
   }
+
+  async forgotPassword(email) {
+    // Memanggil endpoint bawaan Better Auth untuk forgot password
+    // Better Auth (v1.6+) menggunakan endpoint /auth/request-password-reset
+    const response = await api.post("/auth/request-password-reset", {
+      email,
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return response.data;
+  }
+
+  async resetPassword(newPassword, token) {
+    // Memanggil endpoint bawaan Better Auth untuk reset password
+    const response = await api.post("/auth/reset-password", {
+      newPassword,
+      token, // token didapatkan dari URL yang dikirim ke email
+    });
+    return response.data;
+  }
 }

@@ -115,9 +115,9 @@
               </label>
             </div>
             <div class="text-sm">
-              <a href="#" class="font-semibold text-violet-600 hover:text-violet-500">
+              <router-link to="/forgot-password" class="font-semibold text-violet-600 hover:text-violet-500">
                 Forgot Password?
-              </a>
+              </router-link>
             </div>
           </div>
 
