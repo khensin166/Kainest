@@ -1,6 +1,5 @@
 <template>
-  <div class="col-span-12 xl:col-span-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
       <!-- Header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
         <div class="flex items-center gap-2">
@@ -50,7 +49,6 @@
         </li>
       </ul>
     </div>
-  </div>
 </template>
 
 <script setup>

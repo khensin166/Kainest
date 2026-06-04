@@ -1,7 +1,5 @@
 <template>
-  <div class="col-span-12 xl:col-span-8">
-    <!-- Welcome Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           Halo, {{ displayName }} 👋
@@ -9,15 +7,15 @@
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ todayLabel }}</p>
       </div>
       <div v-if="hasBudgeting" class="flex gap-2">
-        <router-link to="/app/transactions"
+        <router-link to="/app/budgeting"
           class="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 transition-all">
           <PlusIcon class="w-4 h-4" />
-          Catat Transaksi
+          Analisis Pocket
         </router-link>
-        <router-link to="/app/budgeting"
+        <router-link to="/app/transactions"
           class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-gray-700 transition-all">
           <ChartBarIcon class="w-4 h-4" />
-          Analisis Pocket
+          Riwayat Transaksi
         </router-link>
       </div>
     </div>
@@ -42,16 +40,17 @@
     <div v-else
       class="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-2xl p-6 border border-violet-100 dark:border-violet-800">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center flex-shrink-0">
+        <div
+          class="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center flex-shrink-0">
           <SparklesIcon class="w-6 h-6 text-violet-600 dark:text-violet-400" />
         </div>
         <div>
           <p class="font-semibold text-gray-900 dark:text-white">Selamat datang di Kainest!</p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Akun kamu masih dalam proses setup oleh admin. Fitur budgeting akan segera tersedia.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Akun kamu masih dalam proses setup oleh admin. Fitur
+            budgeting akan segera tersedia.</p>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>

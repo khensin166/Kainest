@@ -1,6 +1,5 @@
 <template>
-  <div class="col-span-12 xl:col-span-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
       <!-- Header -->
       <div class="flex items-center gap-2 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
         <ChatBubbleLeftRightIcon class="w-4 h-4 text-violet-500" />
@@ -80,7 +79,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
