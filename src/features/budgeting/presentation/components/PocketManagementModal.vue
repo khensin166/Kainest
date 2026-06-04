@@ -87,7 +87,8 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <!-- Pilihan Kategori — pakai @update:modelValue agar bisa intercept untuk konfirmasi -->
               <div class="sm:col-span-2 relative">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Kategori</label>
+                <label class="block text-xs font-medium text-gray-500 mb-0.5">Kategori</label>
+                <p class="text-[10px] text-gray-400 mb-2">Pilih kategori pengeluaran (misal: Makanan, Transportasi, atau Tabungan).</p>
                 <DropdownSelect
                   :modelValue="pocket.categoryId"
                   :options="availableCategories.map(c => ({ label: c.icon + ' ' + c.name, value: c.id }))"
@@ -100,7 +101,8 @@
 
               <!-- Tipe Limit -->
               <div class="relative">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Tipe Batas</label>
+                <label class="block text-xs font-medium text-gray-500 mb-0.5">Tipe Batas</label>
+                <p class="text-[10px] text-gray-400 mb-2 leading-tight">Gunakan "Persentase" untuk alokasi dari gaji bulanan Anda, atau "Nominal" untuk nilai tetap/pasti.</p>
                 <DropdownSelect
                   v-model="pocket.limitType"
                   :options="[{label: 'Persentase (%)', value: 'percentage'}, {label: 'Nominal (Rp)', value: 'nominal'}]"
@@ -110,10 +112,11 @@
               </div>
 
               <!-- Input Nilai -->
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">
+              <div class="flex flex-col h-full">
+                <label class="block text-xs font-medium text-gray-500 mb-0.5">
                   {{ pocket.limitType === 'percentage' ? 'Persentase (%)' : 'Batas Maksimal (Rp)' }}
                 </label>
+                <p class="text-[10px] text-gray-400 mb-2 leading-tight">Sesuaikan dengan target atau batas rencana pengeluaran bulanan Anda.</p>
                 <div v-if="pocket.limitType === 'percentage'">
                   <input v-model.number="pocket.percentage" type="number" min="1" max="100" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 15" required />
                   <div class="mt-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
@@ -125,9 +128,9 @@
 
               <!-- Kata Kunci Kustom (Optional) -->
               <div class="sm:col-span-2 mt-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Kata Kunci AI (Pisahkan dengan koma)</label>
-                <input v-model="pocket.keywordsInput" type="text" class="form-input w-full text-sm rounded-lg" placeholder="contoh: kfc, gofood, warteg, sate" />
-                <p class="text-[10px] text-gray-400 mt-1">AI akan menggunakan kata kunci ini untuk otomatis mengenali pengeluaran Anda.</p>
+                <label class="block text-xs font-medium text-gray-500 mb-0.5">Kata Kunci AI (Pisahkan dengan koma)</label>
+                <p class="text-[10px] text-gray-400 mb-2 leading-tight">Bot WhatsApp akan otomatis mendeteksi dan memasukkan pengeluaran ke kantong ini jika Anda mengetik kata kunci tersebut saat mencatat via chat.</p>
+                <input v-model="pocket.keywordsInput" type="text" class="form-input w-full text-sm rounded-lg" placeholder="Cth: kfc, gofood, bensin, pulsa" />
               </div>
             </div>
           </div>

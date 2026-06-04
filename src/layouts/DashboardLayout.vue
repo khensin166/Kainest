@@ -3,7 +3,7 @@
     <Sidebar :sidebarOpen="sidebarOpen" @close-sidebar="sidebarOpen = false" />
 
     <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-      
+
       <Header :sidebarOpen="sidebarOpen" @toggle-sidebar="sidebarOpen = !sidebarOpen" />
 
       <main class="grow">
@@ -13,55 +13,59 @@
     </div>
 
     <!-- Onboarding Modal untuk User Baru -->
-    <BaseModal 
-      :isOpen="showOnboarding" 
-      size="md"
-      :hideFooter="true"
-      @close="preventClose"
-    >
+    <BaseModal :isOpen="showOnboarding" size="md" :hideFooter="true" @close="preventClose">
       <template #header>
         <div class="text-center">
           <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Selamat Datang di Kainest! 🎉</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400 font-normal">Sebelum mulai, mari lengkapi profil Anda.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 font-normal">Selamat datang di aplikasi pembantu Anda.
+            Lengkapi profil Anda untuk mulai.</p>
         </div>
       </template>
 
       <template #body>
         <form @submit.prevent="submitOnboarding" class="mt-4 space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="displayName">
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="displayName">
               Nama Panggilan <span class="text-red-500">*</span>
             </label>
-            <input 
-              id="displayName" 
-              class="form-input w-full" 
-              type="text" 
-              v-model="onboardingData.displayName" 
-              placeholder="Cth: Kenan"
-              required 
-            />
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Silakan isi nama panggilan agar kami mudah
+              memanggil Anda.</p>
+            <input id="displayName" class="form-input w-full" type="text" v-model="onboardingData.displayName"
+              placeholder="Cth: Kenan" required />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="phone">
-              Nomor Telepon <span class="text-gray-400 font-normal">(Opsional)</span>
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="phone">
+              Nomor Telepon <span class="text-red-500">*</span>
             </label>
-            <input 
-              id="phone" 
-              class="form-input w-full" 
-              type="text" 
-              v-model="onboardingData.phoneNumber"
-              placeholder="Cth: 628123456789" 
-            />
+
+            <!-- WhatsApp Bot Info Block -->
+            <div
+              class="bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800 rounded-lg p-3 my-2 flex items-start gap-2.5">
+              <div
+                class="w-6 h-6 rounded-full bg-violet-100 dark:bg-violet-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5 text-violet-600 dark:text-violet-300" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <p class="text-xs text-violet-800 dark:text-violet-200 leading-relaxed">
+                <strong class="font-semibold block mb-0.5">Kenapa butuh nomor telepon?</strong>
+                Nomor ini akan digunakan sebagai validasi agar Anda bisa terhubung dengan <strong>WhatsApp Bot
+                  Kainest</strong>. Bot ini akan sangat membantu mempermudah kegiatan pencatatan harian Anda (seperti
+                mencatat pengeluaran) langsung dari chat WhatsApp.
+              </p>
+            </div>
+
+            <input id="phone" class="form-input w-full" type="text" v-model="onboardingData.phoneNumber"
+              placeholder="Cth: 628123456789" required />
             <div v-if="phoneError" class="text-xs text-red-500 mt-1">{{ phoneError }}</div>
           </div>
 
           <div class="pt-4">
-            <button 
-              type="submit" 
-              :disabled="profileStore.isUpdatingProfile"
-              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-50"
-            >
+            <button type="submit" :disabled="profileStore.isUpdatingProfile"
+              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-50">
               {{ profileStore.isUpdatingProfile ? "Menyimpan..." : "Lanjutkan ke Aplikasi" }}
             </button>
           </div>
@@ -119,15 +123,18 @@ const submitOnboarding = async () => {
   phoneError.value = null;
   let phoneNumber = onboardingData.value.phoneNumber ? onboardingData.value.phoneNumber.trim() : '';
 
-  if (phoneNumber) {
-    if (phoneNumber.startsWith('0')) phoneNumber = '62' + phoneNumber.substring(1);
-    if (phoneNumber.startsWith('+62')) phoneNumber = phoneNumber.substring(1);
-    
-    const phoneRegex = /^62\d{9,13}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      phoneError.value = "Format No. HP salah. Harus diawali 62 (Cth: 628123456789).";
-      return;
-    }
+  if (!phoneNumber) {
+    phoneError.value = "Nomor telepon wajib diisi.";
+    return;
+  }
+
+  if (phoneNumber.startsWith('0')) phoneNumber = '62' + phoneNumber.substring(1);
+  if (phoneNumber.startsWith('+62')) phoneNumber = phoneNumber.substring(1);
+
+  const phoneRegex = /^62\d{9,13}$/;
+  if (!phoneRegex.test(phoneNumber)) {
+    phoneError.value = "Format No. HP salah. Harus diawali 62 (Cth: 628123456789).";
+    return;
   }
 
   try {

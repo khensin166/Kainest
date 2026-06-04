@@ -195,7 +195,7 @@ export default {
         title: "Keuangan",
         items: [
           {
-            name: "Kantong Pengeluaran",
+            name: "Kantong Keuangan",
             path: "/app/budgeting",
             iconComponent: BanknotesIcon,
             requiredPermission: "budgeting",

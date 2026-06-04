@@ -7,7 +7,7 @@
           <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Manajemen Pengguna</h1>
           <PageGuide :steps="pageGuides.users" />
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Kelola role dan hak akses pengguna</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pusat kendali admin — atur hak akses, pantau, dan kelola aktivitas seluruh pengguna aplikasi.</p>
       </div>
       <button @click="fetchUsers"
         class="p-2 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -136,7 +136,7 @@ const availableModules = [
   { id: 'notes', label: 'Notes' },
   { id: 'gallery', label: 'Gallery' },
   { id: 'calendar', label: 'Calendar' },
-  { id: 'budgeting', label: 'Kantong Pengeluaran' },
+  { id: 'budgeting', label: 'Kantong Keuangan' },
   { id: 'wabot', label: 'WaBot' },
 ];
 

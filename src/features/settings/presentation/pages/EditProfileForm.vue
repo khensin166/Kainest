@@ -1,9 +1,12 @@
 <!-- EditProfileForm   -->
 <template>
   <div>
-    <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold mb-6">
+    <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold">
       Edit Profil
     </h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
+      Perbarui nama panggilan, sesuaikan preferensi, dan atur informasi pribadi Anda.
+    </p>
     <div v-if="!user" class="text-center">Memuat data profil...</div>
     <form v-else @submit.prevent="handleSubmit">
       <div class="flex items-center space-x-4 mb-6">
