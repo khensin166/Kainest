@@ -7,7 +7,7 @@
       </div>
 
       <!-- Feedback List -->
-      <div class="divide-y divide-gray-50 dark:divide-gray-700/50 max-h-72 overflow-y-auto">
+      <div class="divide-y divide-gray-50 dark:divide-gray-700/50 max-h-[400px] overflow-y-auto">
         <div v-if="loadingFeedbacks" class="p-5 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-start gap-3">
             <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex-shrink-0"></div>
