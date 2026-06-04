@@ -116,16 +116,21 @@ onActivated(async () => {
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-    <div class="sm:flex sm:justify-between sm:items-center mb-8">
-      <div class="mb-4 sm:mb-0 flex items-center gap-3">
-        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
-          Dashboard Keuangan
-        </h1>
-        <PageGuide :steps="pageGuides.dashboard" />
+    <div class="sm:flex sm:justify-between sm:items-start mb-8">
+      <div class="mb-4 sm:mb-0">
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
+            Kantong Keuangan
+          </h1>
+          <PageGuide :steps="pageGuides.dashboard" />
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Alokasikan dan pantau keuangan Anda ke berbagai kantong agar pengeluaran terkendali.
+        </p>
       </div>
       <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
-        <Tooltip bg="dark" size="md" position="top">
+        <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
             <button @click="isSetupModalOpen = true"
               class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
@@ -139,10 +144,10 @@ onActivated(async () => {
           <div class="text-sm">Tetapkan total gajimu bulan ini untuk dibagi ke dalam kantong.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="top">
+        <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
-            <button @click="openPocketModal"
-              class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500 font-medium">
+            <button @click="openPocketModal" class="btn border-gray-200 dark:border-gray-700 font-medium transition-all"
+              :class="budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/30 shadow-lg animate-pulse border-transparent' : 'bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500'">
               <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
                 <path
                   d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
@@ -153,7 +158,7 @@ onActivated(async () => {
           <div class="text-sm">Buat, edit, atau hapus kategori kantong persentase/nominal.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="top">
+        <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
             <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
               <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
@@ -213,7 +218,7 @@ onActivated(async () => {
       </div>
 
       <div class="mb-6 flex justify-between items-end col-span-full">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Pocket</h2>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Kantong</h2>
       </div>
 
       <BudgetCategoryCard v-for="category in budgetStore.budgetCategories" :key="category.categoryId"

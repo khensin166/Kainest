@@ -5,9 +5,12 @@
         </div>
 
         <div v-else-if="coupleStore.connectionStatus?.connected">
-            <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold mb-6">
+            <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold">
                 ❤️ Pasangan Terhubung
             </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
+                Kelola pencatatan keuangan bersama dan bagikan pengeluaran dengan pasangan Anda.
+            </p>
             <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg flex items-center space-x-4">
                 <img :src="partnerAvatar" alt="Partner Avatar" class="w-16 h-16 rounded-full object-cover" referrerpolicy="no-referrer" />
                 <div>
