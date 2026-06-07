@@ -227,6 +227,7 @@ import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
+import { formatRupiah } from '@/utils/Utils';
 
 const emit = defineEmits(['close']);
 const budgetStore = useBudgetStore();
@@ -319,15 +320,6 @@ const getCategoryName = (id) => {
   return cat ? cat.name : '';
 };
 
-const formatRupiah = (number) => {
-  if (!number) return 'Rp 0';
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(number);
-};
 
 const getCategoryIcon = (id) => {
   if (!id) return '💼';

@@ -10,6 +10,26 @@ export const formatThousands = (value) => Intl.NumberFormat('en-US', {
   notation: 'compact',
 }).format(value);
 
+export const formatRupiah = (value) => {
+  const num = Number(value);
+  if (value === null || value === undefined || value === '' || isNaN(num)) return 'Rp 0';
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(num);
+};
+
+export const formatRupiahNoSymbol = (value) => {
+  const num = Number(value);
+  if (value === null || value === undefined || value === '' || isNaN(num)) return '';
+  return new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(num);
+};
+
 export const getCssVariable = (variable) => {
   return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
 };

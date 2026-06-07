@@ -3,6 +3,7 @@
 import { reactive, computed, onMounted, inject, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { useModalStore } from '../../../../stores/modalStore';
+import { formatRupiah } from '@/utils/Utils';
 
 const budgetStore = useBudgetStore();
 const modalStore = useModalStore();
@@ -123,8 +124,7 @@ const isFormValid = computed(() => {
 
 // Helper formatter (opsional)
 const formattedAmountPreview = computed(() => {
-  if (!formData.amount) return "Rp 0";
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(formData.amount);
+  return formatRupiah(formData.amount);
 });
 
 

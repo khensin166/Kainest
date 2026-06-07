@@ -203,6 +203,7 @@ import { useBudgetStore } from '../stores/useBudgetStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
 import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
+import { formatRupiah } from '@/utils/Utils';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -215,10 +216,6 @@ onMounted(async () => {
 
 // === Helpers ===
 
-const formatRupiah = (value) => {
-  if (!value && value !== 0) return 'Rp -';
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
-};
 
 const formatMonthShort = (dateStr) => {
   const d = new Date(dateStr);
@@ -293,7 +290,7 @@ const chartOptions = {
     tooltip: {
       callbacks: {
         label: (context) => {
-          return ` ${context.dataset.label}: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(context.parsed.y)}`;
+          return ` ${context.dataset.label}: ${formatRupiah(context.parsed.y)}`;
         },
       },
     },

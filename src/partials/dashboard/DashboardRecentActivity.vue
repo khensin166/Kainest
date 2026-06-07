@@ -56,6 +56,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
 import { ClockIcon, InboxIcon, ArrowDownIcon, ArrowUpIcon, BoltIcon, LinkIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
+import { formatRupiah } from '@/utils/Utils';
 
 const authStore = useAuthStore();
 const loading = ref(true);
@@ -77,9 +78,6 @@ const formatRelative = (dateStr) => {
   return `${days} hari lalu`;
 };
 
-const formatRupiah = (num) => {
-  return 'Rp ' + Number(num).toLocaleString('id-ID');
-};
 
 const activities = computed(() =>
   rawTransactions.value.map(t => ({
