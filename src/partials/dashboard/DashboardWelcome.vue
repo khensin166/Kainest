@@ -9,13 +9,13 @@
       <div v-if="hasBudgeting" class="flex gap-2">
         <router-link to="/app/budgeting"
           class="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 transition-all">
-          <PlusIcon class="w-4 h-4" />
-          Analisis Kantong
+          <BanknotesIcon class="w-4 h-4" />
+          Kantong Keuangan
         </router-link>
-        <router-link to="/app/transactions"
+        <router-link to="/app/history"
           class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-gray-700 transition-all">
           <ChartBarIcon class="w-4 h-4" />
-          Riwayat Transaksi
+          Rekap Bulanan
         </router-link>
       </div>
     </div>
@@ -58,6 +58,7 @@ import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
 import { PlusIcon, ChartBarIcon, BanknotesIcon, ArrowTrendingDownIcon, SparklesIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
+import { formatRupiah } from '@/utils/Utils';
 
 const authStore = useAuthStore();
 const loadingStats = ref(true);
@@ -75,10 +76,6 @@ const todayLabel = computed(() => {
   return new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 });
 
-const formatRupiah = (num) => {
-  if (num === null || num === undefined) return 'Rp -';
-  return 'Rp ' + Number(num).toLocaleString('id-ID');
-};
 
 const stats = computed(() => [
   {

@@ -1,6 +1,7 @@
 <!-- BudgetHeroCard.vue -->
 <script setup>
 import DailyTrendSparkline from './DailyTrendSparkline.vue';
+import { formatRupiah as formatCurrency } from '@/utils/Utils';
 
 const props = defineProps({
   totalRemaining: {
@@ -20,8 +21,6 @@ const props = defineProps({
     default: null, // Bisa null jika data belum siap
   }
 });
-
-const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 </script>
 
 <template>

@@ -2,6 +2,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
+import { formatRupiah as formatCurrency } from '@/utils/Utils';
 
 // Menerima satu objek entity kategori utuh
 const props = defineProps({
@@ -12,7 +13,6 @@ const props = defineProps({
 });
 
 const budgetStore = useBudgetStore();
-const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
 
 // State lokal untuk mengontrol apakah saran AI sedang dibuka/ditutup
 const isAiExpanded = ref(false);

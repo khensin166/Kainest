@@ -9,11 +9,17 @@
                 <!-- Input Gaji -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Pemasukan / Gaji Bulanan (Rp) <span class="text-red-500">*</span>
+                        Pemasukan / Gaji Bulanan <span class="text-red-500">*</span>
                     </label>
-                    <input v-model="salary" type="number"
-                        class="form-input w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500"
-                        placeholder="Contoh: 6000000" required :disabled="isSubmitting" />
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="text-gray-500 sm:text-sm">Rp</span>
+                        </div>
+                        <input v-model="displaySalary" type="text"
+                            class="form-input w-full rounded-md border-gray-300 dark:border-gray-600 pl-10 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500 sm:text-sm"
+                            placeholder="Contoh: 6.000.000" required :disabled="isSubmitting"
+                            @input="onSalaryInput" />
+                    </div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         Gaji ini akan menjadi acuan 100% saat Anda mengatur persentase pembagian di <strong class="text-violet-600 dark:text-violet-400">Kelola Kantong</strong> nanti.
                     </p>
@@ -37,9 +43,10 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, defineProps, onMounted } from 'vue';
+import { ref, defineEmits, defineProps, onMounted, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
+import { formatRupiahNoSymbol } from '@/utils/Utils';
 
 const props = defineProps({
     forced: {
@@ -53,14 +60,40 @@ const budgetStore = useBudgetStore();
 
 // State lokal form
 const salary = ref('');
+const displaySalary = ref('');
 const isSubmitting = ref(false);
 
 onMounted(async () => {
     // Isi gaji dari store jika sudah ada
     if (budgetStore.salary && budgetStore.salary > 0) {
         salary.value = budgetStore.salary;
+        displaySalary.value = formatRupiahNoSymbol(budgetStore.salary);
     }
 });
+
+const onSalaryInput = (e) => {
+    const input = e.target;
+    const selectionStart = input.selectionStart;
+    const oldLength = input.value.length;
+
+    // Bersihkan semua karakter non-digit
+    const raw = input.value.replace(/\D/g, '');
+    
+    if (raw) {
+        salary.value = Number(raw);
+        displaySalary.value = formatRupiahNoSymbol(raw);
+    } else {
+        salary.value = '';
+        displaySalary.value = '';
+    }
+
+    // Sesuaikan cursor setelah rendering selesai
+    nextTick(() => {
+        const newLength = displaySalary.value.length;
+        const newPosition = selectionStart + (newLength - oldLength);
+        input.setSelectionRange(newPosition, newPosition);
+    });
+};
 
 const handleSubmit = async () => {
     // Validasi sederhana

@@ -1,6 +1,7 @@
 <!-- TransactionItem.vue -->
 <script setup>
 import { computed } from 'vue';
+import { formatRupiah } from '@/utils/Utils';
 
 // Menerima satu objek transaction entity
 const props = defineProps({
@@ -20,7 +21,7 @@ const emit = defineEmits(['edit', 'delete']);
 
 // Helper Formatter
 const formattedAmount = computed(() => 
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(props.transaction.amount)
+  formatRupiah(props.transaction.amount)
 );
 
 const formattedDate = computed(() => {

@@ -1,5 +1,6 @@
 <script setup>
 import { Line } from 'vue-chartjs'
+import { formatRupiah } from '@/utils/Utils'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -40,7 +41,7 @@ const chartOptions = {
         label: function (context) {
           // Format Rupiah sederhana di tooltip
           if (context.parsed.y !== null) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+            return formatRupiah(context.parsed.y);
           }
           return '';
         },

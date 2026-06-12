@@ -2,6 +2,7 @@
 <script setup>
 // Import komponen Line dari vue-chartjs
 import { Line } from 'vue-chartjs'
+import { formatRupiah } from '@/utils/Utils'
 
 // Import bagian-bagian penting dari Chart.js core
 import {
@@ -62,7 +63,7 @@ const chartOptions = {
               label += ': ';
           }
           if (context.parsed.y !== null) {
-              label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+              label += formatRupiah(context.parsed.y);
           }
           return label;
         }
