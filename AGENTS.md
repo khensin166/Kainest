@@ -187,6 +187,7 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 | 18 | **Fitur Remember Me & Modals Global** | Implementasi penyimpanan sesi dinamis (localStorage vs sessionStorage) pada login, serta pembuatan `GlobalContentModal.vue` untuk memunculkan S&K dan Kebijakan Privasi tanpa pindah halaman. |
 | 19 | **Restrukturisasi Layout Dashboard & Sistem Update** | Memindahkan komponen *Aktivitas Terbaru* ke kolom utama agar fokus UI lebih dominan ke finansial. Komponen *System Updates* dan *User Feedback* kini ditarik secara dinamis via API (tidak di-hardcode lagi). |
 | 20 | **Integrasi Notifikasi Interaktif** | `DropdownNotifications.vue` di-update untuk mengambil notifikasi dari backend, mem-parsing format tanggal *relative* (seperti "2 jam lalu"), dan mendukung aksi mark-as-read yang langsung disinkronisasi ke server. |
+| 21 | **Isolasi Keywords Kantong** | Memindahkan logika penyimpanan dan pembaruan `keywords` AI dari `BudgetCategory` ke `BudgetPocket`. Endpoint, Store, Repository, dan Modal (*PocketManagementModal*) di-update agar pengguna bisa mengkustomisasi referensi AI untuk kantong masing-masing tanpa berdampak global. |
 ---
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)
@@ -200,4 +201,3 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 7. **Pembatasan Query Default Riwayat (6/12 Bulan)**: Endpoint `GET /budget/history` saat ini mengembalikan seluruh riwayat all-time. Perlu ditambahkan parameter query opsional (misal `?limit=12`) agar default hanya 6 atau 12 bulan terakhir untuk efisiensi dan keterbacaan.
 8. **Filter Dropdown Tahun/Bulan di Halaman Riwayat**: Menambahkan komponen filter interaktif (dropdown atau range picker) di `FinancialHistoryPage.vue` agar user dapat memfilter data riwayat berdasarkan tahun atau rentang bulan tertentu.
 9. **Integrasi WhatsApp Bot (Kenin WA Bot) - Sisi Frontend**: Halaman pengaturan integrasi WhatsApp di Profile UI untuk memfasilitasi "Pairing" (menghubungkan nomor HP WhatsApp pengguna dengan akun Kainest) serta mengelola kata kunci (*keywords*) kategori untuk mendukung pencatatan transaksi yang efisien (Hybrid Routing). Tabel `BotActiveGroup` di database backend sudah siap disinkronkan untuk fitur ini.
-

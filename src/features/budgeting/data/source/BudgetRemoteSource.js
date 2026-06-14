@@ -130,8 +130,8 @@ export class BudgetRemoteSource {
     return response.data;
   }
 
-  async updateCategoryKeywords(categoryId, keywords) {
-    const response = await apiClient.patch(`/budget/categories/${categoryId}/keywords`, { keywords });
+  async updatePocketKeywords(categoryId, keywords) {
+    const response = await apiClient.patch(`/budget/pockets/${categoryId}/keywords`, { keywords });
     return response.data;
   }
 

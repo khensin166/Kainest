@@ -351,9 +351,9 @@ export class BudgetRepository {
     }
   }
 
-  async updateCategoryKeywords(categoryId, keywords) {
+  async updatePocketKeywords(categoryId, keywords) {
     try {
-      const response = await this.remoteSource.updateCategoryKeywords(categoryId, keywords);
+      const response = await this.remoteSource.updatePocketKeywords(categoryId, keywords);
       if (response.success) {
         return right(response.data);
       }

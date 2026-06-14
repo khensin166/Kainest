@@ -19,7 +19,7 @@ import {
   upsertPocketUseCase,
   deletePocketUseCase,
   bulkSetupPocketsUseCase,
-  updateCategoryKeywordsUseCase,
+  updatePocketKeywordsUseCase,
   getMonthlyHistoryUseCase
 } from "../../../../core/di/di";
 
@@ -38,7 +38,7 @@ const getPocketsUseCaseInstance = getPocketsUseCase;
 const upsertPocketUseCaseInstance = upsertPocketUseCase;
 const deletePocketUseCaseInstance = deletePocketUseCase;
 const bulkSetupPocketsUseCaseInstance = bulkSetupPocketsUseCase;
-const updateCategoryKeywordsUseCaseInstance = updateCategoryKeywordsUseCase;
+const updatePocketKeywordsUseCaseInstance = updatePocketKeywordsUseCase;
 const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
@@ -448,7 +448,7 @@ export const useBudgetStore = defineStore("budget", () => {
   async function updateKeywords(categoryId, keywords) {
     isLoadingPockets.value = true;
     errorPockets.value = null;
-    const result = await updateCategoryKeywordsUseCaseInstance.execute(categoryId, keywords);
+    const result = await updatePocketKeywordsUseCaseInstance.execute(categoryId, keywords);
     isLoadingPockets.value = false;
 
     if (result.right) {
