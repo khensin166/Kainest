@@ -85,6 +85,23 @@ export const useBudgetStore = defineStore("budget", () => {
   const expenseCategories = computed(() =>
     categoriesList.value.filter((c) => c.type === "EXPENSE")
   );
+  const incomeCategories = computed(() =>
+    categoriesList.value.filter((c) => c.type === "INCOME")
+  );
+
+  // GETTERS BARU UNTUK INCOME & MoM
+  const totalIncome = computed(
+    () => summaryData.value?.totals?.income || 0
+  );
+  const momSpent = computed(
+    () => summaryData.value?.totals?.mom?.spent ?? null
+  );
+  const momIncome = computed(
+    () => summaryData.value?.totals?.mom?.income ?? null
+  );
+  const totalSpent = computed(
+    () => summaryData.value?.totals?.spent || 0
+  );
 
   // GETTER BARU: Mengubah data entity menjadi format siap pakai untuk Chart.js
   const chartDataCollection = computed(() => {
@@ -510,6 +527,11 @@ export const useBudgetStore = defineStore("budget", () => {
     hasData,
     chartDataCollection,
     expenseCategories,
+    incomeCategories,
+    totalIncome,
+    totalSpent,
+    momSpent,
+    momIncome,
     groupedTransactions,
     currentPage,
     totalPages,
