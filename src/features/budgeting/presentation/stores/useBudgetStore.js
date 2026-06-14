@@ -48,6 +48,7 @@ export const useBudgetStore = defineStore("budget", () => {
   const summaryData = ref(null);
   const isLoadingSummary = ref(false);
   const errorSummary = ref(null);
+  const typeFilter = ref("ALL"); 
   const isTransactionSubmitting = ref(false);
   const categoriesList = ref([]); // Menyimpan array CategoryEntity
   const isLoadingCategories = ref(false); // Status loading dropdown
@@ -292,7 +293,7 @@ export const useBudgetStore = defineStore("budget", () => {
    * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
    */
   async function fetchTransactions(params = {}, forceRefresh = false) {
-    const finalParams = { page: 1, limit: 10, ...params };
+    const finalParams = { page: 1, limit: 10, type: typeFilter.value, ...params };
 
     // Validasi Cache:
     // Gunakan cache hanya jika:
@@ -508,6 +509,7 @@ export const useBudgetStore = defineStore("budget", () => {
     transactionsMeta,
     isLoadingTransactions,
     isDeletingTransactionId,
+    typeFilter,
 
     // Pocket State
     pocketsList,
