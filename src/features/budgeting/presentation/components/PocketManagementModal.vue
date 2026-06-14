@@ -286,7 +286,7 @@ onMounted(async () => {
       limitType: p.percentage != null ? 'percentage' : 'nominal',
       percentage: p.percentage || null,
       limitAmount: p.limitAmount || null,
-      keywordsInput: (p.category?.keywords || []).join(', ')
+      keywordsInput: (p.keywords?.length ? p.keywords : p.category?.keywords || []).join(', ')
     }));
   } else {
     addPocket();

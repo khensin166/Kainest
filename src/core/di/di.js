@@ -33,7 +33,7 @@ import { GetPocketsUseCase } from "../../features/budgeting/domain/use-cases/Get
 import { UpsertPocketUseCase } from "../../features/budgeting/domain/use-cases/UpsertPocketUseCase";
 import { DeletePocketUseCase } from "../../features/budgeting/domain/use-cases/DeletePocketUseCase";
 import { BulkSetupPocketsUseCase } from "../../features/budgeting/domain/use-cases/BulkSetupPocketsUseCase";
-import { UpdateCategoryKeywordsUseCase } from "../../features/budgeting/domain/use-cases/UpdateCategoryKeywordsUseCase";
+import { UpdatePocketKeywordsUseCase } from "../../features/budgeting/domain/use-cases/UpdatePocketKeywordsUseCase";
 import { ClassifyTransactionUseCase } from "../../features/budgeting/domain/use-cases/ClassifyTransactionUseCase";
 import { GetMonthlyHistoryUseCase } from "../../features/budgeting/domain/use-cases/GetMonthlyHistoryUseCase";
 
@@ -95,7 +95,7 @@ export const getPocketsUseCase = new GetPocketsUseCase(budgetRepository);
 export const upsertPocketUseCase = new UpsertPocketUseCase(budgetRepository);
 export const deletePocketUseCase = new DeletePocketUseCase(budgetRepository);
 export const bulkSetupPocketsUseCase = new BulkSetupPocketsUseCase(budgetRepository);
-export const updateCategoryKeywordsUseCase = new UpdateCategoryKeywordsUseCase(budgetRepository);
+export const updatePocketKeywordsUseCase = new UpdatePocketKeywordsUseCase(budgetRepository);
 export const classifyTransactionUseCase = new ClassifyTransactionUseCase(budgetRepository);
 export const getMonthlyHistoryUseCase = new GetMonthlyHistoryUseCase(budgetRepository);
 
