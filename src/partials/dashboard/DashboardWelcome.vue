@@ -33,7 +33,22 @@
         </div>
         <p v-if="!loadingStats" class="text-lg font-bold text-gray-900 dark:text-white" :class="stat.valueClass || ''">{{ stat.value }}</p>
         <div v-else class="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse w-3/4"></div>
-        <p class="text-xs mt-1" :class="stat.changeColor">{{ stat.change }}</p>
+        <!-- MoM Badge -->
+        <div class="mt-2 flex items-center gap-1">
+          <template v-if="stat.mom !== null && stat.mom !== undefined">
+            <span class="inline-flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-md"
+              :class="(
+                stat.momInvert
+                  ? (stat.mom > 0 ? 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30' : 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30')
+                  : (stat.mom >= 0 ? 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30' : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30')
+              )">
+              <component :is="stat.mom >= 0 ? ArrowTrendingUpIcon : ArrowTrendingDownIcon" class="w-3 h-3" />
+              {{ stat.mom > 0 ? '+' : '' }}{{ stat.mom }}%
+            </span>
+            <span class="text-[10px] text-gray-400 dark:text-gray-500">vs bln lalu</span>
+          </template>
+          <span v-else class="text-[10px] text-gray-400 dark:text-gray-500">{{ stat.change }}</span>
+        </div>
         <p v-if="stat.tooltip" class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 leading-tight italic">{{ stat.tooltip }}</p>
       </div>
     </div>
@@ -59,7 +74,7 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
-import { PlusIcon, ChartBarIcon, BanknotesIcon, ArrowTrendingDownIcon, SparklesIcon, PlusCircleIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, ChartBarIcon, BanknotesIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon, SparklesIcon, PlusCircleIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
 import { formatRupiah } from '@/utils/Utils';
 
@@ -80,6 +95,9 @@ const todayLabel = computed(() => {
 });
 
 
+// Helper: ambil nilai MoM dari response summary
+const mom = computed(() => summaryData.value?.data?.totals?.mom ?? {});
+
 const stats = computed(() => [
   {
     label: 'Total Pengeluaran Bulan Ini',
@@ -89,6 +107,8 @@ const stats = computed(() => [
     iconBg: 'bg-red-50 dark:bg-red-900/20',
     iconColor: 'text-red-500',
     changeColor: 'text-gray-400 dark:text-gray-500',
+    mom: mom.value.spent,
+    momInvert: true, // Pengeluaran naik = Merah (buruk)
   },
   {
     label: 'Gaji Utama',
@@ -98,6 +118,8 @@ const stats = computed(() => [
     iconBg: 'bg-green-50 dark:bg-green-900/20',
     iconColor: 'text-green-500',
     changeColor: 'text-gray-400 dark:text-gray-500',
+    mom: mom.value.limit,
+    momInvert: false,
   },
   {
     label: 'Sisa Gaji Pokok',
@@ -107,10 +129,12 @@ const stats = computed(() => [
     iconBg: 'bg-violet-50 dark:bg-violet-900/20',
     iconColor: 'text-violet-500',
     changeColor: 'text-gray-400 dark:text-gray-500',
+    mom: mom.value.remaining,
+    momInvert: false,
   },
   {
     label: 'Pemasukan Tambahan',
-    value: formatRupiah(summaryData.value?.data?.totals?.additionalIncome ?? summaryData.value?.data?.totals?.income ?? 0),
+    value: formatRupiah(summaryData.value?.data?.totals?.additionalIncome ?? 0),
     change: 'Uang ekstra bulan ini',
     icon: PlusCircleIcon,
     iconBg: 'bg-violet-100 dark:bg-violet-900/30',
@@ -120,6 +144,8 @@ const stats = computed(() => [
     labelClass: 'text-violet-600 dark:text-violet-400',
     valueClass: 'text-violet-700 dark:text-violet-300',
     tooltip: 'Di luar gaji pokok. Opsional untuk dialokasikan ke kantong.',
+    mom: mom.value.additionalIncome,
+    momInvert: false,
   },
 ]);
 

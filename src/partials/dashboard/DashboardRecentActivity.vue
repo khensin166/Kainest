@@ -84,13 +84,14 @@ const activities = computed(() =>
     id: t.id,
     title: t.note || t.category?.name || 'Transaksi',
     time: formatRelative(t.createdAt),
-    amount: formatRupiah(t.amount),
-    amountColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-green-500',
+    amount: (t.type === 'INCOME' ? '+ ' : '- ') + formatRupiah(t.amount),
+    amountColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-emerald-500',
     icon: t.type === 'EXPENSE' ? ArrowDownIcon : ArrowUpIcon,
-    iconBg: t.type === 'EXPENSE' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20',
-    iconColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-green-500',
+    iconBg: t.type === 'EXPENSE' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20',
+    iconColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-emerald-500',
   }))
 );
+
 
 onMounted(async () => {
   if (!hasBudgeting.value) {

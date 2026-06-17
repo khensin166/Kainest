@@ -95,15 +95,10 @@ export const useBudgetStore = defineStore("budget", () => {
     () => summaryData.value?.totals?.additionalIncome ?? summaryData.value?.totals?.income ?? 0
   );
 
-  const momSpent = computed(
-    () => summaryData.value?.totals?.mom?.spent ?? null
-  );
-  const momIncome = computed(
-    () => summaryData.value?.totals?.mom?.income ?? null
-  );
-  const totalSpent = computed(
-    () => summaryData.value?.totals?.spent || 0
-  );
+  const momSpent = computed(() => summaryData.value?.totals?.mom?.spent ?? null);
+  const momIncome = computed(() => summaryData.value?.totals?.mom?.additionalIncome ?? summaryData.value?.totals?.mom?.income ?? null);
+  const totalSpent = computed(() => summaryData.value?.totals?.spent || 0);
+
 
   // GETTER BARU: Mengubah data entity menjadi format siap pakai untuk Chart.js
   const chartDataCollection = computed(() => {
