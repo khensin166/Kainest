@@ -92,8 +92,9 @@ export const useBudgetStore = defineStore("budget", () => {
 
   // GETTERS BARU UNTUK INCOME & MoM
   const totalIncome = computed(
-    () => summaryData.value?.totals?.income || 0
+    () => summaryData.value?.totals?.additionalIncome ?? summaryData.value?.totals?.income ?? 0
   );
+
   const momSpent = computed(
     () => summaryData.value?.totals?.mom?.spent ?? null
   );

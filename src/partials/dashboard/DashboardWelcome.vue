@@ -21,20 +21,23 @@
     </div>
 
     <!-- Quick Stats (hanya jika punya akses budgeting) -->
-    <div v-if="hasBudgeting" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div v-if="hasBudgeting" class="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <div v-for="stat in stats" :key="stat.label"
-        class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+        class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow"
+        :class="stat.cardClass || ''">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ stat.label }}</span>
+          <span class="text-xs font-medium" :class="stat.labelClass || 'text-gray-500 dark:text-gray-400'">{{ stat.label }}</span>
           <div :class="['w-8 h-8 rounded-xl flex items-center justify-center', stat.iconBg]">
             <component :is="stat.icon" :class="['w-4 h-4', stat.iconColor]" />
           </div>
         </div>
-        <p v-if="!loadingStats" class="text-lg font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
+        <p v-if="!loadingStats" class="text-lg font-bold text-gray-900 dark:text-white" :class="stat.valueClass || ''">{{ stat.value }}</p>
         <div v-else class="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse w-3/4"></div>
         <p class="text-xs mt-1" :class="stat.changeColor">{{ stat.change }}</p>
+        <p v-if="stat.tooltip" class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 leading-tight italic">{{ stat.tooltip }}</p>
       </div>
     </div>
+
 
     <!-- Onboarding card jika belum ada budgeting -->
     <div v-else
@@ -56,7 +59,7 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
-import { PlusIcon, ChartBarIcon, BanknotesIcon, ArrowTrendingDownIcon, SparklesIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, ChartBarIcon, BanknotesIcon, ArrowTrendingDownIcon, SparklesIcon, PlusCircleIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
 import { formatRupiah } from '@/utils/Utils';
 
@@ -88,8 +91,8 @@ const stats = computed(() => [
     changeColor: 'text-gray-400 dark:text-gray-500',
   },
   {
-    label: 'Total Anggaran',
-    value: formatRupiah(summaryData.value?.data?.totals?.limit ?? 0),
+    label: 'Gaji Utama',
+    value: formatRupiah(summaryData.value?.data?.salary ?? 0),
     change: 'Dari gaji bulan ini',
     icon: BanknotesIcon,
     iconBg: 'bg-green-50 dark:bg-green-900/20',
@@ -97,7 +100,7 @@ const stats = computed(() => [
     changeColor: 'text-gray-400 dark:text-gray-500',
   },
   {
-    label: 'Sisa Anggaran',
+    label: 'Sisa Gaji Pokok',
     value: formatRupiah(summaryData.value?.data?.totals?.remaining ?? 0),
     change: 'Sampai akhir bulan',
     icon: SparklesIcon,
@@ -105,7 +108,21 @@ const stats = computed(() => [
     iconColor: 'text-violet-500',
     changeColor: 'text-gray-400 dark:text-gray-500',
   },
+  {
+    label: 'Pemasukan Tambahan',
+    value: formatRupiah(summaryData.value?.data?.totals?.additionalIncome ?? summaryData.value?.data?.totals?.income ?? 0),
+    change: 'Uang ekstra bulan ini',
+    icon: PlusCircleIcon,
+    iconBg: 'bg-violet-100 dark:bg-violet-900/30',
+    iconColor: 'text-violet-600 dark:text-violet-400',
+    changeColor: 'text-violet-400 dark:text-violet-500',
+    cardClass: 'border-violet-200 dark:border-violet-800/50 bg-violet-50/50 dark:bg-violet-900/10',
+    labelClass: 'text-violet-600 dark:text-violet-400',
+    valueClass: 'text-violet-700 dark:text-violet-300',
+    tooltip: 'Di luar gaji pokok. Opsional untuk dialokasikan ke kantong.',
+  },
 ]);
+
 
 onMounted(async () => {
   if (!hasBudgeting.value) {

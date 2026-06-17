@@ -19,10 +19,14 @@ const props = defineProps({
 // Definisi event yang bisa dikirim ke parent
 const emit = defineEmits(['edit', 'delete']);
 
-// Helper Formatter
-const formattedAmount = computed(() => 
-  formatRupiah(props.transaction.amount)
+// Helper untuk prefix tanda dan warna berdasarkan tipe transaksi
+const amountPrefix = computed(() => props.transaction.type === 'INCOME' ? '+' : '-');
+const amountColorClass = computed(() =>
+  props.transaction.type === 'INCOME'
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : 'text-red-600 dark:text-red-400'
 );
+
 
 const formattedDate = computed(() => {
   if (!props.transaction.date) return '-';
@@ -53,9 +57,10 @@ const formattedDate = computed(() => {
       </div>
 
       <div class="flex flex-col items-end ml-4 flex-shrink-0">
-        <span class="text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mb-2">
-          - {{ formattedAmount }}
+        <span class="text-base sm:text-lg font-bold mb-2" :class="amountColorClass">
+          {{ amountPrefix }} {{ formatRupiah(transaction.amount) }}
         </span>
+
         
         <div class="flex space-x-2">
           <button 
