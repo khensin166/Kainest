@@ -188,6 +188,8 @@ Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang terse
 | 19 | **Restrukturisasi Layout Dashboard & Sistem Update** | Memindahkan komponen *Aktivitas Terbaru* ke kolom utama agar fokus UI lebih dominan ke finansial. Komponen *System Updates* dan *User Feedback* kini ditarik secara dinamis via API (tidak di-hardcode lagi). |
 | 20 | **Integrasi Notifikasi Interaktif** | `DropdownNotifications.vue` di-update untuk mengambil notifikasi dari backend, mem-parsing format tanggal *relative* (seperti "2 jam lalu"), dan mendukung aksi mark-as-read yang langsung disinkronisasi ke server. |
 | 21 | **Isolasi Keywords Kantong** | Memindahkan logika penyimpanan dan pembaruan `keywords` AI dari `BudgetCategory` ke `BudgetPocket`. Endpoint, Store, Repository, dan Modal (*PocketManagementModal*) di-update agar pengguna bisa mengkustomisasi referensi AI untuk kantong masing-masing tanpa berdampak global. |
+| 22 | **Pemasukan Tambahan & UI Transaksi (+/-)** | Implementasi prefiks nominal `+ Rp` (Hijau/INCOME) dan `- Rp` (Merah/EXPENSE) secara konsisten pada komponen `TransactionItem.vue` dan `DashboardRecentActivity.vue`. |
+| 23 | **Redesain Dashboard Quick Stats & MoM Badge** | Relabeling "Total Anggaran" menjadi "Gaji Utama", dan "Sisa Anggaran" menjadi "Sisa Gaji Pokok". Penambahan kartu ke-4 "Pemasukan Tambahan" berwarna violet. Mengimplementasikan Lencana Persentase (MoM Badge) dinamis di bawah setiap kartu untuk memvisualisasikan persentase naik/turun bulan lalu dengan pewarnaan responsif (pengeluaran naik = merah, sisa naik = hijau). |
 ---
 
 ## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)

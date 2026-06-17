@@ -97,6 +97,8 @@ export const useBudgetStore = defineStore("budget", () => {
 
   const momSpent = computed(() => summaryData.value?.totals?.mom?.spent ?? null);
   const momIncome = computed(() => summaryData.value?.totals?.mom?.additionalIncome ?? summaryData.value?.totals?.mom?.income ?? null);
+  const momLimit = computed(() => summaryData.value?.totals?.mom?.limit ?? null);
+  const momRemaining = computed(() => summaryData.value?.totals?.mom?.remaining ?? null);
   const totalSpent = computed(() => summaryData.value?.totals?.spent || 0);
 
 
@@ -530,6 +532,8 @@ export const useBudgetStore = defineStore("budget", () => {
     totalSpent,
     momSpent,
     momIncome,
+    momLimit,
+    momRemaining,
     groupedTransactions,
     currentPage,
     totalPages,

@@ -128,44 +128,46 @@ onActivated(async () => {
           Alokasikan dan pantau keuangan Anda ke berbagai kantong agar pengeluaran terkendali.
         </p>
       </div>
-      <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+      <div class="flex flex-col sm:flex-row w-full sm:w-auto justify-start sm:justify-end gap-3">
 
-        <Tooltip bg="dark" size="md" position="bottom">
+        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
           <template #trigger>
             <button @click="isSetupModalOpen = true"
-              class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+              class="w-full justify-center btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
               <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
                 <path
                   d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
               </svg>
-              <span class="hidden xs:block">Atur Pemasukan</span>
+              <span>Atur Pemasukan</span>
             </button>
           </template>
           <div class="text-sm">Tetapkan total gajimu bulan ini untuk dibagi ke dalam kantong.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="bottom">
+        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
           <template #trigger>
-            <button @click="openPocketModal" class="btn border-gray-200 dark:border-gray-700 font-medium transition-all"
+            <button @click="openPocketModal"
+              class="w-full justify-center btn border-gray-200 dark:border-gray-700 font-medium transition-all"
               :class="budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/30 shadow-lg animate-pulse border-transparent' : 'bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500'">
               <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
                 <path
                   d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
               </svg>
-              <span class="hidden xs:block">Kelola Kantong</span>
+              <span>Kelola Kantong</span>
             </button>
           </template>
           <div class="text-sm">Buat, edit, atau hapus kategori kantong persentase/nominal.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="bottom">
+        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
           <template #trigger>
-            <button @click="openTransactionModal" class="btn bg-violet-600 hover:bg-violet-700 text-white">
+            <button @click="openTransactionModal"
+              class="w-full justify-center btn bg-violet-600 hover:bg-violet-700 text-white">
               <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                 <path
                   d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
               </svg>
-              <span class="hidden xs:block ml-2">Catat Pengeluaran</span>
+              <span class="ml-2">Catat Pengeluaran</span>
             </button>
           </template>
           <div class="text-sm">Input transaksi secara manual jika tidak menggunakan WaBot.</div>
@@ -187,16 +189,11 @@ onActivated(async () => {
 
     <div v-else-if="budgetStore.hasData" class="grid grid-cols-12 gap-6">
 
-      <BudgetHeroCard 
-        :totalRemaining="budgetStore.totalRemaining" 
-        :unallocated="budgetStore.unallocatedBudget"
-        :monthName="budgetStore.currentPeriodMonth" 
-        :trendData="budgetStore.chartDataCollection" 
-        :totalIncome="budgetStore.totalIncome"
-        :totalSpent="budgetStore.totalSpent"
-        :momIncome="budgetStore.momIncome"
-        :momSpent="budgetStore.momSpent"
-      />
+      <BudgetHeroCard :totalRemaining="budgetStore.totalRemaining" :unallocated="budgetStore.unallocatedBudget"
+        :monthName="budgetStore.currentPeriodMonth" :trendData="budgetStore.chartDataCollection"
+        :totalSalary="budgetStore.salary" :totalIncome="budgetStore.totalIncome" :totalSpent="budgetStore.totalSpent"
+        :momSalary="budgetStore.momLimit" :momIncome="budgetStore.momIncome" :momSpent="budgetStore.momSpent"
+        :momRemaining="budgetStore.momRemaining" />
 
       <div
         class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">

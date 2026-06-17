@@ -8,6 +8,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  totalSalary: {
+    type: Number,
+    default: 0,
+  },
   totalIncome: {
     type: Number,
     default: 0,
@@ -16,11 +20,19 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  momSalary: {
+    type: Number,
+    default: null,
+  },
   momIncome: {
     type: Number,
     default: null,
   },
   momSpent: {
+    type: Number,
+    default: null,
+  },
+  momRemaining: {
     type: Number,
     default: null,
   },
@@ -54,88 +66,83 @@ const props = defineProps({
         Periode: {{ monthName }}
       </div>
 
-      <div class="flex flex-col gap-3 flex-1 justify-between">
+      <div class="flex flex-col gap-4 flex-1">
         
-        <!-- Pemasukan -->
-        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50/30 dark:from-green-900/30 dark:to-emerald-900/10 rounded-xl border border-green-100/50 dark:border-green-800/30 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-          <div class="flex items-center gap-3">
-             <div class="p-2.5 bg-green-100 dark:bg-green-800/80 rounded-lg text-green-600 dark:text-green-300 shadow-inner">
-               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-             </div>
-             <div>
-                <div class="text-[11px] font-bold text-green-800/70 dark:text-green-400/80 uppercase tracking-widest mb-0.5">Pemasukan</div>
-                <div class="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight leading-none">{{ formatCurrency(totalIncome) }}</div>
-             </div>
+        <!-- Sisa Kantong (Hero Number) -->
+        <div class="flex flex-col items-center justify-center p-6 bg-gray-50/80 dark:bg-gray-900/50 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-inner text-center">
+          <div class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 flex items-center justify-center gap-2">
+            Sisa Gaji Pokok
           </div>
-          <div class="text-right flex flex-col items-end justify-center group relative">
-             <div v-if="momIncome !== null" 
-                  class="text-xs font-bold flex items-center cursor-help px-2 py-1 rounded-md transition-colors" 
-                  :class="momIncome >= 0 ? 'text-green-600 bg-green-100/50 dark:text-green-400 dark:bg-green-900/30' : 'text-red-500 bg-red-100/50 dark:text-red-400 dark:bg-red-900/30'"
-                  data-tip="((Bulan Ini - Bulan Lalu) / Bulan Lalu) × 100%">
-               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="momIncome >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-               {{ Math.abs(momIncome) }}%
-             </div>
-             <div v-else class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Bulan lalu kosong</div>
-
-             <!-- Tooltip (Custom without daisyUI to guarantee it works gracefully) -->
-             <div class="absolute bottom-full right-0 mb-2 w-max opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-               <div class="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-medium py-1.5 px-3 rounded-md shadow-xl">
-                 Rumus: ((Bulan Ini - Bulan Lalu) / Bulan Lalu) × 100%
-                 <div class="absolute -bottom-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-100 transform rotate-45"></div>
-               </div>
-             </div>
+          <div class="text-3xl sm:text-4xl font-black text-gray-800 dark:text-gray-100 tracking-tight leading-none mb-3">
+            {{ formatCurrency(totalRemaining) }}
+          </div>
+          
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <!-- MoM Badge for Remaining -->
+            <div v-if="momRemaining !== null" 
+                 class="text-xs font-bold flex items-center cursor-help px-2 py-1 rounded-md transition-colors shadow-sm" 
+                 :class="momRemaining >= 0 ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/40 border border-green-200 dark:border-green-800/50' : 'text-red-500 bg-red-100 dark:text-red-400 dark:bg-red-900/40 border border-red-200 dark:border-red-800/50'"
+                 data-tip="MoM Sisa Gaji Pokok">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="momRemaining >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
+              {{ Math.abs(momRemaining) }}% vs bulan lalu
+            </div>
+            
+            <!-- Unallocated Info -->
+            <div v-if="unallocated > 0" class="text-xs font-bold flex items-center px-2 py-1 rounded-md text-amber-700 bg-amber-100 dark:text-amber-400 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-800/50 shadow-sm">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+              {{ formatCurrency(unallocated) }} belum dialokasikan
+            </div>
           </div>
         </div>
 
-        <!-- Pengeluaran -->
-        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-rose-50 to-red-50/30 dark:from-rose-900/30 dark:to-red-900/10 rounded-xl border border-red-100/50 dark:border-red-800/30 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-          <div class="flex items-center gap-3">
-             <div class="p-2.5 bg-red-100 dark:bg-red-800/80 rounded-lg text-red-600 dark:text-red-300 shadow-inner">
-               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-             </div>
-             <div>
-                <div class="text-[11px] font-bold text-red-800/70 dark:text-red-400/80 uppercase tracking-widest mb-0.5">Pengeluaran</div>
-                <div class="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight leading-none">{{ formatCurrency(totalSpent) }}</div>
-             </div>
-          </div>
-          <div class="text-right flex flex-col items-end justify-center group relative">
-             <div v-if="momSpent !== null" 
-                  class="text-xs font-bold flex items-center cursor-help px-2 py-1 rounded-md transition-colors" 
-                  :class="momSpent <= 0 ? 'text-green-600 bg-green-100/50 dark:text-green-400 dark:bg-green-900/30' : 'text-red-500 bg-red-100/50 dark:text-red-400 dark:bg-red-900/30'"
-                  data-tip="((Bulan Ini - Bulan Lalu) / Bulan Lalu) × 100%">
-               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="momSpent >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-               {{ Math.abs(momSpent) }}%
-             </div>
-             <div v-else class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Bulan lalu kosong</div>
-
-             <!-- Tooltip (Custom) -->
-             <div class="absolute bottom-full right-0 mb-2 w-max opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-               <div class="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-medium py-1.5 px-3 rounded-md shadow-xl">
-                 Rumus: ((Bulan Ini - Bulan Lalu) / Bulan Lalu) × 100%
-                 <div class="absolute -bottom-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-100 transform rotate-45"></div>
-               </div>
-             </div>
-          </div>
-        </div>
-
-        <!-- Sisa Uang -->
-        <div class="flex items-center justify-between p-4 bg-gray-50/80 dark:bg-gray-900/50 rounded-xl border border-gray-200/60 dark:border-gray-700/60 transition-all hover:shadow-md hover:-translate-y-0.5">
-          <div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest mb-0.5">Sisa Kantong</div>
-              <div class="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tight leading-none">{{ formatCurrency(totalRemaining) }}</div>
-          </div>
-          <!-- Unallocated Info -->
-          <div v-if="unallocated > 0" class="flex flex-col items-end text-amber-600 dark:text-amber-400">
-              <div class="flex items-center gap-1 mb-1 opacity-90">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Sisa Gaji (Unallocated)</span>
+        <!-- 3-Column Grid for Secondary Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          <!-- Gaji Utama -->
+          <div class="flex flex-col p-3 bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-900/20 dark:to-blue-900/10 rounded-lg border border-indigo-100/50 dark:border-indigo-800/30 transition-all hover:shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="p-1.5 bg-indigo-100 dark:bg-indigo-800/60 rounded text-indigo-600 dark:text-indigo-300">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
-              <span class="text-sm font-bold bg-amber-100 dark:bg-amber-900/40 px-2.5 py-0.5 rounded-md">{{ formatCurrency(unallocated) }}</span>
+              <div class="text-[10px] font-bold text-indigo-800/70 dark:text-indigo-400/80 uppercase tracking-wider">Gaji Utama</div>
+            </div>
+            <div class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1">{{ formatCurrency(totalSalary) }}</div>
+            <div v-if="momSalary !== null" class="text-[10px] font-bold flex items-center" :class="momSalary >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+              <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSalary >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
+              {{ Math.abs(momSalary) }}%
+            </div>
           </div>
-          <div v-else-if="unallocated === 0 && totalRemaining >= 0" class="flex flex-col items-end text-emerald-600 dark:text-emerald-400 opacity-80">
-              <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-right max-w-[100px] leading-tight">Semua gaji telah dialokasikan</span>
+
+          <!-- Pemasukan Tambahan -->
+          <div class="flex flex-col p-3 bg-gradient-to-br from-violet-50/50 to-fuchsia-50/30 dark:from-violet-900/20 dark:to-fuchsia-900/10 rounded-lg border border-violet-100/50 dark:border-violet-800/30 transition-all hover:shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="p-1.5 bg-violet-100 dark:bg-violet-800/60 rounded text-violet-600 dark:text-violet-300">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+              </div>
+              <div class="text-[10px] font-bold text-violet-800/70 dark:text-violet-400/80 uppercase tracking-wider">Tambahan</div>
+            </div>
+            <div class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1">{{ formatCurrency(totalIncome) }}</div>
+            <div v-if="momIncome !== null" class="text-[10px] font-bold flex items-center" :class="momIncome >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+              <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momIncome >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
+              {{ Math.abs(momIncome) }}%
+            </div>
           </div>
+
+          <!-- Pengeluaran -->
+          <div class="flex flex-col p-3 bg-gradient-to-br from-rose-50/50 to-red-50/30 dark:from-rose-900/20 dark:to-red-900/10 rounded-lg border border-red-100/50 dark:border-red-800/30 transition-all hover:shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="p-1.5 bg-red-100 dark:bg-red-800/60 rounded text-red-600 dark:text-red-300">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+              </div>
+              <div class="text-[10px] font-bold text-red-800/70 dark:text-red-400/80 uppercase tracking-wider">Pengeluaran</div>
+            </div>
+            <div class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1">{{ formatCurrency(totalSpent) }}</div>
+            <div v-if="momSpent !== null" class="text-[10px] font-bold flex items-center" :class="momSpent <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+              <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSpent >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
+              {{ Math.abs(momSpent) }}%
+            </div>
+          </div>
+
         </div>
 
       </div>
