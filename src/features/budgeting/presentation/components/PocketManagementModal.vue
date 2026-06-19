@@ -1,5 +1,5 @@
 <template>
-  <div class="px-5 py-4 w-full max-h-[85vh] overflow-y-auto">
+  <div class="px-5 py-4 w-full max-h-[85vh] overflow-y-auto" ref="scrollContainer" @scroll="handleScroll">
     <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6">
       Kelola "Kantong" (Pocket) Pengeluaran Anda. Tentukan batas persentase atau nominal untuk tiap kategori.
     </div>
@@ -185,47 +185,72 @@
     </form>
 
     <!-- ====================================================== -->
-    <!-- STICKY FLOATING FOOTER — Always visible above keyboard  -->
+    <!-- FLOATING ACTION BUTTON (FAB) - Visible when NOT at bottom -->
     <!-- ====================================================== -->
-    <div class="sticky bottom-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 px-5 py-3 flex justify-between items-center gap-3 -mx-5 mt-4">
-      <!-- Batal: icon-only on mobile, text on desktop -->
-      <button type="button"
-        @click="$emit('close')"
-        :disabled="isSubmitting"
-        class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50">
-        <!-- Cross icon -->
-        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-        <span class="hidden sm:inline text-sm font-medium">Batal</span>
-      </button>
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-8 scale-90"
+      enter-to-class="opacity-100 translate-y-0 scale-100"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0 scale-100"
+      leave-to-class="opacity-0 translate-y-8 scale-90"
+    >
+      <div v-show="!isScrolledToBottom" class="fixed right-5 bottom-8 z-[60] flex items-center gap-2 pb-[env(safe-area-inset-bottom)] sm:hidden">
+        <!-- Batal FAB -->
+        <button type="button"
+          @click="$emit('close')"
+          :disabled="isSubmitting"
+          class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
 
-      <!-- Info text (only on mobile) -->
-      <span v-if="totalPercentage > 100" class="sm:hidden text-xs text-red-500 font-medium text-center flex-1">Persentase melebihi 100%!</span>
-      <span v-else-if="!hasChanges" class="sm:hidden text-xs text-gray-400 font-medium text-center flex-1">Belum ada perubahan</span>
-      <span v-else class="sm:hidden text-xs text-violet-600 font-medium text-center flex-1">Ada perubahan — siap disimpan</span>
+        <!-- Simpan FAB -->
+        <button
+          type="button"
+          @click="handleSubmit"
+          :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
+          class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400' : 'bg-violet-600 hover:bg-violet-700'">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </button>
+      </div>
+    </Transition>
 
-      <!-- Info text (only on desktop) -->
-      <span class="hidden sm:block text-xs text-gray-400 flex-1 text-center">
-        <span v-if="totalPercentage > 100" class="text-red-500">⚠ Total persentase melebihi 100%</span>
-        <span v-else-if="!hasChanges">Belum ada perubahan yang perlu disimpan</span>
-        <span v-else class="text-violet-600">✓ Ada perubahan siap disimpan</span>
-      </span>
+    <!-- ====================================================== -->
+    <!-- STATIC FOOTER - Visible completely when scrolled to bottom -->
+    <!-- ====================================================== -->
+    <div class="mt-6 flex flex-col sm:flex-row justify-end items-center gap-3 pt-5 border-t border-gray-200 dark:border-gray-700">
+      
+      <!-- Info text (Ada perubahan atau melebihi 100%) -->
+      <div class="w-full sm:w-auto flex-1 text-center sm:text-left mb-2 sm:mb-0">
+        <span v-if="totalPercentage > 100" class="text-xs text-red-500 font-medium">⚠ Total persentase melebihi 100%</span>
+        <span v-else-if="!hasChanges" class="text-xs text-gray-400 font-medium">Belum ada perubahan yang perlu disimpan</span>
+        <span v-else class="text-xs text-violet-600 font-medium">✓ Ada perubahan — siap disimpan</span>
+      </div>
 
-      <!-- Simpan Kantong: icon + text -->  
-      <button
-        form="pocket-form"
-        type="button"
-        @click="handleSubmit"
-        :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
-        class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400' : 'bg-violet-600 hover:bg-violet-700'">
-        <!-- Checkmark icon -->
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-        </svg>
-        <span class="hidden sm:inline text-sm">{{ isSubmitting ? 'Menyimpan...' : 'Simpan Kantong' }}</span>
-      </button>
+      <div class="flex w-full sm:w-auto gap-3">
+        <!-- Batal -->
+        <button type="button"
+          @click="$emit('close')"
+          :disabled="isSubmitting"
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 font-medium text-sm">
+          Batal
+        </button>
+
+        <!-- Simpan -->
+        <button
+          type="button"
+          @click="handleSubmit"
+          :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
+          class="flex-[2] sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400' : 'bg-violet-600 hover:bg-violet-700'">
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan Kantong' }}
+        </button>
+      </div>
     </div>
 
     <!-- ===================================================== -->
@@ -269,7 +294,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineEmits } from 'vue';
+import { ref, computed, onMounted, defineEmits, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
@@ -297,6 +322,19 @@ const newCategoryName = ref('');
 const newCategoryIcon = ref('');
 const isCreatingCategory = ref(false);
 const categoryFormError = ref('');
+
+// ==========================================
+// Scroll Detection untuk Floating Action Button
+// ==========================================
+const scrollContainer = ref(null);
+const isScrolledToBottom = ref(false);
+
+const handleScroll = () => {
+  if (!scrollContainer.value) return;
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value;
+  // Threshold of 20px to consider it at the bottom
+  isScrolledToBottom.value = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 20;
+};
 
 // ==========================================
 // State untuk dialog konfirmasi ganti kategori
@@ -344,6 +382,11 @@ onMounted(async () => {
   initialPocketsState.value = JSON.stringify(pocketsData.value);
 
   isLoadingCategories.value = false;
+
+  // Cek scroll setelah DOM diupdate dengan list awal
+  nextTick(() => {
+    handleScroll();
+  });
 });
 
 const availableCategories = computed(() => budgetStore.categoriesList || []);
