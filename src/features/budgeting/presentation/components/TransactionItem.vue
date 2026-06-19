@@ -20,12 +20,16 @@ const props = defineProps({
 const emit = defineEmits(['edit', 'delete']);
 
 // Helper untuk prefix tanda dan warna berdasarkan tipe transaksi
-const amountPrefix = computed(() => props.transaction.type === 'INCOME' ? '+' : '-');
-const amountColorClass = computed(() =>
-  props.transaction.type === 'INCOME'
-    ? 'text-emerald-600 dark:text-emerald-400'
-    : 'text-red-600 dark:text-red-400'
-);
+const amountPrefix = computed(() => {
+  const type = props.transaction.type || props.transaction.category?.type;
+  return type === 'INCOME' ? '+' : '-';
+});
+const amountColorClass = computed(() => {
+  const type = props.transaction.type || props.transaction.category?.type;
+  return type === 'INCOME'
+    ? 'text-green-600 dark:text-green-400'
+    : 'text-red-600 dark:text-red-400';
+});
 
 
 const formattedDate = computed(() => {

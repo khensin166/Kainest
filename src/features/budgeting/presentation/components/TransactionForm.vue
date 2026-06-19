@@ -53,7 +53,7 @@ watch(() => formData.type, (newType, oldType) => {
 // Fungsi untuk mengisi form dari data awal
 const populateForm = () => {
   if (isEditMode.value) {
-    formData.type = props.initialData.type || "EXPENSE";
+    formData.type = props.initialData.type || props.initialData.category?.type || "EXPENSE";
     formData.amount = props.initialData.amount;
 
     const targetCategoryId = props.initialData.categoryId || props.initialData.category?.id;
@@ -96,6 +96,15 @@ onMounted(() => {
   budgetStore.fetchAllCategories();
   populateForm();
 });
+
+// FIX LIFECYCLE: Saat modal dibuka ulang untuk edit transaksi berbeda,
+// onMounted TIDAK dipanggil lagi. Watch ini memastikan form selalu
+// mengisi ulang dirinya ketika initialData berubah (transaksi baru diklik).
+watch(() => props.initialData, (newData) => {
+  if (newData) {
+    populateForm();
+  }
+}, { deep: true });
 
 // Computed untuk validasi sederhana
 const isFormValid = computed(() => {

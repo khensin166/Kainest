@@ -106,12 +106,21 @@ export const useBudgetStore = defineStore("budget", () => {
   const chartDataCollection = computed(() => {
     if (trendDataList.value.length === 0) return null;
 
+    // Agregasi (Group by) berdasarkan labelDay agar tidak ada tanggal ganda
+    const aggregated = {};
+    trendDataList.value.forEach((item) => {
+      if (!aggregated[item.labelDay]) {
+        aggregated[item.labelDay] = 0;
+      }
+      aggregated[item.labelDay] += item.amount;
+    });
+
     return {
-      labels: trendDataList.value.map((item) => item.labelDay),
+      labels: Object.keys(aggregated),
       datasets: [
         {
           label: "Realisasi Pengeluaran",
-          data: trendDataList.value.map((item) => item.amount),
+          data: Object.values(aggregated),
           borderColor: "#10B981", // Tailwind green-500
           backgroundColor: "rgba(16, 185, 129, 0.1)",
           tension: 0.3,
@@ -263,6 +272,7 @@ export const useBudgetStore = defineStore("budget", () => {
     if (result.right) {
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -355,6 +365,7 @@ export const useBudgetStore = defineStore("budget", () => {
       if (transactionsMeta.value?.currentPage) {
         fetchTransactions({ page: transactionsMeta.value.currentPage }, true);
       }
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -374,6 +385,7 @@ export const useBudgetStore = defineStore("budget", () => {
     if (result.right) {
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };

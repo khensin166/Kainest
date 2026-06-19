@@ -58,6 +58,7 @@ export const BudgetMapper = {
       amount: apiTransaction.amount,
       note: apiTransaction.note,
       date: apiTransaction.date,
+      type: apiTransaction.type || apiTransaction.category?.type || 'EXPENSE',
       categoryId: apiTransaction.categoryId,
       categoryName: apiTransaction.category?.name,
       categoryIcon: apiTransaction.category?.icon,
