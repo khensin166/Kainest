@@ -211,7 +211,7 @@ const handleSubmit = async () => {
       </label>
       <textarea id="note" v-model="formData.note" rows="2"
         class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm placeholder-gray-400"
-        placeholder="Contoh: Makan siang nasi padang..."></textarea>
+        :placeholder="formData.type === 'INCOME' ? 'Contoh: Bonus proyek sampingan, uang saku ekstra...' : 'Contoh: Beli makan siang nasi padang...'"></textarea>
     </div>
 
     <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">

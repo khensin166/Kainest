@@ -128,30 +128,32 @@ onActivated(async () => {
           Alokasikan dan pantau keuangan Anda ke berbagai kantong agar pengeluaran terkendali.
         </p>
       </div>
-      <div class="flex flex-col sm:flex-row w-full sm:w-auto justify-start sm:justify-end gap-3">
+      <!-- Action Buttons: icon-only for Atur Gaji on mobile, flex-1 for others -->
+      <div class="flex flex-row w-full sm:w-auto justify-start sm:justify-end gap-2">
 
-        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
+        <!-- Atur Gaji: icon-only on mobile, icon+text on desktop -->
+        <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
             <button @click="isSetupModalOpen = true"
-              class="w-full justify-center btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
-              <svg class="w-4 h-4 fill-current text-gray-500 dark:text-gray-400 mr-2" viewBox="0 0 16 16">
-                <path
-                  d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v3c0 .6.4 1 1 1h3c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-3-3zM2.6 13.4l-1-1 7.3-7.3 1 1-7.3 7.3z" />
+              class="shrink-0 btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium px-3">
+              <svg class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span>Atur Pemasukan</span>
+              <span class="hidden sm:inline ml-2">Atur Gaji</span>
             </button>
           </template>
           <div class="text-sm">Tetapkan total gajimu bulan ini untuk dibagi ke dalam kantong.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
+        <!-- Kelola Kantong: flex-1 on mobile -->
+        <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
           <template #trigger>
             <button @click="openPocketModal"
               class="w-full justify-center btn border-gray-200 dark:border-gray-700 font-medium transition-all"
               :class="budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/30 shadow-lg animate-pulse border-transparent' : 'bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500'">
-              <svg class="w-4 h-4 fill-current mr-2" viewBox="0 0 24 24">
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+              <!-- Wallet Icon -->
+              <svg class="w-4 h-4 shrink-0 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
               </svg>
               <span>Kelola Kantong</span>
             </button>
@@ -159,18 +161,18 @@ onActivated(async () => {
           <div class="text-sm">Buat, edit, atau hapus kategori kantong persentase/nominal.</div>
         </Tooltip>
 
-        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto [&>div:first-child]:w-full">
+        <!-- Catat Transaksi: flex-1 on mobile -->
+        <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
           <template #trigger>
             <button @click="openTransactionModal"
               class="w-full justify-center btn bg-violet-600 hover:bg-violet-700 text-white">
-              <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
-                <path
-                  d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+              <svg class="w-4 h-4 fill-current opacity-75 shrink-0" viewBox="0 0 16 16">
+                <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
               </svg>
-              <span class="ml-2">Catat Pengeluaran</span>
+              <span class="ml-2">Catat Transaksi</span>
             </button>
           </template>
-          <div class="text-sm">Input transaksi secara manual jika tidak menggunakan WaBot.</div>
+          <div class="text-sm">Input transaksi (pengeluaran/pemasukan tambahan) secara manual.</div>
         </Tooltip>
 
       </div>
@@ -232,7 +234,7 @@ onActivated(async () => {
 
       <BaseModal :isOpen="isTransactionModalOpen" @close="closeTransactionModal" size="md" :hideFooter="true">
         <template #header>
-          {{ selectedTransactionId ? 'Edit Transaksi' : 'Catat Pengeluaran Baru' }}
+          {{ selectedTransactionId ? 'Edit Transaksi' : 'Catat Transaksi Baru' }}
         </template>
         <template #body>
           <TransactionForm :initialData="selectedTransactionToEdit" :transactionId="selectedTransactionId" />

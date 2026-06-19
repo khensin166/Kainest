@@ -27,7 +27,9 @@
           class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/60 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
         >
           <span class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-            ⚡ Rekomendasi Blueprint Cepat
+            <span class="animate-pulse text-yellow-500">⚡</span>
+            Rekomendasi Blueprint Cepat
+            <span class="ml-1 inline-flex h-2 w-2 rounded-full bg-violet-500 animate-ping opacity-75"></span>
           </span>
           <svg
             class="w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -60,6 +62,47 @@
             </div>
           </div>
         </Transition>
+      </div>
+
+      <!-- Action Buttons moved to TOP (above pocket list) -->
+      <div class="mb-4 flex flex-col sm:flex-row gap-2">
+        <button type="button" @click="addPocket" class="flex-1 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-violet-500 hover:text-violet-600 transition-all flex items-center justify-center gap-2 font-medium text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Tambah Kantong Baru
+        </button>
+        <button v-if="!showNewCategoryForm" type="button" @click="showNewCategoryForm = true; categoryFormError = ''" class="flex-1 py-2.5 border-2 border-dashed border-violet-300 dark:border-violet-700 rounded-xl text-violet-500 hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all flex items-center justify-center gap-2 font-medium text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+          Buat Kategori Kustom
+        </button>
+      </div>
+
+      <!-- Custom Category Inline Form (at top, appears when active) -->
+      <div v-if="showNewCategoryForm" class="mb-4 p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/20">
+        <h4 class="text-sm font-semibold text-violet-800 dark:text-violet-300 mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+          Buat Kategori Kustom
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Nama Kategori <span class="text-red-500">*</span></label>
+            <input v-model="newCategoryName" type="text" class="form-input w-full text-sm rounded-lg" placeholder="cth: Uang Kucing" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Ikon (Emoji) <span class="text-red-500">*</span></label>
+            <input v-model="newCategoryIcon" type="text" class="form-input w-full text-sm rounded-lg text-center" placeholder="cth: 😺" maxlength="2" />
+          </div>
+        </div>
+        <!-- Validation Error Message -->
+        <p v-if="categoryFormError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          {{ categoryFormError }}
+        </p>
+        <div class="flex justify-end gap-2 mt-3">
+          <button type="button" @click="showNewCategoryForm = false; categoryFormError = ''" class="text-xs px-3 py-1.5 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Batal</button>
+          <button type="button" @click="submitNewCategory" class="text-xs px-3 py-1.5 bg-violet-600 text-white hover:bg-violet-700 rounded-lg transition-colors" :disabled="isCreatingCategory">
+            {{ isCreatingCategory ? 'Menyimpan...' : 'Simpan Kategori' }}
+          </button>
+        </div>
       </div>
 
       <div class="space-y-6">
@@ -135,51 +178,55 @@
             </div>
           </div>
 
-          <button type="button" @click="addPocket" class="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-violet-500 hover:text-violet-600 transition-colors flex items-center justify-center gap-2 font-medium">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Kantong Baru
-          </button>
-
-          <!-- Custom Category Form -->
-          <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-            <button v-if="!showNewCategoryForm" type="button" @click="showNewCategoryForm = true" class="text-sm font-medium text-violet-600 hover:text-violet-700 flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-              Buat Kategori Kustom Sendiri
-            </button>
-
-            <div v-else class="p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/20">
-              <h4 class="text-sm font-medium text-violet-800 dark:text-violet-300 mb-3">Buat Kategori Kustom</h4>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="sm:col-span-2">
-                  <label class="block text-xs font-medium text-gray-500 mb-1">Nama Kategori</label>
-                  <input v-model="newCategoryName" type="text" class="form-input w-full text-sm rounded-lg" placeholder="Misal: Uang Kucing" />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1">Ikon (Emoji)</label>
-                  <input v-model="newCategoryIcon" type="text" class="form-input w-full text-sm rounded-lg text-center" placeholder="🐱" maxlength="2" />
-                </div>
-              </div>
-              <div class="flex justify-end gap-2 mt-3">
-                <button type="button" @click="showNewCategoryForm = false" class="text-xs px-3 py-1.5 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Batal</button>
-                <button type="button" @click="submitNewCategory" class="text-xs px-3 py-1.5 bg-violet-600 text-white hover:bg-violet-700 rounded-lg transition-colors" :disabled="isCreatingCategory || !newCategoryName || !newCategoryIcon">
-                  {{ isCreatingCategory ? 'Menyimpan...' : 'Simpan Kategori' }}
-                </button>
-              </div>
-            </div>
-          </div>
+          <!-- (buttons moved to top, pocket list ends here) -->
         </template>
       </div>
 
-      <div class="mt-8 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 pt-4">
-        <button type="button" class="btn bg-white dark:bg-gray-800 border-gray-200 text-gray-600" @click="$emit('close')" :disabled="isSubmitting">
-          Batal
-        </button>
-        <button type="submit" class="btn text-white transition-colors" :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700'" :disabled="isSubmitting || totalPercentage > 100 || !hasChanges">
-          <span v-if="isSubmitting">Menyimpan...</span>
-          <span v-else>Simpan Kantong</span>
-        </button>
-      </div>
     </form>
+
+    <!-- ====================================================== -->
+    <!-- STICKY FLOATING FOOTER — Always visible above keyboard  -->
+    <!-- ====================================================== -->
+    <div class="sticky bottom-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 px-5 py-3 flex justify-between items-center gap-3 -mx-5 mt-4">
+      <!-- Batal: icon-only on mobile, text on desktop -->
+      <button type="button"
+        @click="$emit('close')"
+        :disabled="isSubmitting"
+        class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50">
+        <!-- Cross icon -->
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        <span class="hidden sm:inline text-sm font-medium">Batal</span>
+      </button>
+
+      <!-- Info text (only on mobile) -->
+      <span v-if="totalPercentage > 100" class="sm:hidden text-xs text-red-500 font-medium text-center flex-1">Persentase melebihi 100%!</span>
+      <span v-else-if="!hasChanges" class="sm:hidden text-xs text-gray-400 font-medium text-center flex-1">Belum ada perubahan</span>
+      <span v-else class="sm:hidden text-xs text-violet-600 font-medium text-center flex-1">Ada perubahan — siap disimpan</span>
+
+      <!-- Info text (only on desktop) -->
+      <span class="hidden sm:block text-xs text-gray-400 flex-1 text-center">
+        <span v-if="totalPercentage > 100" class="text-red-500">⚠ Total persentase melebihi 100%</span>
+        <span v-else-if="!hasChanges">Belum ada perubahan yang perlu disimpan</span>
+        <span v-else class="text-violet-600">✓ Ada perubahan siap disimpan</span>
+      </span>
+
+      <!-- Simpan Kantong: icon + text -->  
+      <button
+        form="pocket-form"
+        type="button"
+        @click="handleSubmit"
+        :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
+        class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-gray-400' : 'bg-violet-600 hover:bg-violet-700'">
+        <!-- Checkmark icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span class="hidden sm:inline text-sm">{{ isSubmitting ? 'Menyimpan...' : 'Simpan Kantong' }}</span>
+      </button>
+    </div>
 
     <!-- ===================================================== -->
     <!-- KONFIRMASI GANTI KATEGORI — Menggunakan BaseModal -->
@@ -249,6 +296,7 @@ const showNewCategoryForm = ref(false);
 const newCategoryName = ref('');
 const newCategoryIcon = ref('');
 const isCreatingCategory = ref(false);
+const categoryFormError = ref('');
 
 // ==========================================
 // State untuk dialog konfirmasi ganti kategori
@@ -422,7 +470,20 @@ const applyBlueprint = (type) => {
 // ==========================================
 
 const submitNewCategory = async () => {
-  if (!newCategoryName.value || !newCategoryIcon.value) return;
+  // Validasi dengan error message
+  if (!newCategoryName.value && !newCategoryIcon.value) {
+    categoryFormError.value = 'Nama kategori dan ikon wajib diisi terlebih dahulu.';
+    return;
+  }
+  if (!newCategoryName.value) {
+    categoryFormError.value = 'Nama kategori wajib diisi.';
+    return;
+  }
+  if (!newCategoryIcon.value) {
+    categoryFormError.value = 'Ikon (emoji) wajib diisi. Contoh: 😺';
+    return;
+  }
+  categoryFormError.value = '';
 
   isCreatingCategory.value = true;
   const result = await budgetStore.createCategory(newCategoryName.value, newCategoryIcon.value);
@@ -433,6 +494,7 @@ const submitNewCategory = async () => {
     showNewCategoryForm.value = false;
     newCategoryName.value = '';
     newCategoryIcon.value = '';
+    categoryFormError.value = '';
     pocketsData.value.push({
       categoryId: result.data.id,
       limitType: 'percentage',
