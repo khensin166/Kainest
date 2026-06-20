@@ -69,7 +69,8 @@ export const useProfileStore = defineStore("profile", () => {
       throw new Error(message);
     } else {
       // BERHASIL! Update data user di authStore
-      authStore.setUser(result.right); // result.right adalah ProfileEntity baru
+      // Gabungkan data agar permissions & role dari session sebelumnya tidak hilang
+      authStore.setUser({ ...authStore.user, ...result.right }); 
       modalStore.openModal({
         newTitle: "Berhasil",
         newMessage: "Profil Anda telah diperbarui.",
@@ -98,7 +99,8 @@ export const useProfileStore = defineStore("profile", () => {
       throw new Error(message);
     } else {
       // BERHASIL! Update data user di authStore
-      authStore.setUser(result.right); // result.right adalah ProfileEntity baru
+      // Gabungkan data agar permissions & role dari session sebelumnya tidak hilang
+      authStore.setUser({ ...authStore.user, ...result.right }); 
       modalStore.openModal({
         newTitle: "Berhasil",
         newMessage: "Foto profil telah diperbarui.",
