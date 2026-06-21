@@ -52,7 +52,8 @@ export const useBudgetStore = defineStore("budget", () => {
   const isTransactionSubmitting = ref(false);
   const categoriesList = ref([]); // Menyimpan array CategoryEntity
   const isLoadingCategories = ref(false); // Status loading dropdown
-  const trendDataList = ref([]); // Menyimpan array TrendDataEntity penuh satu bulan
+  const expenseTrendData = ref([]); // Tren pengeluaran harian bulan ini
+  const incomeTrendData = ref([]);  // Tren pemasukan harian bulan ini
   const isLoadingTrend = ref(false);
   const transactionsList = ref([]); // Array TransactionEntity
   const transactionsMeta = ref(null); // Object pagination { currentPage, totalPages, ... }
@@ -104,30 +105,48 @@ export const useBudgetStore = defineStore("budget", () => {
 
   // GETTER BARU: Mengubah data entity menjadi format siap pakai untuk Chart.js
   const chartDataCollection = computed(() => {
-    if (trendDataList.value.length === 0) return null;
+    const hasExpense = expenseTrendData.value.length > 0;
+    const hasIncome = incomeTrendData.value.length > 0;
+    if (!hasExpense && !hasIncome) return null;
 
-    // Agregasi (Group by) berdasarkan labelDay agar tidak ada tanggal ganda
-    const aggregated = {};
-    trendDataList.value.forEach((item) => {
-      if (!aggregated[item.labelDay]) {
-        aggregated[item.labelDay] = 0;
-      }
-      aggregated[item.labelDay] += item.amount;
-    });
+    // Gabungkan semua label tanggal dari kedua dataset
+    const allDates = new Set([
+      ...expenseTrendData.value.map(d => d.date),
+      ...incomeTrendData.value.map(d => d.date),
+    ]);
+    const labels = [...allDates].sort();
 
-    return {
-      labels: Object.keys(aggregated),
-      datasets: [
-        {
-          label: "Realisasi Pengeluaran",
-          data: Object.values(aggregated),
-          borderColor: "#10B981", // Tailwind green-500
-          backgroundColor: "rgba(16, 185, 129, 0.1)",
-          tension: 0.3,
-          fill: true,
-        },
-      ],
-    };
+    // Buat lookup maps untuk mempercepat pencarian
+    const expenseMap = Object.fromEntries(expenseTrendData.value.map(d => [d.date, d.total]));
+    const incomeMap = Object.fromEntries(incomeTrendData.value.map(d => [d.date, d.total]));
+
+    const datasets = [];
+
+    if (hasExpense) {
+      datasets.push({
+        label: "Pengeluaran",
+        data: labels.map(d => expenseMap[d] || 0),
+        borderColor: "#ef4444",        // Merah
+        backgroundColor: "rgba(239, 68, 68, 0.1)",
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: "#ef4444",
+      });
+    }
+
+    if (hasIncome) {
+      datasets.push({
+        label: "Pemasukan",
+        data: labels.map(d => incomeMap[d] || 0),
+        borderColor: "#22c55e",        // Hijau
+        backgroundColor: "rgba(34, 197, 94, 0.08)",
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: "#22c55e",
+      });
+    }
+
+    return { labels, datasets };
   });
 
   // GETTER BARU: Mengelompokkan transaksi berdasarkan tanggal untuk UI "Recent Activity"
@@ -253,7 +272,8 @@ export const useBudgetStore = defineStore("budget", () => {
     const result = await getSpendingTrendUseCaseInstance.execute();
 
     if (result.right) {
-      trendDataList.value = result.right;
+      expenseTrendData.value = result.right.expenseTrend || [];
+      incomeTrendData.value = result.right.incomeTrend || [];
     } else {
       console.error("❌ Gagal memuat data grafik:", result.left?.message);
     }
@@ -510,7 +530,8 @@ export const useBudgetStore = defineStore("budget", () => {
     summaryData,
     isLoadingSummary,
     errorSummary,
-    trendDataList,
+    expenseTrendData,
+    incomeTrendData,
     isLoadingTrend,
     categoriesList,
     isLoadingCategories,
