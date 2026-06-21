@@ -27,7 +27,14 @@ const modalStore = useModalStore();
 const dateRange = ref(null);
 const limitPerPage = ref(10);
 const searchQuery = ref('');
+const typeFilter = ref('ALL');
 const isFilterExpanded = ref(false);
+
+const typeOptions = [
+  { label: 'Semua Tipe', value: 'ALL' },
+  { label: 'Pemasukan', value: 'INCOME' },
+  { label: 'Pengeluaran', value: 'EXPENSE' },
+];
 
 // Opsi untuk dropdown limit
 const limitOptions = [
@@ -58,7 +65,8 @@ const loadTransactions = (page = 1, force = false) => {
     limit: limitPerPage.value,
     startDate: startDate,
     endDate: endDate,
-    search: searchQuery.value
+    search: searchQuery.value,
+    type: typeFilter.value
   }, force);
 };
 
@@ -78,22 +86,12 @@ const isFilterActive = computed(() => {
   const hasDateFilter = dateRange.value !== null && dateRange.value.length > 0;
   const hasLimitFilter = limitPerPage.value !== 10;
   const hasSearchFilter = searchQuery.value.trim() !== '';
+  const hasTypeFilter = typeFilter.value !== 'ALL';
 
-  // Return true jika salah satu kondisi terpenuhi
-  return hasDateFilter || hasLimitFilter || hasSearchFilter;
+  return hasDateFilter || hasLimitFilter || hasSearchFilter || hasTypeFilter;
 });
 
-
-// 🔥 3. UBAH WATCHER 🔥
-// Jangan watch 'dateRange' langsung, tapi watch 'dateRangeStable'
-watch([dateRangeStable, limitPerPage, searchQuery], ([newDateStr, newLimit], [oldDateStr, oldLimit]) => {
-  // Logika debugging bisa kita sederhanakan sekarang karena pemicunya sudah stabil
-  console.log("🔍 Watcher Filter Stabil Terpanggil");
-  console.log("🔍 Filter/Search berubah. Memuat ulang data...");
-  console.log(`Date berubah: ${oldDateStr !== newDateStr}`);
-  console.log(`Limit berubah: ${oldLimit !== newLimit}`);
-
-  // Panggil fungsi debounced
+watch([dateRangeStable, limitPerPage, searchQuery, typeFilter], () => {
   debouncedLoadTransactions();
 });
 
@@ -101,6 +99,7 @@ const clearFilters = () => {
   dateRange.value = null;
   limitPerPage.value = 10;
   searchQuery.value = '';
+  typeFilter.value = 'ALL';
 };
 
 const nextPage = () => { if (budgetStore.hasNextPage) loadTransactions(budgetStore.currentPage + 1); };
@@ -237,6 +236,12 @@ onActivated(() => {
               </div>
             </div>
             
+            <!-- Tipe Transaksi -->
+            <div class="w-full">
+              <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Tipe Transaksi</label>
+              <DropdownSelect :wFull="true" label="Pilih Tipe" :options="typeOptions" v-model="typeFilter" />
+            </div>
+
             <!-- Rentang Tanggal -->
             <div class="w-full">
               <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Rentang Tanggal</label>
@@ -245,7 +250,7 @@ onActivated(() => {
 
             <!-- Tampilkan -->
             <div class="w-full">
-              <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Tampilkan</label>
+              <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Tampilkan Data</label>
               <DropdownSelect :wFull="true" label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
             </div>
 

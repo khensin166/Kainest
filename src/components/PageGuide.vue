@@ -30,26 +30,34 @@
         <!-- Perhatikan min-h-[350px] dan h-auto agar konten panjang tidak terpotong -->
         <div class="relative overflow-hidden w-full min-h-[350px] h-auto flex flex-col justify-between mt-2">
           
-          <!-- Slide Content -->
-          <transition name="slide-fade" mode="out-in">
-            <div :key="currentStep" class="flex flex-col items-center text-center px-4 pt-4 pb-6">
+          <!-- Slide Content (Swipeable Native CSS Carousel) -->
+          <div 
+            ref="sliderRef"
+            class="flex overflow-x-auto snap-x snap-mandatory w-full no-scrollbar"
+            @scroll="handleSliderScroll"
+          >
+            <div 
+              v-for="(step, index) in steps" 
+              :key="index" 
+              class="w-full shrink-0 snap-center flex flex-col items-center text-center px-4 pt-4 pb-6"
+            >
               <!-- Icon/Emoji Besar -->
               <div class="w-24 h-24 shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-5xl mb-6 shadow-inner animate-bounce-slow">
-                {{ steps[currentStep].emoji }}
+                {{ step.emoji }}
               </div>
               
               <!-- Judul -->
               <h4 class="text-xl font-extrabold text-gray-900 dark:text-white mb-3">
-                {{ steps[currentStep].title }}
+                {{ step.title }}
               </h4>
               
               <!-- Deskripsi dengan v-html agar bisa support tag HTML seperti <strong> jika diperlukan -->
               <div 
                 class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed space-y-2 text-left w-full px-2"
-                v-html="steps[currentStep].desc"
+                v-html="step.desc"
               ></div>
             </div>
-          </transition>
+          </div>
 
           <!-- Navigation & Pagination -->
           <div class="flex flex-col items-center mt-auto w-full space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700/60">
@@ -105,17 +113,43 @@ const props = defineProps({
 
 const isOpen = ref(false);
 const currentStep = ref(0);
+const sliderRef = ref(null);
+
+const handleSliderScroll = () => {
+  if (!sliderRef.value) return;
+  const scrollLeft = sliderRef.value.scrollLeft;
+  const width = sliderRef.value.clientWidth;
+  if (width === 0) return;
+  
+  // Calculate current step based on scroll position (round to nearest step)
+  const newStep = Math.round(scrollLeft / width);
+  if (newStep !== currentStep.value) {
+    currentStep.value = newStep;
+  }
+};
 
 const handleClose = () => {
   isOpen.value = false;
   setTimeout(() => {
     currentStep.value = 0;
+    if (sliderRef.value) {
+      sliderRef.value.scrollTo({ left: 0 });
+    }
   }, 300);
+};
+
+const scrollToStep = (index) => {
+  if (!sliderRef.value) return;
+  const width = sliderRef.value.clientWidth;
+  sliderRef.value.scrollTo({
+    left: index * width,
+    behavior: 'smooth'
+  });
 };
 
 const nextStep = () => {
   if (currentStep.value < props.steps.length - 1) {
-    currentStep.value++;
+    scrollToStep(currentStep.value + 1);
   } else {
     handleClose();
   }
@@ -123,31 +157,25 @@ const nextStep = () => {
 
 const prevStep = () => {
   if (currentStep.value > 0) {
-    currentStep.value--;
+    scrollToStep(currentStep.value - 1);
   }
 };
 
 const setStep = (index) => {
-  currentStep.value = index;
+  scrollToStep(index);
 };
 </script>
 
 <style scoped>
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.slide-fade-leave-active {
-  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from {
-  transform: translateX(20px);
-  opacity: 0;
-}
-.slide-fade-leave-to {
-  transform: translateX(-20px);
-  opacity: 0;
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .animate-bounce-slow {

@@ -48,6 +48,7 @@ export const useBudgetStore = defineStore("budget", () => {
   const summaryData = ref(null);
   const isLoadingSummary = ref(false);
   const errorSummary = ref(null);
+  const typeFilter = ref("ALL"); 
   const isTransactionSubmitting = ref(false);
   const categoriesList = ref([]); // Menyimpan array CategoryEntity
   const isLoadingCategories = ref(false); // Status loading dropdown
@@ -85,17 +86,41 @@ export const useBudgetStore = defineStore("budget", () => {
   const expenseCategories = computed(() =>
     categoriesList.value.filter((c) => c.type === "EXPENSE")
   );
+  const incomeCategories = computed(() =>
+    categoriesList.value.filter((c) => c.type === "INCOME")
+  );
+
+  // GETTERS BARU UNTUK INCOME & MoM
+  const totalIncome = computed(
+    () => summaryData.value?.totals?.additionalIncome ?? summaryData.value?.totals?.income ?? 0
+  );
+
+  const momSpent = computed(() => summaryData.value?.totals?.mom?.spent ?? null);
+  const momIncome = computed(() => summaryData.value?.totals?.mom?.additionalIncome ?? summaryData.value?.totals?.mom?.income ?? null);
+  const momLimit = computed(() => summaryData.value?.totals?.mom?.limit ?? null);
+  const momRemaining = computed(() => summaryData.value?.totals?.mom?.remaining ?? null);
+  const totalSpent = computed(() => summaryData.value?.totals?.spent || 0);
+
 
   // GETTER BARU: Mengubah data entity menjadi format siap pakai untuk Chart.js
   const chartDataCollection = computed(() => {
     if (trendDataList.value.length === 0) return null;
 
+    // Agregasi (Group by) berdasarkan labelDay agar tidak ada tanggal ganda
+    const aggregated = {};
+    trendDataList.value.forEach((item) => {
+      if (!aggregated[item.labelDay]) {
+        aggregated[item.labelDay] = 0;
+      }
+      aggregated[item.labelDay] += item.amount;
+    });
+
     return {
-      labels: trendDataList.value.map((item) => item.labelDay),
+      labels: Object.keys(aggregated),
       datasets: [
         {
           label: "Realisasi Pengeluaran",
-          data: trendDataList.value.map((item) => item.amount),
+          data: Object.values(aggregated),
           borderColor: "#10B981", // Tailwind green-500
           backgroundColor: "rgba(16, 185, 129, 0.1)",
           tension: 0.3,
@@ -247,6 +272,7 @@ export const useBudgetStore = defineStore("budget", () => {
     if (result.right) {
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -275,7 +301,7 @@ export const useBudgetStore = defineStore("budget", () => {
    * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
    */
   async function fetchTransactions(params = {}, forceRefresh = false) {
-    const finalParams = { page: 1, limit: 10, ...params };
+    const finalParams = { page: 1, limit: 10, type: typeFilter.value, ...params };
 
     // Validasi Cache:
     // Gunakan cache hanya jika:
@@ -339,6 +365,7 @@ export const useBudgetStore = defineStore("budget", () => {
       if (transactionsMeta.value?.currentPage) {
         fetchTransactions({ page: transactionsMeta.value.currentPage }, true);
       }
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -358,6 +385,7 @@ export const useBudgetStore = defineStore("budget", () => {
     if (result.right) {
       fetchDashboardSummary();
       fetchTransactions({ page: 1 }, true);
+      fetchMonthlyHistory();
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
@@ -491,6 +519,7 @@ export const useBudgetStore = defineStore("budget", () => {
     transactionsMeta,
     isLoadingTransactions,
     isDeletingTransactionId,
+    typeFilter,
 
     // Pocket State
     pocketsList,
@@ -510,6 +539,13 @@ export const useBudgetStore = defineStore("budget", () => {
     hasData,
     chartDataCollection,
     expenseCategories,
+    incomeCategories,
+    totalIncome,
+    totalSpent,
+    momSpent,
+    momIncome,
+    momLimit,
+    momRemaining,
     groupedTransactions,
     currentPage,
     totalPages,

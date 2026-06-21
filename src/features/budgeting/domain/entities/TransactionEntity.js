@@ -1,12 +1,13 @@
 export class TransactionEntity {
-  constructor({ id, amount, note, date, categoryName, categoryIcon, categoryId }) {
+  constructor({ id, amount, note, date, categoryName, categoryIcon, categoryId, type }) {
     this.id = id;
     this.amount = amount;
     this.note = note || "-";
+    this.type = type || "EXPENSE"; // 'INCOME' | 'EXPENSE'
     this.categoryId = categoryId;
     this.date = date ? new Date(date) : new Date();
     this.categoryName = categoryName || "Unknown";
-    this.categoryIcon = categoryIcon || "🏷️";
+    this.categoryIcon = categoryIcon || "💸";
   }
 
   // Helper untuk format tanggal (Opsional, bisa juga pakai library kayak date-fns di UI)
