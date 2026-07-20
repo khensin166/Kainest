@@ -57,12 +57,23 @@ const closeSetupModal = async (payload) => {
   if (payload && payload.refresh) {
     console.log("🔄 Me-refresh Dashboard secara background setelah modal setup tertutup...");
     await budgetStore.fetchDashboardSummary();
+    // Juga ambil data kantong terbaru agar cek onboarding akurat
+    await budgetStore.fetchPockets();
   }
 
   if (isSetupForced.value) {
     checkAndForceSetup();
   }
+
+  // 🌟 Onboarding Seamless: Jika gaji sudah diisi tapi belum ada kantong sama sekali,
+  // langsung buka PocketManagementModal agar user tidak perlu mencari tombolnya.
+  if (budgetStore.salary > 0 && budgetStore.pocketsList.length === 0) {
+    console.log("🎯 Onboarding: Gaji terisi tapi kantong masih kosong. Buka Pocket Modal otomatis...");
+    await nextTick();
+    isPocketModalOpen.value = true;
+  }
 };
+
 
 const checkAndForceSetup = () => {
   // Jika data sudah diload dan salary masih 0, force setup!

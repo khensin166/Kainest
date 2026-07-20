@@ -4,6 +4,20 @@
       Kelola "Kantong" (Pocket) Pengeluaran Anda. Tentukan batas persentase atau nominal untuk tiap kategori.
     </div>
 
+    <!-- 🌟 Onboarding Banner: Tampil hanya saat kantong masih kosong -->
+    <div v-if="isOnboarding" class="mb-5 p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/30 dark:to-purple-900/20">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl mt-0.5">👋</span>
+        <div>
+          <p class="text-sm font-semibold text-violet-800 dark:text-violet-300">Selamat datang! Ayo buat kantong keuangan pertamamu</p>
+          <p class="text-xs text-violet-600 dark:text-violet-400 mt-1 leading-relaxed">
+            Gunakan <strong>⚡ Blueprint Cepat</strong> untuk menerapkan template instan, atau tekan
+            <strong>+ Tambah Kantong Baru</strong> untuk membuat secara custom sesuai kebutuhanmu.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Alert / Summary Info -->
     <div class="mb-6 p-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
       <div class="flex items-center justify-between">
@@ -310,7 +324,7 @@ const pocketsData = ref([]);
 // Loading state untuk keseluruhan modal
 const isLoadingCategories = ref(true);
 
-// Blueprint section collapsible
+// Blueprint section collapsible — auto-expand saat pertama buka jika onboarding
 const isBlueprintExpanded = ref(false);
 
 // Submitting state (terpisah dari isLoadingPockets agar tidak memicu re-render parent)
@@ -376,6 +390,8 @@ onMounted(async () => {
     }));
   } else {
     addPocket();
+    // Auto-expand blueprint saat onboarding (belum ada kantong)
+    isBlueprintExpanded.value = true;
   }
 
   // Simpan state awal setelah dimuat untuk referensi deteksi perubahan
@@ -390,6 +406,9 @@ onMounted(async () => {
 });
 
 const availableCategories = computed(() => budgetStore.categoriesList || []);
+
+// Computed: true jika user belum punya kantong sama sekali (mode onboarding)
+const isOnboarding = computed(() => budgetStore.pocketsList.length === 0);
 
 const addPocket = () => {
   pocketsData.value.push({
@@ -441,8 +460,14 @@ const onCategoryChange = (index, newCategoryId) => {
   const oldId = pocket.categoryId;
 
   // Jika belum ada kategori sebelumnya, langsung set (tidak perlu konfirmasi)
+  // Sekaligus auto-fill keywords dari kategori yang dipilih
   if (!oldId) {
     pocketsData.value[index].categoryId = newCategoryId;
+    // Auto-fill keywordsInput dari kategori master
+    const cat = availableCategories.value.find(c => c.id === newCategoryId);
+    if (cat?.keywords?.length && !pocketsData.value[index].keywordsInput) {
+      pocketsData.value[index].keywordsInput = cat.keywords.join(', ');
+    }
     return;
   }
 
@@ -477,6 +502,13 @@ const cancelCategoryChange = () => {
 const applyBlueprint = (type) => {
   pocketsData.value = [];
 
+  const buildPocket = (catId, percent) => {
+    // Ambil keywords dari master kategori untuk auto-fill
+    const cat = availableCategories.value.find(c => c.id === catId);
+    const kw = cat?.keywords?.length ? cat.keywords.join(', ') : '';
+    return { categoryId: catId, limitType: 'percentage', percentage: percent, limitAmount: null, keywordsInput: kw };
+  };
+
   if (type === '503020') {
     const plan = [
       { names: ['makan', 'food'], percent: 25 },
@@ -488,9 +520,9 @@ const applyBlueprint = (type) => {
     ];
     plan.forEach(item => {
       const catId = findCategoryByName(item.names);
-      if (catId) pocketsData.value.push({ categoryId: catId, limitType: 'percentage', percentage: item.percent, limitAmount: null, keywordsInput: '' });
+      if (catId) pocketsData.value.push(buildPocket(catId, item.percent));
     });
-    toast.success("Blueprint 50-30-20 diterapkan!");
+    toast.success('Blueprint 50-30-20 diterapkan!');
   } else if (type === 'hemat') {
     const plan = [
       { names: ['makan', 'food'], percent: 40 },
@@ -500,9 +532,9 @@ const applyBlueprint = (type) => {
     ];
     plan.forEach(item => {
       const catId = findCategoryByName(item.names);
-      if (catId) pocketsData.value.push({ categoryId: catId, limitType: 'percentage', percentage: item.percent, limitAmount: null, keywordsInput: '' });
+      if (catId) pocketsData.value.push(buildPocket(catId, item.percent));
     });
-    toast.success("Blueprint Mahasiswa Hemat diterapkan!");
+    toast.success('Blueprint Mahasiswa Hemat diterapkan!');
   }
 
   if (pocketsData.value.length === 0) addPocket();
