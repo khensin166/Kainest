@@ -214,7 +214,7 @@ onActivated(async () => {
             </div>
           </div>
 
-          <div v-else-if="budgetStore.chartDataCollection" class="h-72">
+          <div v-else-if="budgetStore.chartDataCollection" class="h-72 relative w-full">
             <SpendingTrendChart :chartData="budgetStore.chartDataCollection" />
           </div>
 

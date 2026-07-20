@@ -128,6 +128,7 @@ export const useBudgetStore = defineStore("budget", () => {
         data: labels.map(d => expenseMap[d] || 0),
         borderColor: "#ef4444",        // Merah
         backgroundColor: "rgba(239, 68, 68, 0.1)",
+        borderWidth: 2,
         tension: 0.3,
         fill: true,
         pointBackgroundColor: "#ef4444",
@@ -140,6 +141,7 @@ export const useBudgetStore = defineStore("budget", () => {
         data: labels.map(d => incomeMap[d] || 0),
         borderColor: "#22c55e",        // Hijau
         backgroundColor: "rgba(34, 197, 94, 0.08)",
+        borderWidth: 2,
         tension: 0.3,
         fill: true,
         pointBackgroundColor: "#22c55e",
