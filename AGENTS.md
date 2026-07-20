@@ -1,205 +1,176 @@
-# 🤖 Kainest Frontend — Software Requirements Specification (SRS) & Agent Guidelines
+# Kainest Project - Agent Handoff Notes
 
-Dokumen ini mendefinisikan spesifikasi kebutuhan perangkat lunak (SRS), arsitektur, standar UI/UX, manajemen state, perubahan sistem terbaru, serta rencana pengembangan masa depan untuk **Kainest Frontend**. Dokumen ini bersifat _living document_ dan ditujukan bagi pengembang serta AI Agent yang bekerja pada repositori ini.
+## Status Terkini (03 Juni 2026)
+- **Frontend (Kainest Vue 3):**
+  - Menggunakan UI/UX modern (vibrant colors, glassmorphism, blob animation).
+  - Auth flow (Login, Register, Forgot Password, Reset Password) sudah terkoneksi dengan backend *Better Auth*.
+  - Halaman Lupa Password (`/forgot-password`) & Reset Password (`/reset-password`) telah didesain ulang dengan gaya *split-screen* yang sama dengan halaman Login.
+  - Terdapat komponen panduan (`<PageGuide>`) di seluruh halaman utama.
 
-> **PENTING UNTUK AGENT**: Selalu baca dokumen ini terlebih dahulu sebelum melakukan perubahan apapun pada kode. Patuhi aturan arsitektur, konvensi DI, dan pola response yang sudah ditetapkan.
+- **Backend (Kainest_Be - Hono & Prisma):**
+  - Menggunakan *Better Auth* v1.6+. Endpoint untuk lupa password berada di `/auth/request-password-reset`.
+  - Integrasi **Resend** telah ditambahkan di dalam `auth.ts` untuk mengirimkan email *Reset Password*.
+  - Template email telah diekstrak secara rapi ke `src/infrastructure/email/templates/resetPasswordTemplate.ts`.
+  - Variabel lingkungan `RESEND_FROM_EMAIL` sudah disiapkan di `.env`.
+
+## Update 04 Juni 2026
+- **Frontend**: Dashboard dirombak dengan memfokuskan layout pada ringkasan keuangan dan Aktivitas Terbaru di sisi utama. `System Updates` dan `User Feedback` ditarik dinamis dari API. `DropdownNotifications` kini interaktif (terhubung ke backend). Sidebar `filteredMenu` bereaksi otomatis saat login, dan menu `Vault Rahasia` sudah dilindungi permission.
+- **Backend**: Skema `NotificationLog` dan `ShiftActivity` lama dihilangkan, digantikan dengan `AppNotification` & `UserFeedback` serta `SystemUpdate`. Endpoint API notifikasi, feedback, dan changelog (termasuk fitur *Sync dari GitHub* dengan deteksi keyword `[BLAST]`) telah aktif di Hono.
+- **Bot WhatsApp**: Alur registrasi `!link` diperketat (tidak bisa lagi aktivasi personal sebelum membuat grup). Bot kini juga merespons transaksi berhasil dengan mengirimkan stiker animasi *kicaw*.
+
+## Update 13 Juni 2026
+- **Frontend**:
+  - Menyederhanakan modal Atur Pemasukan (`BudgetSetupModal.vue`) dengan menghapus input target tabungan yang redundan dan menambahkan teks edukasi penjelas gaji sebagai acuan 100%.
+  - Memberikan helper text tambahan pada tabel input Kelola Kantong (`PocketManagementModal.vue`).
+  - Menambahkan panduan visual interaktif (efek *glow pulse* ungu) pada tombol "Kelola Kantong" di dashboard saat terdeteksi user telah mengisi gaji namun belum memiliki kantong sama sekali (alurnya diarahkan secara visual).
+- **Backend**:
+  - Sinkronisasi skema Prisma (`schema.prisma`) untuk model `BackupTargets`, `ChatLogs`, dan `ApiKeys` dengan schema `kainest`.
+  - Pembersihan file client Supabase lama (`supabaseClient.ts`) yang tidak digunakan untuk menjaga kebersihan repositori.
+- **Bot WhatsApp (Staging Safe Mode, Ephemeral Fix & Schema Views)**:
+  - Mengembalikan konfigurasi schema Supabase ke default (`public`) dan menggunakan PostgreSQL Views di skema `public` yang merujuk ke tabel asli di skema `kainest` untuk menghindari pemblokiran query oleh PostgREST.
+  - Menerapkan isolasi environment via `BOT_ENV_MODE` (`staging` / `production`). Pada mode staging, bot hanya merespons nomor terdaftar di `STAGING_ALLOWED_NUMBERS` dan harus diawali perintah `!dev ` (prefix dilepas otomatis saat masuk ke pemrosesan AI).
+  - Isolasi blast pengingat shift kerja pada mode staging agar hanya terkirim ke `STAGING_ALLOWED_NUMBERS`.
+  - Perbaikan warning *"This message will not disappear..."* dengan menyalin status durasi ephemeral (`expiration` milidetik) dari pesan masuk dan meneruskannya ke objek `sendMessage` (baik teks maupun stiker).
+
+## Update 14 Juni 2026
+- **Frontend & Backend (Isolasi Kata Kunci Kantong)**: 
+  - Logika kata kunci AI (*keywords*) dipindahkan dari level Kategori ke level Kantong (`BudgetPocket`). Ini memungkinkan pengguna menambahkan kata kunci custom ke kantong mereka sendiri tanpa memengaruhi kategori global atau pengguna lain.
+  - Kategori tetap menyimpan `keywords` sebagai *template* (nilai *default*) saat pengguna membuat kantong baru.
+  - Jika pengguna mengosongkan *keywords* pada kantongnya, sistem (Kenin AI) akan otomatis melakukan *fallback* ke *keywords* milik kategori sebagai pengaman.
+
+## Update 19 Juni 2026
+- **Frontend (UI & UX Dashboard/Rekap)**:
+  - Halaman **Rekap Bulanan** (`FinancialHistoryPage.vue`) mendapat fitur *filter* dinamis (3, 6, 12, Semua rentang bulan). Kartu akordion bulan yang berjalan otomatis terbuka (*auto-expand*) saat halaman dimuat. 
+  - Membersihkan elemen statis "Rincian segera hadir" dari *Donut Chart* pemasukan, serta mengoptimalkan desain UI dengan menghilangkan label nominal (Masuk/Keluar) ganda di header daftar akordion.
+  - Perbaikan *Trend Line Chart* di Dashboard: Sistem sekarang mengagregasi data transaksi sehingga nominal di hari yang sama tergabung menjadi satu titik koordinat yang akurat.
+- **Frontend (Transaksi & Form)**:
+  - Transaksi tipe pemasukan (*Income*) kini stabil ditampilkan dengan warna Hijau dan *prefix* `+`.
+  - Memperbaiki siklus hidup (*lifecycle*) form edit transaksi (`TransactionForm.vue`) dengan menambah *watcher* pada `props.initialData`. Form kini berpindah tab (Pemasukan/Pengeluaran) secara reaktif saat mengedit transaksi berbeda.
+  - Menambal *property* `type` yang terlewat pada proses *mapping* (`TransactionEntity.js` dan `BudgetMapper.js`), memastikan komponen UI mengenali tipe transaksi dengan benar.
+  - Saat menambah/mengedit transaksi, `useBudgetStore` kini memicu sinkronisasi otomatis ke Riwayat Bulanan.
+
+## Update 20 Juni 2026
+- **Frontend (Profile Store)**:
+  - Memperbaiki `useProfileStore.js` agar data role dan permissions user tidak hilang (dipertahankan dari session yang sedang berjalan) saat memperbarui profil atau foto profil.
+- **Backend (Transaction & Spending Trend)**:
+  - Menyertakan include `category` saat data transaksi baru dibuat di `TransactionRepository.ts`.
+  - Melakukan agregasi (group-by tanggal) di `GetSpendingTrendUseCase.ts` untuk memastikan transaksi yang terjadi di hari yang sama terjumlah ke satu titik koordinat di diagram tren pengeluaran, sehingga tidak ada duplikasi tanggal.
+  - Memastikan properti `type` (INCOME/EXPENSE) hasil klasifikasi AI diteruskan dengan benar ke prisma create di `ProcessBotTransactionUseCase.ts`.
+- **Bot WhatsApp (Unified Message Template)**:
+  - Memperbarui template respons transaksi berhasil di `expenseUseCase.js` menjadi format tunggal yang dinamis.
+  - Template baru mendukung icon kategori dinamis di label Pocket, format waktu terstandar (`20 Juni 2026 pukul 06.33`), header/footer bervariasi yang disesuaikan secara cerdas berdasarkan tipe transaksi (Pemasukan vs Pengeluaran).
+
+## Update 21 Juni 2026
+- **Frontend (Tren Keuangan)**:
+  - Mengubah tampilan grafik Tren Pengeluaran menjadi _Dual Line Chart_ (Pengeluaran berwarna Merah dan Pemasukan berwarna Hijau).
+  - Komponen Vue dan Store telah disesuaikan untuk membaca struktur balasan API baru yang memisahkan `expenseTrend` dan `incomeTrend`.
+- **Backend (API & Skema DB)**:
+  - Endpoint Tren Pengeluaran kini mem- _fetch_ data transaksi INCOME dan EXPENSE secara paralel dari database dan memisahkannya dalam respons JSON.
+  - Menambahkan kolom `botPhoneNumberStaging` ke tabel `WaBotConfig` agar bot Staging dan Production bisa menggunakan nomor WA yang berbeda tanpa saling menimpa data satu sama lain.
+  - Membalik urutan validasi grup: Jika *user* tak terdaftar mengirim pesan dari dalam grup, bot akan melakukan _silent ignore_ (tanpa balasan/reaksi sama sekali) untuk mencegah *spam*. Sapaan dasar (`hai`, `halo`) kini diproses sebagai perintah agar bot bisa merespons di grup yang belum diaktifkan.
+  - Memperbaiki fitur sinkronisasi *System Updates* dari GitHub. Mengatasi *delay cache* endpoint `/releases` GitHub dengan cara memanggil `/releases/latest` secara paralel dan menggabungkan hasilnya tanpa duplikasi, sehingga rilis yang baru saja dipublikasikan bisa langsung terdeteksi.
+- **Bot WhatsApp**:
+  - `syncBotInfo` sekarang mengirimkan informasi `BOT_ENV_MODE` ke Backend saat me-*restart* koneksi, memungkinkan Backend memisahkan _update_ profil bot Staging vs Prod.
+  - Mengimplementasikan **Jeda Mengetik Universal (1.5s)** pada seluruh _outgoing message_. Selain memberi kesan natural, hal ini terbukti menyelesaikan masalah permanen di mana pesan pertama bot pasca _restart_ sering memunculkan _error_ "Waiting for this message" akibat berpacu dengan inisialisasi _E2EE Sender Key_.
+
+## Update 27 Juni 2026
+- **Bot WhatsApp (Auto-Restart QR Code)**:
+  - Memperbaiki bug di mana bot tidak memunculkan QR Code baru di web setelah pengguna melakukan *logout* (keluar dari perangkat tertaut di HP).
+  - Kini, ketika sesi terputus dengan alasan `loggedOut`, sistem akan secara fisik menghapus folder kredensial `baileys_auth_info` dan melakukan *auto-restart* sesi dalam 3 detik, sehingga QR Code baru otomatis ter- *generate* dan dikirimkan kembali ke Frontend.
+
+## Update 2 Juli 2026
+- **Backend (Perbaikan Rollover Kantong Awal Bulan)**:
+  - Memperbaiki bug di mana kantong yang dikonfigurasi menggunakan **persentase gaji** mendapatkan `limitAmount = 0` saat sistem secara otomatis membuat rekap (*history*) bulan baru.
+  - Penyebab: Saat membuat snapshot kantong untuk bulan baru, sistem hanya membaca kolom `limitAmount` tanpa menghitung ulang nilai persentase terhadap gaji terkini.
+  - Perbaikan di `BudgetRepository.ts` → fungsi `syncMonthlyHistory`: Sekarang sistem mengecek kolom `percentage`. Jika bernilai `> 0`, maka limit dihitung ulang secara otomatis dengan formula `Math.floor((percentage / 100) * salary)`, memastikan template kantong bulan baru selalu akurat.
+
+## Catatan untuk Agent Selanjutnya
+1. Pastikan selalu mematuhi instruksi **Web Application Development** yang mengutamakan UI yang estetik, tidak generik, dan menggunakan animasi ringan (micro-animations).
+2. Jika ada masalah terkait rute autentikasi *Better Auth*, perhatikan versi terbarunya (khususnya perbedaan antara endpoint lama `/forget-password` dengan yang baru `/request-password-reset`).
+3. Database *Supabase* (pooler port 6543) sesekali mungkin mengalami *timeout* saat inisialisasi awal di mode *development* lokal, cukup jalankan ulang jika terjadi *error*.
+4. **Perhatian Penting**: Di sisi Backend, saat ini chat pribadi melalui Linked Devices (`@lid`) memicu error 403 ("bot belum diaktifkan di grup") karena validasi backend menganggap domain JID `@lid` memerlukan aktivasi grup. Ke depannya, validasi ini harus disesuaikan agar mengenali chat pribadi secara tepat.
+5. **Peringatan/Future Repair (Disappearing Messages di WA)**: Meskipun parameter `ephemeralExpiration` sudah diekstrak dari pesan masuk dan diteruskan ke opsi pengiriman Baileys sehingga pesan bot kini dapat terbaca dengan baik, terkadang gelembung peringatan WhatsApp *"This message won't disappear. The sender may be on an old version of WhatsApp"* masih muncul secara paralel. Investigasi lebih lanjut diperlukan (misal: memeriksa apakah format ekstraksi regex dari `JSON.stringify(msg)` ada yang kurang presisi, atau status default chat-level ephemeral di sisi client perlu diatur). Hal ini didefer untuk perbaikan di masa mendatang.
+
 
 ---
 
-## 1. PENDAHULUAN (SYSTEM OVERVIEW)
+## Panduan Operasional Administrator
+### Cara Merilis "System Updates" & Notifikasi Blast
+Untuk menambahkan pembaruan sistem (*changelog*) agar muncul di Dashboard aplikasi, dan/atau mengirim notifikasi ke semua pengguna:
 
-Kainest Frontend adalah aplikasi web (Single Page Application / SPA) responsif yang dibangun menggunakan **Vue 3 (Composition API)** dengan **Vite** sebagai build tool. 
+1. **Buat Release di GitHub**:
+   - Buka repositori frontend/backend di GitHub.
+   - Pergi ke menu **Releases** lalu klik **Draft a new release**.
+   - Isi form (pilih/buat Tag baru seperti `v1.4.0`, masukkan judul fitur, dan tulis deskripsi rilis).
+2. **Berikan Keyword Blast (Opsional)**:
+   - Jika Anda **ingin mengirim notifikasi lonceng** ke semua pengguna terdaftar saat rilis ini disinkronisasi, tambahkan kata kunci `[BLAST]` di bagian mana saja pada deskripsi GitHub Anda.
+   - Jika *tidak ingin* mengirim notifikasi (hanya *silent update*), **jangan** cantumkan kata kunci tersebut.
+   - Klik **Publish release** di GitHub.
+3. **Sinkronisasi di Aplikasi Kainest**:
+   - Buka aplikasi Kainest dan *login* menggunakan akun yang memiliki *role* **Admin**.
+   - Masuk ke **Dashboard**.
+   - Pada panel *System Updates* (Kainest Changelog) di sebelah kanan, klik tombol ungu **"Sync GitHub"**.
+   - Server otomatis akan mem- *parsing* rilis baru, menyimpannya di database, dan menghapus teks `[BLAST]` tersebut agar tidak terlihat aneh di UI pengguna.
+   - Selesai! Pembaruan kini sudah terpampang di layar seluruh pengguna.
 
-Aplikasi ini beroperasi sebagai **Platform Multi-Layanan (Multi-Service Platform)** yang mencakup keuangan, kolaborasi, dan utilitas produktivitas:
-- **AI Budgeting:** Pengelolaan anggaran dan pencatatan transaksi terintegrasi dengan Bot WhatsApp (Groq AI).
-- **Couples & Collaboration Hub:** Daftar aktivitas, notes, kalender memori untuk pasangan atau keluarga (Couple Connect).
-- **Split Payment & Invoicing (Mendatang):** Modul pemisahan tagihan otomatis antar pengguna dan sistem penerbitan invoice/tagihan.
-- **Manajemen Finansial Lanjutan:** Dashboard keuangan, pengelolaan kantong (Pockets), dan visualisasi riwayat bulanan.
+### Cara Mengonfigurasi Docker & Staging Safe Mode di VPS
+Karena bot Staging dan Production berjalan di atas VPS yang sama dan menggunakan berkas `.env` yang sama, gunakan fitur override environment pada berkas `docker-compose.yml` VPS Anda untuk mengisolasi perilaku masing-masing instance.
 
-Secara lebih rinci, aplikasi ini menyediakan antarmuka pengguna untuk:
-- Dashboard ringkasan keuangan bulanan (status kantong, pengeluaran vs alokasi)
-- Pengelolaan "Kantong" Budget (Pocket) berbasis persentase atau nominal Rupiah
-- Pengelolaan & riwayat transaksi harian
-- Pembuatan kategori kantong kustom oleh user
-- Visualisasi tren pengeluaran harian (grafik)
-- Antarmuka AI asisten finansial (Kenin)
-- Halaman Riwayat Keuangan Bulanan (Bar Chart + Akordion per bulan dengan rincian kantong)
+#### 1. Perbarui Berkas `.env` di VPS Anda
+Tambahkan/sesuaikan variabel berikut di dalam berkas `.env` global di VPS Anda:
 
----
+```env
+# ==========================================
+# 🤖 WA BOT ADVANCED CONFIGURATIONS (Staging Safe Mode)
+# ==========================================
+# Nomor WhatsApp Admin yang diperbolehkan di mode Staging (pisahkan dengan koma)
+STAGING_ALLOWED_NUMBERS="62812345678,62887654321"
 
-## 2. ARSITEKTUR & STRUKTUR SISTEM (ARCHITECTURAL SPECIFICATION)
-
-Proyek ini mengadopsi **Feature-Based Clean Architecture** (Domain-Driven Design) yang tersusun secara modular di bawah `src/features/`.
-
-### 2.1 Struktur Folder Utama
-
-```text
-src/
-├── core/
-│   └── di/di.js             # Pusat Dependency Injection manual — WAJIB diperbarui saat menambah Use Case baru
-├── features/                # Modul fitur terisolasi
-│   ├── auth/
-│   ├── budgeting/
-│   ├── notes/
-│   ├── todos/
-│   ├── profile/
-│   ├── couple/
-│   ├── security/
-│   ├── wabot/
-│   └── admin/
-├── layouts/                 # Layout Vue global (DashboardLayout.vue, dll.)
-├── components/              # Komponen UI global (forms, modals, dll.)
-├── lib/
-│   └── apiClient.js         # Axios singleton dengan interceptor token otomatis
-├── router.js                # Vue Router & Navigation Guards (RBAC)
-└── main.js                  # Entry point aplikasi
+# URL Backend Terpisah
+KAINEST_API_URL_PROD="https://kainest.be.kenantomfie.site"
+KAINEST_API_URL_STAGING="https://staging.kainest.be.kenantomfie.site"
 ```
 
-### 2.2 Lapisan Modul Fitur (`features/budgeting/` sebagai contoh)
+#### 2. Perbarui Berkas `docker-compose.yml` di VPS Anda
+Sesuaikan bagian service untuk container Production (`wa-bot`) dan Staging (`wa-bot-staging`) agar menggunakan *overrides* variabel lingkungan secara terpisah:
 
-| Lapisan | Lokasi | Tanggung Jawab |
-|---|---|---|
-| **Presentation** | `presentation/pages/` | Halaman utama Vue |
-| **Presentation** | `presentation/components/` | Komponen UI spesifik fitur |
-| **Presentation** | `presentation/stores/` | State management via **Pinia** |
-| **Domain** | `domain/use-cases/` | Logika bisnis client-side — agnostik terhadap API & framework |
-| **Data** | `data/repository/` | Implementasi konkret repository (memanggil Remote Source) |
-| **Data** | `data/source/` | Axios HTTP request ke backend API |
-| **Data** | `data/mappers/` | Pemetaan data dari format API ke domain entity |
+```yaml
+version: '3.8'
 
-### 2.3 Dependency Injection (DI) Manual — Aturan Wajib
+services:
+  # Instance Bot WhatsApp Production
+  wa-bot:
+    image: wa-bot:latest  # Sesuaikan dengan konfigurasi Anda
+    container_name: wa-bot-prod
+    restart: always
+    environment:
+      - PORT=3000
+      - BOT_ENV_MODE=production
+      - KAINEST_API_URL=${KAINEST_API_URL_PROD}
+    env_file:
+      - .env
+    # ... volume, port, dll.
 
-Semua dependensi dikelola secara terpusat di **`src/core/di/di.js`**.
-
-> **ATURAN AGENT**: Setiap Use Case atau Repository baru **WAJIB** didaftarkan di `di.js` sebelum bisa digunakan di Pinia Store atau komponen Vue. Kegagalan mendaftarkan di sini adalah penyebab paling umum error `is not a function` atau `undefined`.
-
-Pola penambahan:
-```javascript
-// 1. Import class baru
-import { CreateCategoryUseCase } from "../../features/budgeting/domain/use-cases/CreateCategoryUseCase";
-
-// 2. Buat singleton instance
-export const createCategoryUseCase = new CreateCategoryUseCase(budgetRepository);
+  # Instance Bot WhatsApp Staging
+  wa-bot-staging:
+    image: wa-bot:latest  # Sesuaikan dengan konfigurasi Anda
+    container_name: wa-bot-staging
+    restart: always
+    environment:
+      - PORT=3001  # Sesuaikan port jika diekspos
+      - BOT_ENV_MODE=staging
+      - KAINEST_API_URL=${KAINEST_API_URL_STAGING}
+      - STAGING_ALLOWED_NUMBERS=${STAGING_ALLOWED_NUMBERS}
+    env_file:
+      - .env
+    # ... volume, port, dll.
 ```
 
-### 2.4 Standar Penanganan Response (Either Pattern) — Aturan Wajib
+#### 3. Terapkan Perubahan & Restart Container
+Jalankan perintah ini di direktori server VPS Anda untuk menerapkan konfigurasi baru:
 
-Komunikasi antar layer menggunakan pola **Either** (`right` untuk sukses, `left` untuk gagal).
-
-> **ATURAN AGENT**: **JANGAN** memanggil `.isRight()` atau `.isLeft()` sebagai fungsi. Ini akan menyebabkan runtime error. Lakukan pengecekan properti secara langsung:
-
-```javascript
-const result = await createCategoryUseCase.execute(name, icon);
-
-if (result.right) {
-  // Sukses — data ada di result.right
-  console.log(result.right);
-} else {
-  // Gagal — pesan error ada di result.left.message
-  console.error(result.left.message);
-}
+```bash
+docker compose down
+docker compose up -d
 ```
 
----
-
-## 3. STANDAR UI/UX & DESAIN SISTEM
-
-Aplikasi ini mengutamakan visual premium dan kemudahan interaksi.
-
-### 3.1 Komponen Global
-
-Selalu prioritaskan penggunaan komponen UI yang sudah terdaftar secara global sebelum membuat komponen baru:
-- **`DropdownSelect.vue`** — Untuk semua dropdown pilihan (kategori, tipe limit, dll.)
-- **`BaseModal.vue`** — Pembungkus semua modal dialog
-
-### 3.2 Responsif & Layout Aman
-
-- Gunakan `max-h-[85vh] overflow-y-auto` pada konten modal agar scroll internal tersedia dan konten tidak terpotong.
-- Gunakan `size="2xl"` atau ukuran yang sesuai pada `BaseModal.vue` untuk form dengan banyak kolom.
-
-### 3.3 Loading & Feedback State
-
-Selalu berikan feedback visual yang jelas pada elemen interaktif:
-- Tombol submit: `disabled` saat loading + ganti teks menjadi `"Menyimpan..."`.
-- Gunakan variabel reaktif `isLoading`, `isSubmitting`, `isCreating` sesuai konteks.
-
----
-
-## 4. INTEGRASI STATE & FITUR UTAMA (STATE MANAGEMENT)
-
-### 4.1 Budget Store (`useBudgetStore.js`)
-
-State management terpusat untuk seluruh fitur keuangan. Fungsi-fungsi utama:
-
-| Action | Deskripsi |
-|---|---|
-| `fetchDashboardSummary()` | Mengambil ringkasan bulanan dari `/budget/summary` |
-| `fetchAllCategories()` | Mengambil semua kategori (global + kustom user) — hasil di-cache |
-| `createCategory(name, icon)` | Membuat kategori kustom baru, lalu otomatis me-refresh `categoriesList` |
-| `fetchPockets()` | Mengambil daftar kantong budget user |
-| `upsertPocket(data)` | Membuat atau memperbarui satu kantong |
-| `deletePocket(categoryId)` | Menghapus kantong |
-| `bulkSetupPockets(data)` | Setup massal kantong (onboarding / manajemen) |
-| `updateKeywords(categoryId, keywords)` | Menyimpan kata kunci klasifikasi AI ke database |
-| `submitTransaction(data)` | Catat transaksi baru |
-| `fetchTransactions(params)` | List riwayat transaksi dengan pagination & filter |
-| `updateTransaction(id, data)` | Perbarui transaksi |
-| `deleteTransaction(id)` | Hapus transaksi |
-| `fetchMonthlyHistory()` | 🆕 Mengambil seluruh riwayat keuangan bulanan user dari `/budget/history` — hasilnya disimpan di `historyList` |
-
-### 4.2 Manajemen Kantong & Kategori Kustom (`PocketManagementModal.vue`) 🆕
-
-Modal ini adalah antarmuka utama untuk konfigurasi budget user. Fitur yang tersedia:
-
-- **Blueprint Cepat**: Tombol "50-30-20" dan "Mahasiswa Hemat" untuk konfigurasi kantong sekali klik.
-- **Form Kantong**: Menambah/menghapus kantong, memilih kategori, mengatur tipe limit (persentase atau nominal).
-- **Pembuatan Kategori Kustom**: Tombol "Buat Kategori Kustom Sendiri" membuka form inline untuk membuat kategori baru dengan nama dan emoji icon. Setelah berhasil dibuat, kategori langsung muncul di dropdown dan otomatis ditambahkan sebagai kantong baru.
-
-### 4.3 Alur Otorisasi & RBAC (`authStore.js`)
-
-- `UserEntity` menyimpan `role` dan array `permissions`.
-- `authStore.js` menyediakan getter `isAdmin` dan method `hasPermission(module_name)`.
-- Router Guard membaca `meta.requiresAdmin` atau `meta.requiredPermission` sebelum mengizinkan navigasi.
-
----
-
-## 5. PERUBAHAN & FITUR YANG SUDAH DILAKUKAN (CHANGELOG)
-
-| # | Fitur / Perbaikan | Deskripsi Singkat |
-|---|---|---|
-| 1 | **Kategori Kustom User** | Ditambahkan `CreateCategoryUseCase.js`, endpoint baru `POST /budget/categories`, dan form inline di `PocketManagementModal.vue`. User bisa membuat kategori kantong sendiri dengan emoji + nama. |
-| 2 | **Refactoring `PocketManagementModal.vue`** | Menggantikan `BudgetSetupModal.vue` yang usang. Integrasi `DropdownSelect.vue`, sistem blueprint cepat (50-30-20 & Mahasiswa Hemat), form kategori kustom. Dihapus: input "Biaya Sewa/Kos" dan "Target Tabungan (%)" karena kini dikelola lewat sistem Pocket. |
-| 3 | **Dashboard Hanya Tampilkan Pocket User** | Perbaikan endpoint summary agar hanya mengembalikan kategori yang ada di `pocketsSnapshot` (kantong user), bukan semua kategori sistem. |
-| 4 | **Perbaikan Runtime Error (Either Pattern)** | Mengoreksi bug `.isRight()` di seluruh store dan komponen. Pengecekan kini menggunakan `.right` dan `.left` secara langsung. |
-| 5 | **Optimasi Bundle Chunking** | Library vendor (Vue, Pinia, Axios) dipisah ke chunk terpisah di `vite.config.js` untuk mempercepat muat halaman pertama. |
-| 6 | **Pendaftaran DI Lengkap** | `di.js` diperbarui dengan `CreateCategoryUseCase` dan semua Use Case terbaru lainnya. |
-| 7 | **Perbaikan Bug `createCategory()` di Repository** | Method `createCategory()` hilang dari `BudgetRepository.js` frontend sehingga klik tombol tidak mengirim request ke backend. Diperbaiki dengan menambahkan method tersebut di antara `getCategories()` dan `getSpendingTrend()`. |
-| 8 | **Halaman Riwayat Keuangan Bulanan** | Halaman baru `FinancialHistoryPage.vue` di rute `/app/history` (permission: `budgeting`). Menampilkan Bar Chart perbandingan bulanan (Rencana / Aktual / Tabungan) dan Akordion kartu per bulan yang memuat rincian kantong dari `pocketsSnapshot`. Menu "Riwayat Bulanan" dengan `ChartBarIcon` ditambahkan ke `Sidebar.vue`. |
-| 9 | **`GetMonthlyHistoryUseCase.js` & DI** | Use Case baru didaftarkan di `di.js`. State `historyList`, `isLoadingHistory`, dan action `fetchMonthlyHistory()` ditambahkan ke `useBudgetStore.js`. Data source `getMonthlyHistory()` ditambahkan ke `BudgetRemoteSource.js` dan `BudgetRepository.js`. |
-| 10 | **Perbaikan Caching API Pocket** | Mengatasi aggressive browser caching pada data `GET /budget/pockets` dengan menambahkan header `Cache-Control: no-cache` secara global di `apiClient.js`. Serta mengimplementasikan strict unmounting (`v-if`) pada `PocketManagementModal.vue` agar state modal ter-reset total saat ditutup. |
-| 11 | **Perbaikan Bug Update Transaksi & Sinkronisasi Sejarah Bulanan** | Bug format tanggal `"2026-05-31 00:00:00"` pada form `TransactionForm.vue` telah diperbaiki agar menggunakan `.substring(0, 10)` absolut tanpa mencari huruf 'T'. Disuntikkan pula fitur interaktif `Progress Bar` dan teks `Rp Terpakai / Rp Limit` pada daftar riwayat kantong bulan lalu (`FinancialHistoryPage.vue`). Terakhir, mengembalikan fungsi `updateTransaction` yang sempat terhapus di Pinia Store `useBudgetStore.js`. |
-| 12 | **Perbaikan Bug Re-Opening Modal Atur Pemasukan** | Memperbaiki bug di mana `BudgetSetupModal.vue` tiba-tiba tertutup/terbuka kembali setelah tombol simpan ditekan. Penyebabnya adalah mutasi state global `isLoadingSummary` di `useBudgetStore.js` yang memicu re-render (`v-if`) di parent page `BudgetDashboardPage.vue`. Solusinya adalah menggunakan local state `isSubmitting` di modal tersebut untuk melacak proses loading pengiriman form. |
-| 13 | **Perbaikan Kalkulasi Total Persentase di Pengelolaan Kantong** | Memperbaiki kalkulasi total persentase terpakai (`totalPercentage`) di `PocketManagementModal.vue` agar nominal limit pada kantong juga ikut dikonversi secara dinamis ke bentuk persentase terhadap gaji pengguna, sehingga total persentase yang ditampilkan akurat. |
-| 14 | **Redesain & Perapian Panel Filter Riwayat Transaksi** | Mendesain ulang panel filter pada `TransactionListPage.vue` menjadi grid 3 kolom yang simetris dan responsif. Memperbarui `DropdownSelect.vue` dan `Datepicker.vue` agar mendukung opsi pelebaran penuh (`w-full`), menyelaraskan letak label, serta memindahkan tombol "Hapus Semua Filter" ke bagian footer card filter yang dinamis. Dilengkapi pula dengan lencana titik berkedip (pulsing badge dot) pada tombol header saat filter aktif. |
-| 15 | **Migrasi Skema Bot WhatsApp di Backend** | Menyelesaikan migrasi database backend dengan menambahkan tabel `BotActiveGroup` untuk mendukung penyimpanan pendaftaran grup aktif WhatsApp Bot secara dinamis guna persiapan integrasi komersialisasi. |
-| 16 | **Sentralisasi Empty State** | Dibuatnya komponen universal `BaseEmptyState.vue` untuk menyeragamkan UI daftar kosong di semua halaman (Todos, Notes, Transactions, History, Admin, WaBot). |
-| 17 | **Pemisahan Kredensial Environment (Staging vs Prod)** | Pembersihan `.env` frontend dan backend. Variabel OAuth (GitHub/Google) dan Better Auth diseragamkan namanya, membuang kode JWT lama di backend yang sudah menjadi *dead code*, serta memperbaiki bug `state_mismatch` dan *redirect* lintas domain dengan memastikan `FRONTEND_URL` dan `BETTER_AUTH_URL` diatur benar di Vercel. |
-| 18 | **Fitur Remember Me & Modals Global** | Implementasi penyimpanan sesi dinamis (localStorage vs sessionStorage) pada login, serta pembuatan `GlobalContentModal.vue` untuk memunculkan S&K dan Kebijakan Privasi tanpa pindah halaman. |
-| 19 | **Restrukturisasi Layout Dashboard & Sistem Update** | Memindahkan komponen *Aktivitas Terbaru* ke kolom utama agar fokus UI lebih dominan ke finansial. Komponen *System Updates* dan *User Feedback* kini ditarik secara dinamis via API (tidak di-hardcode lagi). |
-| 20 | **Integrasi Notifikasi Interaktif** | `DropdownNotifications.vue` di-update untuk mengambil notifikasi dari backend, mem-parsing format tanggal *relative* (seperti "2 jam lalu"), dan mendukung aksi mark-as-read yang langsung disinkronisasi ke server. |
-| 21 | **Isolasi Keywords Kantong** | Memindahkan logika penyimpanan dan pembaruan `keywords` AI dari `BudgetCategory` ke `BudgetPocket`. Endpoint, Store, Repository, dan Modal (*PocketManagementModal*) di-update agar pengguna bisa mengkustomisasi referensi AI untuk kantong masing-masing tanpa berdampak global. |
-| 22 | **Pemasukan Tambahan & UI Transaksi (+/-)** | Implementasi prefiks nominal `+ Rp` (Hijau/INCOME) dan `- Rp` (Merah/EXPENSE) secara konsisten pada komponen `TransactionItem.vue` dan `DashboardRecentActivity.vue`. |
-| 23 | **Redesain Dashboard Quick Stats & MoM Badge** | Relabeling "Total Anggaran" menjadi "Gaji Utama", dan "Sisa Anggaran" menjadi "Sisa Gaji Pokok". Penambahan kartu ke-4 "Pemasukan Tambahan" berwarna violet. Mengimplementasikan Lencana Persentase (MoM Badge) dinamis di bawah setiap kartu untuk memvisualisasikan persentase naik/turun bulan lalu dengan pewarnaan responsif (pengeluaran naik = merah, sisa naik = hijau). |
----
-
-## 6. RENCANA PENGEMBANGAN MASA DEPAN (FUTURE DEVELOPMENT)
-
-1. **Split Payment & Bill Sharing**: Fitur otomatis memisahkan tagihan (patungan) setelah mencatat pengeluaran besar (misalnya makan bersama).
-2. **Sistem Invoicing**: Modul pembuatan, pelacakan, dan pengiriman invoice (tagihan pembayaran) profesional, cocok untuk pengguna freelancer atau umkm.
-3. **PWA Quick Input Widget**: Widget input cepat berbasis AI di layar utama ponsel (PWA) agar pengguna dapat mencatat pengeluaran tanpa membuka dashboard.
-4. **Visualisasi Alokasi vs Realisasi**: Grafik dinamis yang membandingkan alokasi persentase kantong dengan realisasi pengeluaran bulan berjalan secara real-time.
-5. **AI Categorization Approval Prompt**: Dialog konfirmasi setelah input teks AI — menampilkan hasil parsing (kategori, nominal, catatan) sebelum disimpan permanen.
-6. **Handbook / Panduan Fitur In-App**: Sistem onboarding atau halaman dokumentasi interaktif yang menjelaskan setiap fitur Kainest kepada pengguna baru (opsi: guided tour via Driver.js, halaman `/app/handbook`, atau tooltip kontekstual).
-7. **Pembatasan Query Default Riwayat (6/12 Bulan)**: Endpoint `GET /budget/history` saat ini mengembalikan seluruh riwayat all-time. Perlu ditambahkan parameter query opsional (misal `?limit=12`) agar default hanya 6 atau 12 bulan terakhir untuk efisiensi dan keterbacaan.
-8. **Filter Dropdown Tahun/Bulan di Halaman Riwayat**: Menambahkan komponen filter interaktif (dropdown atau range picker) di `FinancialHistoryPage.vue` agar user dapat memfilter data riwayat berdasarkan tahun atau rentang bulan tertentu.
-9. **Integrasi WhatsApp Bot (Kenin WA Bot) - Sisi Frontend**: Halaman pengaturan integrasi WhatsApp di Profile UI untuk memfasilitasi "Pairing" (menghubungkan nomor HP WhatsApp pengguna dengan akun Kainest) serta mengelola kata kunci (*keywords*) kategori untuk mendukung pencatatan transaksi yang efisien (Hybrid Routing). Tabel `BotActiveGroup` di database backend sudah siap disinkronkan untuk fitur ini.

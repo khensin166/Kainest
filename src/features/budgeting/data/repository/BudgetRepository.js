@@ -153,13 +153,12 @@ export class BudgetRepository {
       const response = await this.remoteSource.getSpendingTrend();
 
       if (response.success && response.data) {
-        const sparseTrendData = response.data.trend || [];
+        // Format baru: { expenseTrend: [...], incomeTrend: [...] }
+        const expenseTrend = response.data.expenseTrend || [];
+        const incomeTrend = response.data.incomeTrend || [];
 
-        // 🔥 Panggil Mapper Ajaib kita untuk mengisi data kosong
-        const fullEntities = BudgetMapper.mapTrendDataFromApi(sparseTrendData);
-
-        // Bungkus dengan right()
-        return right(fullEntities);
+        // Kembalikan kedua dataset langsung (sudah diagregasi di backend)
+        return right({ expenseTrend, incomeTrend });
       } else {
         return left(
           new ServerFailure(

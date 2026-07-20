@@ -1,7 +1,7 @@
 <!-- SpendingTrendCard.vue -->
 <script setup>
 // Import komponen Line dari vue-chartjs
-import { Line } from 'vue-chartjs'
+import { Line as LineChart } from 'vue-chartjs'
 import { formatRupiah } from '@/utils/Utils'
 
 // Import bagian-bagian penting dari Chart.js core
@@ -45,7 +45,14 @@ const chartOptions = {
   maintainAspectRatio: false, // Agar bisa mengisi container induknya
   plugins: {
     legend: {
-      display: false // Sembunyikan legend karena judul card sudah cukup menjelaskan
+      display: true, // Tampilkan legend untuk membedakan garis pengeluaran & pemasukan
+      position: 'top',
+      labels: {
+        usePointStyle: true,
+        boxWidth: 8,
+        padding: 14,
+        font: { size: 11 }
+      }
     },
     tooltip: {
       mode: 'index',
@@ -111,5 +118,5 @@ const chartOptions = {
 </script>
 
 <template>
-  <Line :data="chartData" :options="chartOptions" />
+  <LineChart :data="chartData" :options="chartOptions" />
 </template>
