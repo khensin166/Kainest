@@ -282,7 +282,7 @@ const isSomeSelected = computed(() => filteredGroups.value.some(g => selectedGro
 const fetchGroups = async () => {
   isLoading.value = true;
   try {
-    const { data } = await api.get('/api/wabot/active-groups');
+    const { data } = await api.get('/wabot/active-groups');
     activeGroups.value = data.data || [];
   } catch (e) {
     console.error('[Blast] Gagal memuat grup:', e.message);
@@ -356,7 +356,7 @@ const sendBlast = async () => {
   isSending.value = true;
   blastResult.value = null;
   try {
-    const { data } = await api.post('/api/wabot/blast', {
+    const { data } = await api.post('/wabot/blast', {
       message: blastMessage.value,
       groupIds: Array.from(selectedGroupIds),
     });
