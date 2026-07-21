@@ -230,17 +230,12 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Konfirmasi Modal (reusable) -->
-    <GlobalDeleteModal />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { useModalStore } from '@/stores/modalStore';
-import GlobalDeleteModal from '@/components/modals/GlobalDeleteModal.vue';
 import api from '@/lib/apiClient';
 
 const modalStore = useModalStore();

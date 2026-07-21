@@ -126,9 +126,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Konfirmasi Modal (reusable) -->
-    <GlobalDeleteModal />
   </div>
 </template>
 
@@ -136,7 +133,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useGowaStore } from '../stores/useGowaStore';
 import { useModalStore } from '@/stores/modalStore';
-import GlobalDeleteModal from '@/components/modals/GlobalDeleteModal.vue';
+// GlobalDeleteModal sudah ter-mount global di App.vue, tidak perlu di-import di sini
 
 const gowaStore = useGowaStore();
 const modalStore = useModalStore();
