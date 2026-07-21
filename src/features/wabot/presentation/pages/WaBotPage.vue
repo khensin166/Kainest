@@ -1,325 +1,209 @@
-<!-- WaBotPage.vue -->
 <template>
-  <div class="flex flex-col items-center justify-center min-h-[80vh] px-4 sm:px-6 lg:px-8 py-8">
-
-    <div class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl text-gray-800 dark:text-white font-bold mb-2">
-        Koneksi WhatsApp Bot
-      </h1>
-      <p class="text-gray-500 dark:text-gray-400">
-        Kelola status koneksi bot Anda secara real-time
-      </p>
+  <div class="flex flex-col min-h-[80vh] px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-1">
+          WhatsApp Device Hub
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">
+          Kelola koneksi multi-device GOWA secara real-time.
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Status Server -->
+        <div class="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-300">GOWA Server Online</span>
+        </div>
+        <!-- Tambah Device -->
+        <button @click="promptAddDevice" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl shadow-md transition-colors text-sm font-medium flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Tambah Device
+        </button>
+      </div>
     </div>
 
-    <!-- Session Switcher Tabs -->
-    <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl max-w-sm mx-auto">
-      <button v-for="session in sessions" :key="session.id" @click="switchSession(session.id)"
-        class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
-        :class="activeSession === session.id
-          ? (session.id === 'primary' ? 'bg-white dark:bg-gray-700 text-green-600 shadow-sm' : 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm')
-          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'">
-        <span class="text-lg">{{ session.icon }}</span>
-        {{ session.name }}
+    <!-- Loading State -->
+    <div v-if="gowaStore.isLoading && gowaStore.devices.length === 0" class="flex flex-col items-center justify-center py-20 text-gray-400">
+      <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4 text-primary"></i>
+      <p>Memuat perangkat...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="gowaStore.devices.length === 0" class="flex flex-col items-center justify-center py-20 text-gray-500 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <i class="fa-solid fa-mobile-screen text-5xl mb-4 text-gray-300 dark:text-gray-600"></i>
+      <p class="text-lg font-medium mb-1">Belum Ada Device</p>
+      <p class="text-sm mb-6">Tambahkan device baru untuk menghubungkan WhatsApp Bot.</p>
+      <button @click="promptAddDevice" class="text-primary hover:text-primary-dark font-medium underline">
+        Tambah Device Sekarang
       </button>
     </div>
 
-    <div
-      class="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
-      :class="activeSession === 'primary' ? 'shadow-green-900/10' : 'shadow-blue-900/10'">
+    <!-- Device Grid -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <div v-for="device in gowaStore.devices" :key="device.id" class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col hover:shadow-md transition-shadow relative overflow-hidden">
+        
+        <!-- Decoration Blur -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div
-        class="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center mb-15">
-        <span class="font-semibold text-gray-700 dark:text-gray-200">Status System</span>
-        <div class="flex items-center gap-2">
-          <span class="relative flex h-3 w-3">
-            <span v-if="isConnected" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-              :class="activeSession === 'primary' ? 'bg-green-400' : 'bg-blue-400'"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3"
-              :class="isConnected ? (activeSession === 'primary' ? 'bg-green-500' : 'bg-blue-500') : 'bg-amber-500'"></span>
-          </span>
-          <span class="text-sm font-medium"
-            :class="isConnected ? (activeSession === 'primary' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400') : 'text-amber-600 dark:text-amber-400'">
-            {{ isConnected ? 'Online' : 'Menunggu Koneksi' }}
-          </span>
-        </div>
-      </div>
-
-      <div class="p-8 lg:p-12">
-        <div v-if="!isConnected && qrValue" class="flex flex-col md:flex-row items-center justify-between gap-10">
-
-          <div class="flex-1 space-y-6 text-center md:text-left">
+        <div class="flex justify-between items-start mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" :class="getDeviceColors(device.id, device.status).bg">
+              <i class="fa-brands fa-whatsapp" :class="getDeviceColors(device.id, device.status).text"></i>
+            </div>
             <div>
-              <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                Tautkan Perangkat
-              </h2>
-              <p class="text-gray-500 dark:text-gray-400">
-                Scan QR Code di samping untuk menghubungkan bot dengan akun WhatsApp Anda.
+              <h3 class="font-bold text-gray-800 dark:text-white text-lg leading-tight">{{ device.id }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mt-0.5">ID Device</p>
+            </div>
+          </div>
+          
+          <div class="flex flex-col items-end gap-2">
+            <span class="px-3 py-1 text-xs font-semibold rounded-full flex items-center gap-1.5 border" :class="getStatusBadgeClass(device.status)">
+              <span v-if="device.status === 'CONNECTED'" class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+              <i v-else-if="device.status === 'CONNECTING'" class="fa-solid fa-circle-notch fa-spin"></i>
+              {{ getStatusLabel(device.status) }}
+            </span>
+            <button @click="confirmDeleteDevice(device.id)" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 p-1.5 rounded-lg transition-colors text-xs" title="Hapus Device">
+              <i class="fa-solid fa-trash-can"></i> Hapus
+            </button>
+          </div>
+        </div>
+
+        <div class="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+          
+          <!-- Content Left -->
+          <div class="flex-1 space-y-2 text-center md:text-left">
+            <template v-if="device.status === 'CONNECTED'">
+              <h4 class="font-bold text-green-600 dark:text-green-400">Bot Aktif & Siap Digunakan</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Koneksi WebSocket stabil. Bot akan merespons pesan otomatis berdasarkan fitur aktif.
               </p>
-            </div>
-
-            <div
-              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 text-sm text-gray-600 dark:text-gray-300 text-left space-y-2">
-              <p class="font-semibold mb-2">Caranya:</p>
-              <ol class="list-decimal list-inside space-y-1">
-                <li>Buka WhatsApp di HP Anda.</li>
-                <li>Buka <strong>Menu</strong> (Android) atau <strong>Settings</strong> (iOS).</li>
-                <li>Pilih <strong>Perangkat Tertaut</strong> (Linked Devices).</li>
-                <li>Ketuk <strong>Tautkan Perangkat</strong> dan scan kode.</li>
-              </ol>
-            </div>
-
-            <div class="text-amber-600 dark:text-amber-400 text-sm font-medium animate-pulse">
-              {{ statusMessage }}
-            </div>
+              <button @click="confirmLogoutDevice(device.id)" class="mt-4 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm w-full md:w-auto">
+                Keluar Perangkat (Logout)
+              </button>
+            </template>
+            <template v-else-if="device.status === 'UNPAIRED'">
+              <h4 class="font-bold text-amber-600 dark:text-amber-400">Scan QR Code</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Buka WhatsApp di HP Anda > Perangkat Tertaut > Tautkan Perangkat.
+              </p>
+              <p class="text-xs text-gray-500 mt-2">
+                <i class="fa-solid fa-circle-info mr-1"></i> QR Code akan refresh otomatis.
+              </p>
+            </template>
+            <template v-else>
+              <h4 class="font-bold text-blue-600 dark:text-blue-400">Menghubungkan...</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Mencoba terhubung ke server GOWA melalui WebSocket.
+              </p>
+            </template>
           </div>
 
-          <div class="flex-1 flex justify-center">
-            <div class="relative p-4 bg-white rounded-xl shadow-sm border-2 border-gray-100 dark:border-gray-600">
-              <qrcode-vue :value="qrValue" :size="260" level="H" class="rounded-lg" />
-              <div
-                class="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-amber-500 -mt-1 -ml-1 rounded-tl-lg">
+          <!-- Content Right (QR/Status Icon) -->
+          <div class="flex-shrink-0 flex items-center justify-center p-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700" style="width: 160px; height: 160px;">
+            <template v-if="device.status === 'CONNECTED'">
+              <div class="text-green-500 text-6xl">
+                <i class="fa-solid fa-circle-check"></i>
               </div>
-              <div
-                class="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-amber-500 -mt-1 -mr-1 rounded-tr-lg">
+            </template>
+            <template v-else-if="device.status === 'UNPAIRED'">
+              <img v-if="gowaStore.qrCodes[device.id]" :src="gowaStore.qrCodes[device.id]" alt="QR Code" class="w-full h-full object-contain rounded-lg" />
+              <div v-else class="flex flex-col items-center justify-center text-gray-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
+                <span class="text-xs">Memuat QR...</span>
               </div>
-              <div
-                class="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-amber-500 -mb-1 -ml-1 rounded-bl-lg">
+            </template>
+            <template v-else>
+              <div class="text-gray-300 dark:text-gray-600 text-5xl animate-pulse">
+                <i class="fa-brands fa-whatsapp"></i>
               </div>
-              <div
-                class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-amber-500 -mb-1 -mr-1 rounded-br-lg">
-              </div>
-            </div>
+            </template>
           </div>
+
         </div>
-
-        <!-- <div v-else class="flex flex-col items-center justify-center text-center py-8"> -->
-        <div v-else-if="isConnected" class="flex flex-col items-center justify-center text-center py-8">
-
-          <div class="relative flex items-center justify-center mb-8 scale-125">
-            <div class="bot-container">
-              <div v-if="isConnected" class="status-badge">
-                <span class="status-dot"></span>
-                CONNECTED
-              </div>
-
-              <div v-if="isConnected" class="rotating-ring"></div>
-
-              <div class="bot-body" :class="{ 'bot-connected': isConnected, 'bot-celebrate': showCelebration }">
-                <div class="bot-head">
-                  <div class="bot-eyes">
-                    <div v-if="!isConnected" class="bot-eye left"></div>
-                    <div v-if="!isConnected" class="bot-eye right"></div>
-                    <div v-if="isConnected" class="check-marks">
-                      <svg class="check-mark check-1" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      <svg class="check-mark check-2" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </div>
-                  </div>
-                  <div class="bot-antenna">
-                    <div class="antenna-ball" :class="{ 'antenna-active': isConnected }"></div>
-                  </div>
-                </div>
-
-                <div class="bot-screen" :class="{ 'bot-screen-backup': activeSession === 'backup_1' }">
-                  <!-- PRIMARY Bot Screen: WhatsApp Icon -->
-                  <svg v-if="!isConnected && activeSession === 'primary'" class="whatsapp-logo" viewBox="0 0 24 24"
-                    fill="currentColor">
-                    <path
-                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                  </svg>
-
-                  <!-- BACKUP Bot Screen: Database/Cloud Icon -->
-                  <svg v-if="!isConnected && activeSession === 'backup_1'" class="whatsapp-logo" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-                  </svg>
-                  <svg v-if="isConnected" class="big-check" viewBox="0 0 24 24" fill="none" stroke="white"
-                    stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  <div v-if="isConnected" class="online-text">ONLINE</div>
-                </div>
-
-                <div class="bot-arms">
-                  <div class="bot-arm left"></div>
-                  <div class="bot-arm right"></div>
-                </div>
-              </div>
-
-              <div class="particle particle-1" :class="{ 'particle-gold': isConnected }"></div>
-              <div class="particle particle-2" :class="{ 'particle-gold': isConnected }"></div>
-              <div class="particle particle-3" :class="{ 'particle-gold': isConnected }"></div>
-
-              <div v-if="showCelebration" class="burst-container">
-                <div class="burst-particle" v-for="i in 12" :key="i" :style="{ '--i': i }"></div>
-              </div>
-            </div>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-            {{ activeSession === 'primary' ? 'WhatsApp Terhubung!' : 'Backup Bot Aktif!' }}
-          </h2>
-          <p class="text-gray-500 dark:text-gray-400 max-w-md">
-            Bot Anda sudah aktif. Pesan otomatis akan dikirim sesuai jadwal yang telah ditentukan.
-          </p>
-        </div>
-
-        <!-- <div v-if="!qrValue && !isConnected" class="flex flex-col items-center justify-center py-12"> -->
-        <div v-else class="flex flex-col items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mb-4"></div>
-          <p class="text-gray-500 dark:text-gray-400 animate-pulse">{{ statusMessage }}</p>
-        </div>
-
       </div>
     </div>
+
+    <!-- Konfirmasi Modal (reusable) -->
+    <GlobalDeleteModal />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive, watch } from "vue";
-import io from "socket.io-client";
-import QrcodeVue from "qrcode.vue";
-import { useWaBotStore } from "../stores/useWaBotStore"; // Pastikan path benar
+import { onMounted, onUnmounted } from 'vue';
+import { useGowaStore } from '../stores/useGowaStore';
+import { useModalStore } from '@/stores/modalStore';
+import GlobalDeleteModal from '@/components/modals/GlobalDeleteModal.vue';
 
-const waStore = useWaBotStore();
-
-const qrValue = ref(null);
-const statusMessage = ref("Menginisialisasi...");
-const isConnected = ref(false);
-const showCelebration = ref(false);
-const activeSession = ref(localStorage.getItem('wabot_active_session') || 'primary');
-
-const sessions = [
-  { id: 'primary', name: 'Primary Bot', icon: '🤖' },
-  { id: 'backup_1', name: 'Backup Bot', icon: '💾' }
-];
-
-let socket = null;
-
-const form = reactive({
-  url: '',
-  secret: ''
-});
-
-// Fungsi simpan config awal
-const saveInitialConfig = async () => {
-  if (!form.url) return alert("URL wajib diisi");
-  try {
-    await waStore.connectBot(form.url, "Kainest Bot", form.secret);
-    // Connect socket setelah config tersimpan
-    connectSocket(form.url);
-  } catch (e) {
-    alert("Gagal menyimpan config");
-  }
-};
-
-const resetConfig = () => {
-  if (confirm("Yakin ingin reset URL?")) {
-    waStore.logout(); // Hapus key lokal
-    // Opsional: Panggil API Backend untuk hapus data DB
-    // Disini hanya reset state frontend agar form muncul
-    waStore.baseUrl = '';
-    if (socket) socket.disconnect();
-  }
-}
-
-// Logic Koneksi Socket
-const connectSocket = (url) => {
-  if (socket) socket.disconnect();
-  if (!url) return;
-
-  statusMessage.value = `Menghubungkan ke ${url}...`;
-
-  socket = io(url);
-
-  socket.on("connect", () => {
-    statusMessage.value = "Terhubung ke Server Bot. Mengecek status WA...";
-    // Emit event requesting an immediate status check/resend if supported/needed
-    // socket.emit("check_status", activeSession.value);
-  });
-
-  // Listener Dinamis berdasarkan Session Aktif
-  setupSessionListeners(socket, activeSession.value);
-
-  socket.on("disconnect", () => {
-    statusMessage.value = "Terputus dari server.";
-    isConnected.value = false;
-  });
-
-  socket.on("connect_error", (err) => {
-    console.error("Socket error:", err.message);
-    statusMessage.value = "Gagal konek ke Server Bot (Cek URL/CORS).";
-    isConnected.value = false;
-    qrValue.value = null;
-  });
-};
-
-const setupSessionListeners = (socketInstance, sessionId) => {
-  // Remove existing dynamic listeners to avoid duplicates
-  socketInstance.removeAllListeners(`status_primary`);
-  socketInstance.removeAllListeners(`qr_code_primary`);
-  socketInstance.removeAllListeners(`status_backup_1`);
-  socketInstance.removeAllListeners(`qr_code_backup_1`);
-
-  socketInstance.on(`status_${sessionId}`, (message) => {
-    statusMessage.value = message;
-    if (message === "Terhubung" || message === "WhatsApp Terhubung!") { // "Terhubung" from new backend
-      qrValue.value = null;
-      if (!isConnected.value) {
-        isConnected.value = true;
-        showCelebration.value = true;
-        setTimeout(() => { showCelebration.value = false; }, 1000);
-      }
-    } else if (message === "Session Habis" || message === "Terputus") {
-      isConnected.value = false;
-    }
-  });
-
-  socketInstance.on(`qr_code_${sessionId}`, (qrData) => {
-    console.log(`QR Code diterima untuk ${sessionId}`);
-    qrValue.value = qrData;
-    statusMessage.value = "Silakan Scan QR Code";
-    isConnected.value = false;
-  });
-};
-
-const switchSession = (sessionId) => {
-  if (activeSession.value === sessionId) return;
-
-  activeSession.value = sessionId;
-  localStorage.setItem('wabot_active_session', sessionId);
-
-  // Reset UI State
-  qrValue.value = null;
-  isConnected.value = false;
-  statusMessage.value = "Mengecek status session...";
-
-  // Re-attach listeners for the new session
-  if (socket) {
-    setupSessionListeners(socket, sessionId);
-  }
-};
+const gowaStore = useGowaStore();
+const modalStore = useModalStore();
 
 onMounted(async () => {
-  // 1. Load config dari DB/Local
-  await waStore.loadConfig();
+  await gowaStore.fetchDevices();
+  gowaStore.initWebSockets();
+});
 
-  // 2. Jika URL sudah ada, inisialisasi socket
-  if (waStore.baseUrl) {
-    connectSocket(waStore.baseUrl);
+onUnmounted(() => {
+  gowaStore.cleanupSockets();
+});
+
+// -- Helpers --
+const getStatusLabel = (status) => {
+  switch (status) {
+    case 'CONNECTED': return 'Online';
+    case 'UNPAIRED': return 'Scan QR';
+    case 'CONNECTING': return 'Connecting...';
+    case 'DISCONNECTED': return 'Offline';
+    default: return status;
   }
-});
+};
 
-// Watcher jika URL berubah
-watch(() => waStore.baseUrl, (newUrl) => {
-  if (newUrl) connectSocket(newUrl);
-});
+const getStatusBadgeClass = (status) => {
+  switch (status) {
+    case 'CONNECTED': return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800';
+    case 'UNPAIRED': return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800';
+    case 'DISCONNECTED': return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800';
+    default: return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+  }
+};
 
-onBeforeUnmount(() => {
-  if (socket) socket.disconnect();
-});
+const getDeviceColors = (id, status) => {
+  if (status === 'CONNECTED') {
+    return { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-600 dark:text-green-400' };
+  }
+  // Warnai berdasarkan awalan nama agar gampang dibedakan (staging vs prod)
+  if (id.toLowerCase().includes('prod')) {
+    return { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-600 dark:text-purple-400' };
+  } else if (id.toLowerCase().includes('stag')) {
+    return { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400' };
+  }
+  return { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400' };
+};
+
+// -- Actions --
+const promptAddDevice = () => {
+  const deviceId = window.prompt("Masukkan ID Device (contoh: staging, production):");
+  if (deviceId && deviceId.trim() !== '') {
+    gowaStore.createDevice(deviceId.trim().toLowerCase());
+  }
+};
+
+const confirmDeleteDevice = (id) => {
+  modalStore.openDeleteModal({
+    title: `Hapus Device ${id}?`,
+    message: `Menghapus device akan memutus koneksi WhatsApp selamanya. Anda yakin?`,
+    onConfirm: () => gowaStore.deleteDevice(id)
+  });
+};
+
+const confirmLogoutDevice = (id) => {
+  modalStore.openDeleteModal({
+    title: `Logout Device ${id}?`,
+    message: `WhatsApp bot pada perangkat ini akan dikeluarkan. Anda harus scan ulang untuk terhubung. Lanjutkan?`,
+    onConfirm: () => gowaStore.logoutDevice(id)
+  });
+};
 </script>
