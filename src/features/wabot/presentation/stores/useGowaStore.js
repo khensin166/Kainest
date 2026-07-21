@@ -15,11 +15,12 @@ export const useGowaStore = defineStore('gowa', () => {
     isLoading.value = true;
     try {
       const response = await api.get('/wabot/devices');
-      if (response.data && response.data.data) {
-        devices.value = response.data.data.map(d => ({
-          id: d.device_id,
-          status: 'CONNECTING', 
-          name: d.device_id,
+      if (response.data && response.data.results) {
+        devices.value = response.data.results.map(d => ({
+          id: d.id, // GOWA uses UUID for id
+          status: d.state === 'logged_in' ? 'CONNECTED' : 'UNPAIRED', 
+          name: d.display_name || d.id,
+          jid: d.jid
         }));
       }
     } catch (error) {

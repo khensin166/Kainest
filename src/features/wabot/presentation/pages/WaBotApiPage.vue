@@ -212,7 +212,7 @@
             </div>
 
             <!-- Tombol blast -->
-            <button @click="confirmBlast" :disabled="isSending || selectedGroupIds.length === 0 || !blastMessage.trim()"
+            <button @click.stop.prevent="confirmBlast" :disabled="isSending || selectedGroupIds.length === 0 || !blastMessage.trim()"
               class="w-full py-3 rounded-xl font-bold text-sm transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               :class="isSending
                 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
