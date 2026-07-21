@@ -20,6 +20,7 @@ export const useModalStore = defineStore("modal", () => {
   const deleteMessage = ref(
     "Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan."
   );
+  const deleteConfirmLabel = ref("Hapus"); // Label tombol konfirmasi (bisa diubah)
   const deleteAction = ref(null);
   const isDeleting = ref(false);
 
@@ -72,9 +73,10 @@ export const useModalStore = defineStore("modal", () => {
   // =========================================
   // ACTIONS BARU UNTUK DELETE MODAL
   // =========================================
-  function openDeleteModal({ title, message, onConfirm }) {
+  function openDeleteModal({ title, message, onConfirm, confirmLabel = 'Hapus' }) {
     if (title) deleteTitle.value = title;
     if (message) deleteMessage.value = message;
+    deleteConfirmLabel.value = confirmLabel;
     deleteAction.value = onConfirm;
     isDeleteOpen.value = true;
   }
@@ -83,10 +85,10 @@ export const useModalStore = defineStore("modal", () => {
     isDeleteOpen.value = false;
     deleteAction.value = null;
     isDeleting.value = false;
-    // Reset pesan ke default (opsional)
+    // Reset ke default
     deleteTitle.value = "Hapus Item?";
-    deleteMessage.value =
-      "Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.";
+    deleteMessage.value = "Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.";
+    deleteConfirmLabel.value = "Hapus";
   }
 
   async function confirmDeleteAction() {
@@ -120,6 +122,7 @@ export const useModalStore = defineStore("modal", () => {
     isDeleteOpen,
     deleteTitle,
     deleteMessage,
+    deleteConfirmLabel,
     isDeleting,
     openDeleteModal,
     closeDeleteModal,

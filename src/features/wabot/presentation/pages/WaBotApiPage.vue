@@ -89,9 +89,9 @@
               <input type="checkbox" :checked="isAllSelected" :indeterminate="isSomeSelected && !isAllSelected"
                 @change="toggleSelectAll"
                 class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer" />
-              <span>{{ selectedGroupIds.size > 0 ? `${selectedGroupIds.size} grup dipilih` : 'Pilih Semua' }}</span>
+              <span>{{ selectedGroupIds.value.length > 0 ? `${selectedGroupIds.value.length} grup dipilih` : 'Pilih Semua' }}</span>
             </label>
-            <button v-if="selectedGroupIds.size > 0" @click="selectedGroupIds.clear()"
+            <button v-if="selectedGroupIds.value.length > 0" @click="selectedGroupIds.value = []"
               class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
               Batalkan Pilihan
             </button>
@@ -128,7 +128,7 @@
                   class="hover:bg-violet-50/50 dark:hover:bg-violet-900/10 transition-colors cursor-pointer"
                   @click="toggleSelect(group.groupId)">
                   <td class="px-5 py-3.5">
-                    <input type="checkbox" :checked="selectedGroupIds.has(group.groupId)"
+                    <input type="checkbox" :checked="selectedGroupIds.value.includes(group.groupId)"
                       @click.stop="toggleSelect(group.groupId)"
                       class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer" />
                   </td>
@@ -212,7 +212,7 @@
             </div>
 
             <!-- Tombol blast -->
-            <button @click="confirmBlast" :disabled="isSending || selectedGroupIds.size === 0 || !blastMessage.trim()"
+            <button @click="confirmBlast" :disabled="isSending || selectedGroupIds.value.length === 0 || !blastMessage.trim()"
               class="w-full py-3 rounded-xl font-bold text-sm transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               :class="isSending
                 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
@@ -221,7 +221,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
-              <span>{{ isSending ? 'Mengirim...' : `Blast ke ${selectedGroupIds.size} Grup` }}</span>
+              <span>{{ isSending ? 'Mengirim...' : `Blast ke ${selectedGroupIds.value.length} Grup` }}</span>
             </button>
 
             <p class="text-xs text-gray-400 dark:text-gray-500 text-center">
@@ -238,7 +238,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useModalStore } from '@/stores/modalStore';
 import GlobalDeleteModal from '@/components/modals/GlobalDeleteModal.vue';
 import api from '@/lib/apiClient';
@@ -253,7 +253,7 @@ const blastMessage = ref('');
 const blastResult = ref(null);
 const searchQuery = ref('');
 const filterMode = ref('all');
-const selectedGroupIds = reactive(new Set());
+const selectedGroupIds = ref([]); // Array untuk reaktivitas Vue 3 yang stabil
 
 // ─── Computed ─────────────────────────────────────────────
 const filteredGroups = computed(() => {
@@ -275,8 +275,8 @@ const filteredGroups = computed(() => {
 
 const linkedGroups = computed(() => activeGroups.value.filter(g => !g.needsRelink).length);
 const pendingGroups = computed(() => activeGroups.value.filter(g => g.needsRelink).length);
-const isAllSelected = computed(() => filteredGroups.value.length > 0 && filteredGroups.value.every(g => selectedGroupIds.has(g.groupId)));
-const isSomeSelected = computed(() => filteredGroups.value.some(g => selectedGroupIds.has(g.groupId)));
+const isAllSelected = computed(() => filteredGroups.value.length > 0 && filteredGroups.value.every(g => selectedGroupIds.value.includes(g.groupId)));
+const isSomeSelected = computed(() => filteredGroups.value.some(g => selectedGroupIds.value.includes(g.groupId)));
 
 // ─── Methods ──────────────────────────────────────────────
 const fetchGroups = async () => {
@@ -292,15 +292,18 @@ const fetchGroups = async () => {
 };
 
 const toggleSelect = (groupId) => {
-  if (selectedGroupIds.has(groupId)) selectedGroupIds.delete(groupId);
-  else selectedGroupIds.add(groupId);
+  const idx = selectedGroupIds.value.indexOf(groupId);
+  if (idx >= 0) selectedGroupIds.value.splice(idx, 1);
+  else selectedGroupIds.value.push(groupId);
 };
 
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
-    filteredGroups.value.forEach(g => selectedGroupIds.delete(g.groupId));
+    const filtered = filteredGroups.value.map(g => g.groupId);
+    selectedGroupIds.value = selectedGroupIds.value.filter(id => !filtered.includes(id));
   } else {
-    filteredGroups.value.forEach(g => selectedGroupIds.add(g.groupId));
+    const toAdd = filteredGroups.value.map(g => g.groupId).filter(id => !selectedGroupIds.value.includes(id));
+    selectedGroupIds.value.push(...toAdd);
   }
 };
 
@@ -343,11 +346,12 @@ const applyTemplate = (key) => {
 };
 
 const confirmBlast = () => {
-  if (selectedGroupIds.size === 0 || !blastMessage.value.trim()) return;
+  if (selectedGroupIds.value.length === 0 || !blastMessage.value.trim()) return;
 
   modalStore.openDeleteModal({
-    title: `Kirim Blast ke ${selectedGroupIds.size} Grup?`,
-    message: `Pesan akan dikirim ke ${selectedGroupIds.size} grup yang Anda pilih secara bertahap. Pastikan isi pesan sudah benar sebelum melanjutkan.`,
+    title: `Kirim Blast ke ${selectedGroupIds.value.length} Grup?`,
+    message: `Pesan akan dikirim ke ${selectedGroupIds.value.length} grup yang Anda pilih secara bertahap. Pastikan isi pesan sudah benar sebelum melanjutkan.`,
+    confirmLabel: '📤 Kirim Blast',
     onConfirm: sendBlast,
   });
 };
@@ -358,16 +362,16 @@ const sendBlast = async () => {
   try {
     const { data } = await api.post('/wabot/blast', {
       message: blastMessage.value,
-      groupIds: Array.from(selectedGroupIds),
+      groupIds: [...selectedGroupIds.value],
     });
     blastResult.value = data.summary;
     if (data.summary.success > 0) {
       blastMessage.value = '';
-      selectedGroupIds.clear();
+      selectedGroupIds.value = [];
     }
   } catch (e) {
     console.error('[Blast] Error:', e.message);
-    blastResult.value = { success: 0, failed: selectedGroupIds.size, failedGroups: [] };
+    blastResult.value = { success: 0, failed: selectedGroupIds.value.length, failedGroups: [] };
   } finally {
     isSending.value = false;
   }
