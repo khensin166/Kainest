@@ -238,7 +238,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { useModalStore } from '@/stores/modalStore';
 import GlobalDeleteModal from '@/components/modals/GlobalDeleteModal.vue';
 import api from '@/lib/apiClient';
@@ -345,12 +345,16 @@ const applyTemplate = (key) => {
   blastMessage.value = TEMPLATES[key] || '';
 };
 
-const confirmBlast = () => {
-  if (selectedGroupIds.value.length === 0 || !blastMessage.value.trim()) return;
+const confirmBlast = async () => {
+  if (selectedGroupIds.length === 0 || !blastMessage.value.trim()) return;
+
+  // Tunggu satu tick agar siklus event klik selesai sebelum backdrop modal muncul.
+  // Ini mencegah Dialog Headless UI mendeteksi klik sisa sebagai "klik di luar".
+  await nextTick();
 
   modalStore.openDeleteModal({
-    title: `Kirim Blast ke ${selectedGroupIds.value.length} Grup?`,
-    message: `Pesan akan dikirim ke ${selectedGroupIds.value.length} grup yang Anda pilih secara bertahap. Pastikan isi pesan sudah benar sebelum melanjutkan.`,
+    title: `Kirim Blast ke ${selectedGroupIds.length} Grup?`,
+    message: `Pesan akan dikirim ke ${selectedGroupIds.length} grup yang Anda pilih secara bertahap. Pastikan isi pesan sudah benar sebelum melanjutkan.`,
     confirmLabel: '📤 Kirim Blast',
     onConfirm: sendBlast,
   });
