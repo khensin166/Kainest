@@ -1,19 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import axios from 'axios';
+import api from '@/lib/apiClient';
 
-// Konfigurasi API GOWA
-const GOWA_BASE_URL = import.meta.env.VITE_GOWA_URL || 'https://gowa.kenantomfie.com';
+// WebSocket GOWA (Langsung ke GOWA karena WS tidak kena CORS strict)
 const GOWA_WS_URL = import.meta.env.VITE_GOWA_WS_URL || 'wss://gowa.kenantomfie.com/ws';
-const GOWA_AUTH = import.meta.env.VITE_GOWA_AUTH || 'Basic YWRtaW46YWRtaW4=';
-
-const gowaApi = axios.create({
-  baseURL: GOWA_BASE_URL,
-  headers: {
-    'Authorization': GOWA_AUTH,
-    'Content-Type': 'application/json',
-  },
-});
 
 export const useGowaStore = defineStore('gowa', () => {
   const devices = ref([]);
@@ -24,7 +14,7 @@ export const useGowaStore = defineStore('gowa', () => {
   const fetchDevices = async () => {
     isLoading.value = true;
     try {
-      const response = await gowaApi.get('/devices');
+      const response = await api.get('/wabot/devices');
       if (response.data && response.data.data) {
         devices.value = response.data.data.map(d => ({
           id: d.device_id,
@@ -41,7 +31,7 @@ export const useGowaStore = defineStore('gowa', () => {
 
   const createDevice = async (deviceId) => {
     try {
-      await gowaApi.post('/devices', { device_id: deviceId });
+      await api.post('/wabot/devices', { device_id: deviceId });
       await fetchDevices();
       connectWebSocket(deviceId);
       await fetchQr(deviceId);
@@ -57,7 +47,7 @@ export const useGowaStore = defineStore('gowa', () => {
         sockets.value[deviceId].close();
         delete sockets.value[deviceId];
       }
-      await gowaApi.delete(`/devices/${deviceId}`);
+      await api.delete(`/wabot/devices/${deviceId}`);
       devices.value = devices.value.filter(d => d.id !== deviceId);
       delete qrCodes.value[deviceId];
     } catch (error) {
@@ -68,7 +58,7 @@ export const useGowaStore = defineStore('gowa', () => {
 
   const logoutDevice = async (deviceId) => {
     try {
-      await gowaApi.post(`/devices/${deviceId}/logout`);
+      await api.post(`/wabot/devices/${deviceId}/logout`);
       updateDeviceStatus(deviceId, 'UNPAIRED');
       await fetchQr(deviceId);
     } catch (error) {
@@ -79,7 +69,7 @@ export const useGowaStore = defineStore('gowa', () => {
 
   const fetchQr = async (deviceId) => {
     try {
-      const response = await gowaApi.get(`/devices/${deviceId}/login`);
+      const response = await api.get(`/wabot/devices/${deviceId}/login`);
       if (response.data && response.data.data && response.data.data.qr) {
         qrCodes.value[deviceId] = response.data.data.qr;
       }
