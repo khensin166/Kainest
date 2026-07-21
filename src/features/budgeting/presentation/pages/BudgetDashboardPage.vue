@@ -57,12 +57,23 @@ const closeSetupModal = async (payload) => {
   if (payload && payload.refresh) {
     console.log("🔄 Me-refresh Dashboard secara background setelah modal setup tertutup...");
     await budgetStore.fetchDashboardSummary();
+    // Juga ambil data kantong terbaru agar cek onboarding akurat
+    await budgetStore.fetchPockets();
   }
 
   if (isSetupForced.value) {
     checkAndForceSetup();
   }
+
+  // 🌟 Onboarding Seamless: Jika gaji sudah diisi tapi belum ada kantong sama sekali,
+  // langsung buka PocketManagementModal agar user tidak perlu mencari tombolnya.
+  if (budgetStore.salary > 0 && budgetStore.pocketsList.length === 0) {
+    console.log("🎯 Onboarding: Gaji terisi tapi kantong masih kosong. Buka Pocket Modal otomatis...");
+    await nextTick();
+    isPocketModalOpen.value = true;
+  }
 };
+
 
 const checkAndForceSetup = () => {
   // Jika data sudah diload dan salary masih 0, force setup!
@@ -96,18 +107,36 @@ onMounted(async () => {
     budgetStore.fetchSpendingTrend();
   }
   checkAndForceSetup();
+
+  // 🌟 Onboarding Seamless: Cek apakah user sudah isi gaji tapi belum buat kantong
+  // Ini memastikan flow tetap berjalan meski user me-refresh halaman
+  if (budgetStore.salary > 0 && !isPocketModalOpen.value) {
+    await budgetStore.fetchPockets();
+    if (budgetStore.pocketsList.length === 0) {
+      console.log('🎯 Onboarding: Gaji ada tapi kantong kosong, buka Pocket Modal...');
+      isPocketModalOpen.value = true;
+    }
+  }
 });
 
 onActivated(async () => {
-  console.log("👀 User kembali melihat Dashboard, cek data baru...");
+  console.log('👀 User kembali melihat Dashboard, cek data baru...');
 
   await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
 
   // Guard: jangan panggil checkAndForceSetup jika pocket modal baru saja ditutup
-  // atau sedang dalam proses close (isPocketModalOpen masih true)
   if (!isPocketModalOpen.value) {
     checkAndForceSetup();
+
+    // 🌟 Onboarding Seamless: Jika gaji sudah ada tapi kantong masih 0
+    if (budgetStore.salary > 0) {
+      await budgetStore.fetchPockets();
+      if (budgetStore.pocketsList.length === 0) {
+        console.log('🎯 Onboarding (activated): Kantong kosong, buka Pocket Modal...');
+        isPocketModalOpen.value = true;
+      }
+    }
   }
 });
 

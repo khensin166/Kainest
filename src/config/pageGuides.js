@@ -11,23 +11,18 @@ export const pageGuides = {
     },
     {
       emoji: "📲",
-      title: "2. Setup WaBot (Personal)",
-      desc: "Mulai pencatatan otomatis via WhatsApp! Buka <strong>Profil (kanan atas)</strong> ➡️ <strong>Settings</strong> ➡️ <strong>Tautkan ke Bot WhatsApp</strong> pada kolom Nomor Telepon. Anda akan dialihkan untuk mengirimkan kode ke bot."
-    },
-    {
-      emoji: "🔗",
-      title: "3. Pairing Perangkat (Opsional)",
-      desc: "Ingin pasangan/anggota keluarga juga bisa mencatat ke akun ini? Validasi akun WA Anda terlebih dahulu, lalu minta mereka mengetik <strong>!link idunik</strong> ke bot Kainest untuk mendapatkan kode penyambungan."
+      title: "2. Hubungkan WhatsApp Bot",
+      desc: "Mulai pencatatan otomatis via WhatsApp! Buka <strong>Profil (kanan atas)</strong> ➡️ <strong>Pasangan</strong> ➡️ Salin kode tautanmu. Buat Grup WA baru, masukkan bot, lalu kirim kode itu di dalam grup. Akun dan grup langsung aktif sekaligus!"
     },
     {
       emoji: "👨‍👩‍👧‍👦",
-      title: "4. Integrasi ke Grup",
-      desc: "Setelah akun Anda tervalidasi, Anda bisa mengundang nomor bot Kainest ke dalam Grup WhatsApp (Keluarga/Pasangan). Setelah bot masuk grup, cukup ketik <strong>!aktifkan-kainest</strong> di grup tersebut agar bot siap melayani perintah dari grup."
+      title: "3. Integrasi ke Grup",
+      desc: "Ingin pasangan/keluarga bisa mencatat di satu tempat? Buat Grup WhatsApp bersama, undang bot Kainest, lalu kirimkan kode <strong>!link KODE_KAMU</strong> langsung di dalam grup tersebut. Grup otomatis aktif dan siap digunakan bersama!"
     },
     {
       emoji: "💬",
-      title: "5. Mulai Mencatat Cepat",
-      desc: "Selesai! Sekarang Anda cukup ketik <strong>'Makan siang 25k'</strong> atau <strong>'Beli bensin 50k'</strong> ke bot WA, dan AI kami akan otomatis memisahkannya ke kantong yang tepat!"
+      title: "4. Mulai Mencatat Cepat",
+      desc: "Selesai! Cukup ketik <strong>'Makan siang 25k'</strong> atau <strong>'Beli bensin 50k'</strong> ke bot, dan AI Kainest akan otomatis memisahkannya ke kantong yang tepat. Ketik <strong>!help</strong> di WhatsApp untuk melihat semua perintah yang tersedia."
     }
   ],
 
