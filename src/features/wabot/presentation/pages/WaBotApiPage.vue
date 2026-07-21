@@ -89,9 +89,9 @@
               <input type="checkbox" :checked="isAllSelected" :indeterminate="isSomeSelected && !isAllSelected"
                 @change="toggleSelectAll"
                 class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer" />
-              <span>{{ selectedGroupIds.value.length > 0 ? `${selectedGroupIds.value.length} grup dipilih` : 'Pilih Semua' }}</span>
+              <span>{{ selectedGroupIds.length > 0 ? `${selectedGroupIds.length} grup dipilih` : 'Pilih Semua' }}</span>
             </label>
-            <button v-if="selectedGroupIds.value.length > 0" @click="selectedGroupIds.value = []"
+            <button v-if="selectedGroupIds.length > 0" @click="selectedGroupIds = []"
               class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
               Batalkan Pilihan
             </button>
@@ -128,7 +128,7 @@
                   class="hover:bg-violet-50/50 dark:hover:bg-violet-900/10 transition-colors cursor-pointer"
                   @click="toggleSelect(group.groupId)">
                   <td class="px-5 py-3.5">
-                    <input type="checkbox" :checked="selectedGroupIds.value.includes(group.groupId)"
+                    <input type="checkbox" :checked="selectedGroupIds.includes(group.groupId)"
                       @click.stop="toggleSelect(group.groupId)"
                       class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer" />
                   </td>
@@ -212,7 +212,7 @@
             </div>
 
             <!-- Tombol blast -->
-            <button @click="confirmBlast" :disabled="isSending || selectedGroupIds.value.length === 0 || !blastMessage.trim()"
+            <button @click="confirmBlast" :disabled="isSending || selectedGroupIds.length === 0 || !blastMessage.trim()"
               class="w-full py-3 rounded-xl font-bold text-sm transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               :class="isSending
                 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
@@ -221,7 +221,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
-              <span>{{ isSending ? 'Mengirim...' : `Blast ke ${selectedGroupIds.value.length} Grup` }}</span>
+              <span>{{ isSending ? 'Mengirim...' : `Blast ke ${selectedGroupIds.length} Grup` }}</span>
             </button>
 
             <p class="text-xs text-gray-400 dark:text-gray-500 text-center">
