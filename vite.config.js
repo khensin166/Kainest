@@ -4,6 +4,10 @@ import { fileURLToPath, URL } from "url";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  esbuild: {
+    pure: ["console.log", "console.info", "console.debug"],
+    // cara hapus console logging di prod
+  },
   define: {
     "process.env": process.env,
   },
