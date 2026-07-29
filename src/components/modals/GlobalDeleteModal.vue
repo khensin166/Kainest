@@ -1,7 +1,6 @@
 <script setup>
 import { useModalStore } from '../../stores/modalStore';
 import BaseModal from './BaseModal.vue';
-import { DialogTitle } from '@headlessui/vue';
 
 const modalStore = useModalStore();
 </script>
@@ -19,9 +18,7 @@ const modalStore = useModalStore();
                     </svg>
                 </div>
                 <div>
-                    <DialogTitle>
-                        {{ modalStore.deleteTitle }}
-                    </DialogTitle>
+                    <span>{{ modalStore.deleteTitle }}</span>
                 </div>
             </div>
         </template>
@@ -51,8 +48,8 @@ const modalStore = useModalStore();
 
         <template #footer>
             <button type="button"
-                class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 transition-colors duration-200 sm:ml-3 sm:w-auto disabled:opacity-70 disabled:cursor-not-allowed"
-                @click="modalStore.confirmDeleteAction" :disabled="modalStore.isDeleting">
+                class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-colors duration-200 sm:ml-3 sm:w-auto disabled:opacity-70 disabled:cursor-not-allowed"
+                @click="modalStore.confirmDeleteAction()" :disabled="modalStore.isDeleting">
 
                 <span v-if="modalStore.isDeleting" class="flex items-center">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
@@ -70,9 +67,9 @@ const modalStore = useModalStore();
 
             <button type="button"
                 class="mt-2 sm:mt-0 inline-flex w-full justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200 sm:w-auto"
-                @click="modalStore.closeDeleteModal" :disabled="modalStore.isDeleting">
+                @click="modalStore.closeDeleteModal()" :disabled="modalStore.isDeleting">
                 Batal
             </button>
         </template>
     </BaseModal>
-</template>
+</template>
