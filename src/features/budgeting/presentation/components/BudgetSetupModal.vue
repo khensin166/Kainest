@@ -24,10 +24,27 @@
                         Gaji ini akan menjadi acuan 100% saat Anda mengatur persentase pembagian di <strong class="text-violet-600 dark:text-violet-400">Kelola Kantong</strong> nanti.
                     </p>
                 </div>
+
+                <!-- Dropdown Tanggal Gajian / Reset Siklus -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Tanggal Gajian / Reset Siklus Bulanan
+                    </label>
+                    <select v-model="payday"
+                        class="form-select w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500 sm:text-sm"
+                        :disabled="isSubmitting">
+                        <option v-for="day in paydayOptions" :key="day.value" :value="day.value">
+                            {{ day.label }}
+                        </option>
+                    </select>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        Bot Kainest akan mengirimkan laporan &amp; mereset siklus keuangan pada tanggal ini setiap bulannya.
+                    </p>
+                </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                    <button v-if="!forced" type="button"
+                <button v-if="!forced" type="button"
                     class="btn-sm border-gray-200 hover:border-gray-300 text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                     @click="$emit('close')" :disabled="isSubmitting">
                     Batal
@@ -43,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, defineProps, onMounted, nextTick } from 'vue';
+import { ref, computed, defineEmits, defineProps, onMounted, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import { formatRupiahNoSymbol } from '@/utils/Utils';
@@ -61,13 +78,28 @@ const budgetStore = useBudgetStore();
 // State lokal form
 const salary = ref('');
 const displaySalary = ref('');
+const payday = ref(31); // Default: Akhir Bulan
 const isSubmitting = ref(false);
+
+// Opsi dropdown tanggal gajian (1 - 31)
+const paydayOptions = computed(() => {
+    const options = [];
+    for (let i = 1; i <= 30; i++) {
+        options.push({ value: i, label: `Tanggal ${i}` });
+    }
+    options.push({ value: 31, label: '31 / Akhir Bulan (Default)' });
+    return options;
+});
 
 onMounted(async () => {
     // Isi gaji dari store jika sudah ada
     if (budgetStore.salary && budgetStore.salary > 0) {
         salary.value = budgetStore.salary;
         displaySalary.value = formatRupiahNoSymbol(budgetStore.salary);
+    }
+    // Isi payday dari store/profil jika sudah ada
+    if (budgetStore.payday) {
+        payday.value = budgetStore.payday;
     }
 });
 
@@ -104,7 +136,8 @@ const handleSubmit = async () => {
 
     const payload = {
         salary: Number(salary.value),
-        rent: 0
+        rent: 0,
+        payday: payday.value,
     };
 
     isSubmitting.value = true;
