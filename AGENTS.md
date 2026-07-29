@@ -186,3 +186,28 @@ docker compose down
 docker compose up -d
 ```
 
+## Roadmap & Ide Pengembangan Masa Depan (Inspirasi FinanceFlow PRO)
+Berikut adalah daftar fitur potensial yang dapat dikembangkan untuk Kainest ke depannya berdasarkan inspirasi UI/UX aplikasi kelas profesional:
+
+1. **Manajemen Tagihan & Cicilan (Upcoming Bills)**
+   - **Konsep:** Membuat modul "Target & Tagihan" di mana pengguna bisa memasukkan tagihan bulanan (langganan, cicilan, listrik).
+   - **Eksekusi AI:** Kainest atau Bot WhatsApp akan mengirimkan notifikasi pengingat otomatis (misal H-3) sebelum tagihan jatuh tempo.
+
+2. **Visualisasi Progres Target Tabungan (Saving Goals)**
+   - **Konsep:** Membuat tipe Kantong khusus bernama "Kantong Tabungan".
+   - **Mekanisme:** Uang yang dialokasikan ke kantong ini tidak dihitung sebagai pengeluaran bulanan, melainkan akan menambah *progress bar* menuju target spesifik (misal: Beli Laptop Rp 10.000.000).
+
+3. **Widget "AI Insight" & Status Kesehatan Keuangan**
+   - **Konsep:** Menampilkan skor kesehatan finansial pengguna di Dashboard (contoh: jika pengeluaran > pemasukan, status = Critical).
+   - **Eksekusi AI:** Menarik ringkasan analisis cerdas dari Groq AI untuk ditampilkan sebagai teks Insight harian di Dashboard (contoh: *"Pengeluaran makanmu minggu ini naik 20%, yuk rem sedikit"*).
+   - **Perbandingan Antar Bulan:** AI akan dapat melakukan analisis perbandingan pengeluaran antar bulan yang dipilih pengguna (misal: membandingkan kebiasaan belanja bulan Juni dan Juli) untuk memberikan *insight* tren yang lebih mendalam.
+
+4. **UI/UX: Premium Dark Mode & Glassmorphism Pekat**
+   - **Konsep:** Menambahkan opsi tema "Premium Dark Mode" di pengaturan aplikasi.
+   - **Visual:** Menggunakan latar belakang *navy blue/dark gray* polos dengan panel semi-transparan (Tailwind `dark:` classes yang lebih *deep*) untuk memberikan kesan elegan layaknya aplikasi finansial/trading level pro.
+
+## Update 30 Juli 2026
+- **Frontend (BudgetSetupModal.vue)**:
+  - Menambahkan dropdown **"Tanggal Gajian / Reset Siklus Bulanan"** dengan pilihan tanggal 1-30 serta `31/Akhir Bulan (Default)`.
+  - Mengirim properti `payday` ke backend API `/budget/setup` bersama dengan nilai `salary`.
+
