@@ -421,13 +421,21 @@ export const useBudgetStore = defineStore("budget", () => {
     const result = await setupBudgetUseCaseInstance.execute(data);
     
     if (result.right) {
-      // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
-      // agar tidak terjadi race condition UI saat modal ditutup.
+      // 🆕 Trigger ulang semua data secara paralel karena payday/salary mungkin berubah.
+      // Ini memastikan Dashboard, Grafik, Riwayat Transaksi, dan Rekap Bulanan
+      // langsung mencerminkan siklus baru tanpa user perlu refresh manual.
+      await Promise.all([
+        fetchDashboardSummary(),
+        fetchSpendingTrend(),
+        fetchTransactions({ page: 1 }, true),
+        fetchMonthlyHistory(),
+      ]);
       return { success: true };
     } else {
       return { success: false, message: result.left?.message };
     }
   }
+
 
   // =========================================
   // 💰 POCKET ACTIONS

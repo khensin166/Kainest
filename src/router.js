@@ -61,6 +61,13 @@ const routes = [
     component: SharedNotePage,
   },
   
+  // ✅ ROUTE UNTUK SHARED SPLIT BILL (PUBLIK)
+  {
+    path: "/share/split/:id",
+    name: "SharedSplit",
+    component: () => import('./features/budgeting/presentation/pages/SharedSplitPage.vue'),
+  },
+  
   // ✅ ROUTE VALENTINE (PUBLIK)
   {
     path: "/valentine",
@@ -144,6 +151,12 @@ const routes = [
         path: "history",
         name: "FinancialHistory",
         component: () => import('./features/budgeting/presentation/pages/FinancialHistoryPage.vue'),
+        meta: { requiredPermission: "budgeting" },
+      },
+      {
+        path: "split",
+        name: "SplitBill",
+        component: () => import('./features/budgeting/presentation/pages/SplitBillPage.vue'),
         meta: { requiredPermission: "budgeting" },
       },
       {

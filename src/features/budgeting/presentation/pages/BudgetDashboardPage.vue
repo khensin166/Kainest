@@ -55,8 +55,6 @@ const closeSetupModal = async (payload) => {
   await nextTick();
 
   if (payload && payload.refresh) {
-    console.log("🔄 Me-refresh Dashboard secara background setelah modal setup tertutup...");
-    await budgetStore.fetchDashboardSummary();
     // Juga ambil data kantong terbaru agar cek onboarding akurat
     await budgetStore.fetchPockets();
   }

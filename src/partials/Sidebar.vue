@@ -212,6 +212,12 @@ export default {
             iconComponent: ChartBarIcon,
             requiredPermission: "budgeting",
           },
+          {
+            name: "Split Bill AI",
+            path: "/app/split",
+            iconComponent: SparklesIcon,
+            requiredPermission: "budgeting",
+          },
         ],
       },
       {
