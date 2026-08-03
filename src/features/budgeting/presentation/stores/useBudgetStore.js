@@ -1,6 +1,7 @@
 // useBudgetStore.js
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import { useModalStore } from "../../../../stores/modalStore";
 
 // --- Dependencies Injection ---
 import { 
@@ -297,6 +298,16 @@ export const useBudgetStore = defineStore("budget", () => {
       fetchMonthlyHistory();
       return { success: true };
     } else {
+      // 🔒 Handle Tutup Buku Permanen — tampilkan modal warning khusus
+      if (result.left?.code === 'TRANSACTION_CLOSED_PERIOD') {
+        const modalStore = useModalStore();
+        modalStore.openModal({
+          newTitle: '🔒 Periode Sudah Tutup Buku',
+          newMessage: result.left.message,
+          newStatus: 'warning',
+        });
+        return { success: false, closedPeriod: true, message: result.left.message };
+      }
       return { success: false, message: result.left?.message };
     }
   }
@@ -315,6 +326,16 @@ export const useBudgetStore = defineStore("budget", () => {
       fetchTransactions({ page: 1 }, true);
       return { success: true };
     } else {
+      // 🔒 Handle Tutup Buku Permanen
+      if (result.left?.code === 'TRANSACTION_CLOSED_PERIOD') {
+        const modalStore = useModalStore();
+        modalStore.openModal({
+          newTitle: '🔒 Periode Sudah Tutup Buku',
+          newMessage: result.left.message,
+          newStatus: 'warning',
+        });
+        return { success: false, closedPeriod: true, message: result.left.message };
+      }
       return { success: false, message: result.left?.message };
     }
   }
