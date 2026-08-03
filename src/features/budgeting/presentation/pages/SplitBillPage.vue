@@ -176,11 +176,50 @@
 
       </div>
     </div>
+
+    <!-- HISTORY SECTION -->
+    <div class="mt-12 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="p-6 md:p-8">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+          <ReceiptRefundIcon class="w-6 h-6 text-violet-500" />
+          Riwayat Split Bill
+        </h2>
+        
+        <div v-if="isLoadingHistory" class="animate-pulse flex space-x-4">
+          <div class="flex-1 space-y-4 py-1">
+            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div class="space-y-2">
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div v-else-if="historyList.length === 0" class="text-center py-8">
+          <p class="text-gray-500 dark:text-gray-400">Belum ada riwayat Split Bill. Yuk coba scan struk pertamamu!</p>
+        </div>
+        
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-for="history in historyList" :key="history.id" 
+               @click="openHistory(history.id)"
+               class="bg-gray-50 dark:bg-gray-700/30 border border-gray-200 dark:border-gray-700 p-5 rounded-xl cursor-pointer hover:border-violet-400 dark:hover:border-violet-500 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg">{{ history.merchant || 'Tempat Makan' }}</h3>
+              <span class="text-xs text-gray-500">{{ formatDate(history.createdAt) }}</span>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Total: <span class="font-bold text-violet-600 dark:text-violet-400">Rp {{ formatNumber(history.totalAmount) }}</span></p>
+            <div class="text-xs text-gray-500 truncate">
+              {{ parseSummary(history.summaryText) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import apiClient from '@/lib/apiClient';
 import { 
@@ -196,6 +235,45 @@ import {
 const router = useRouter();
 const steps = ['Upload Struk', 'Review & Teman', 'Bagi Menu'];
 const currentStep = ref(0);
+
+// History State
+const historyList = ref([]);
+const isLoadingHistory = ref(false);
+
+const fetchHistory = async () => {
+  isLoadingHistory.value = true;
+  try {
+    const res = await apiClient.get('/split/history');
+    if (res.data && res.data.data) {
+      historyList.value = res.data.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch split history", error);
+  } finally {
+    isLoadingHistory.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchHistory();
+});
+
+const openHistory = (id) => {
+  const url = router.resolve(`/share/split/${id}`).href;
+  window.open(url, '_blank');
+};
+
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString('id-ID', options);
+};
+
+const parseSummary = (text) => {
+  if (!text) return "";
+  // Ambil beberapa baris pertama dari ringkasan WA
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  return lines.slice(0, 3).join(' ') + '...';
+};
 
 // State Step 1
 const fileInput = ref(null);

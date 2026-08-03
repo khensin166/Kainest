@@ -79,7 +79,7 @@
                 Salin Teks ke WA
               </button>
               
-              <button @click="showBlastModal = true" class="flex-1 btn bg-green-500 hover:bg-green-600 text-white rounded-xl py-3 shadow-lg shadow-green-500/30 flex justify-center items-center gap-2 font-semibold transition-all">
+              <button v-if="authStore.user?.id === sessionData.userId" @click="showBlastModal = true" class="flex-1 btn bg-green-500 hover:bg-green-600 text-white rounded-xl py-3 shadow-lg shadow-green-500/30 flex justify-center items-center gap-2 font-semibold transition-all">
                 <ChatBubbleLeftRightIcon class="w-5 h-5" />
                 Blast Otomatis via Bot
               </button>
@@ -145,6 +145,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
 import { 
   SparklesIcon, 
   UsersIcon, 
@@ -159,6 +160,7 @@ import {
 
 const route = useRoute();
 const splitId = route.params.id;
+const authStore = useAuthStore();
 
 const isLoading = ref(true);
 const error = ref(null);
