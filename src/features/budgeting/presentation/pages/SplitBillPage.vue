@@ -242,6 +242,7 @@ const scanReceipt = async () => {
   isScanning.value = true;
   try {
     const formData = new FormData();
+    formData.append('image', selectedFile.value);
     formData.append('file', selectedFile.value);
     
     // Panggil API Backend (Kainest_Be) proxy
