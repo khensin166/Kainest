@@ -89,6 +89,24 @@
           </div>
         </div>
 
+        <!-- KAINEST PROMO BANNER -->
+        <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-violet-500/30">
+          <div class="space-y-2 text-center sm:text-left">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider text-violet-100">
+              <SparklesIcon class="w-4 h-4 text-amber-300" /> Powered by Kainest AI
+            </div>
+            <h3 class="text-xl font-bold">Mau Split Bill Otomatis & Atur Keuangan Praktis?</h3>
+            <p class="text-sm text-violet-100 max-w-xl">
+              Jangan pusing hitung patungan manual! Gunakan <strong>Aplikasi Kainest</strong> untuk scan struk otomatis, alokasi pajak adil, & kelola dompet keuanganmu dengan AI cerdas.
+            </p>
+          </div>
+          <a href="https://kainest.kenantomfie.com" target="_blank" rel="noopener noreferrer" 
+             class="px-6 py-3 bg-white text-violet-700 hover:bg-violet-50 font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2 text-sm">
+            Coba Kainest Sekarang
+            <ArrowTopRightOnSquareIcon class="w-4 h-4" />
+          </a>
+        </div>
+
       </div>
     </div>
     
@@ -124,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { 
@@ -135,7 +153,8 @@ import {
   XCircleIcon,
   XMarkIcon,
   PaperAirplaneIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ArrowTopRightOnSquareIcon
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
@@ -151,11 +170,12 @@ const blastPhone = ref('');
 const isBlasting = ref(false);
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const DOMAIN_URL = 'https://kainest.kenantomfie.com';
 
 onMounted(async () => {
   try {
     // Ini public endpoint, jadi panggil lgsg dengan axios tanpa interceptor auth
-    const response = await axios.get(`${API_BASE}/api/split/share/${splitId}`);
+    const response = await axios.get(`${API_BASE}/split/share/${splitId}`);
     
     if (response.data && response.data.data) {
       sessionData.value = response.data.data;
@@ -170,10 +190,28 @@ onMounted(async () => {
   }
 });
 
+// Format ringkasan pesan dengan tambahan selling copy untuk Kainest App
+const formattedSummaryText = computed(() => {
+  const baseText = sessionData.value.summaryText || '';
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : `${DOMAIN_URL}/share/split/${splitId}`;
+
+  const promoFooter = [
+    '',
+    '----------------------------------',
+    '⚡ *Mau Split Bill Otomatis & Kelola Keuangan Praktis?*',
+    'Gunakan aplikasi *Kainest* untuk scan struk pake AI, bagi tagihan adil, dan atur dompet keuanganmu! 🚀',
+    '',
+    `🌐 *Website Kainest:* ${DOMAIN_URL}`,
+    `🔗 *Akses Tagihan Ini Online:* ${currentUrl}`
+  ].join('\n');
+
+  return baseText ? (baseText + promoFooter) : promoFooter;
+});
+
 const copyToClipboard = () => {
-  if (sessionData.value.summaryText) {
-    navigator.clipboard.writeText(sessionData.value.summaryText);
-    alert("Teks berhasil disalin! Silakan paste di WhatsApp.");
+  if (formattedSummaryText.value) {
+    navigator.clipboard.writeText(formattedSummaryText.value);
+    alert("Teks ringkasan tagihan & link Kainest berhasil disalin! Silakan paste di WhatsApp.");
   }
 };
 
@@ -185,16 +223,16 @@ const blastWhatsApp = async () => {
     // Ambil auth token dari localStorage karena ini action privileged
     const token = localStorage.getItem("auth_token");
     
-    await axios.post(`${API_BASE}/api/split/blast`, {
+    await axios.post(`${API_BASE}/split/blast`, {
       targetPhone: blastPhone.value,
-      message: sessionData.value.summaryText
+      message: formattedSummaryText.value
     }, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     
-    alert("Berhasil! Pesan tagihan telah diblast via GOWA.");
+    alert("Berhasil! Pesan tagihan & link promo Kainest telah diblast via GOWA.");
     showBlastModal.value = false;
   } catch (err) {
     console.error("Gagal blast:", err);
@@ -213,3 +251,4 @@ const formatDate = (isoString) => {
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 </script>
+

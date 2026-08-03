@@ -245,7 +245,7 @@ const scanReceipt = async () => {
     formData.append('file', selectedFile.value);
     
     // Panggil API Backend (Kainest_Be) proxy
-    const response = await apiClient.post('/api/split/scan', formData, {
+    const response = await apiClient.post('/split/scan', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -323,7 +323,8 @@ const processSplit = async () => {
       assignments: assignmentsPayload
     };
 
-    const response = await apiClient.post('/api/split', payload);
+    // Simpan data Split ke DB
+    const response = await apiClient.post('/split', payload);
     
     if (response.data && response.data.sessionId) {
       // Redirect ke halaman share
