@@ -82,17 +82,20 @@ export class BudgetRepository {
 
       if (response.success && response.data) {
         const entity = BudgetMapper.mapTransactionFromApi(response.data);
-        // 🔑 KUNCI PERBAIKAN: Bungkus dengan right()
         return right(entity);
       } else {
         return left(
-          new ServerFailure(response.message || "Gagal mencatat transaksi.")
+          new ServerFailure(response.message || "Gagal mencatat transaksi.", response.code)
         );
       }
     } catch (error) {
-      return left(
-        new ServerFailure(error.response?.data?.message || "Kesalahan server.")
+      // Ekstrak kode error dari response API (misal: TRANSACTION_CLOSED_PERIOD)
+      const errData = error.response?.data;
+      const failure = new ServerFailure(
+        errData?.message || error.response?.data?.message || "Kesalahan server.",
+        errData?.code
       );
+      return left(failure);
     }
   }
 
@@ -244,16 +247,16 @@ export class BudgetRepository {
     try {
       const response = await this.remoteSource.updateTransaction(id, data);
       if (response.success) {
-        // Opsional: kembalikan data yang baru diupdate jika perlu
         return right(true);
       } else {
         return left(
-          new ServerFailure(response.message || "Gagal mengupdate transaksi.")
+          new ServerFailure(response.message || "Gagal mengupdate transaksi.", response.code)
         );
       }
     } catch (error) {
+      const errData = error.response?.data;
       return left(
-        new ServerFailure(error.response?.data?.message || error.message)
+        new ServerFailure(errData?.message || error.message, errData?.code)
       );
     }
   }

@@ -186,6 +186,17 @@
                   </div>
                 </div>
 
+                <!-- Rincian Pemasukan -->
+                <div v-if="item.salarySnapshot > 0"
+                  class="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 rounded-xl mt-4">
+                  <span class="text-base">💰</span>
+                  <div class="text-xs text-emerald-700 dark:text-emerald-300 flex flex-wrap gap-x-4 gap-y-1">
+                    <span>Gaji: <strong>{{ formatRupiah(item.salarySnapshot) }}</strong></span>
+                    <span v-if="item.additionalIncome > 0">+ Pemasukan Tambahan: <strong>{{ formatRupiah(item.additionalIncome) }}</strong></span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold">= Total Masuk: {{ formatRupiah(item.totalIncome) }}</span>
+                  </div>
+                </div>
+
                 <!-- Overbudget Warning -->
                 <div
                   v-if="(item.totalSpent > item.totalIncome && item.totalIncome > 0) || (item.totalSpent > item.totalBudgeted && item.totalIncome === 0)"

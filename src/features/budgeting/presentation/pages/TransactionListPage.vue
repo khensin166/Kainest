@@ -28,12 +28,18 @@ const dateRange = ref(null);
 const limitPerPage = ref(10);
 const searchQuery = ref('');
 const typeFilter = ref('ALL');
+const scopeFilter = ref('cycle'); // 'cycle' = siklus aktif, 'all' = semua waktu
 const isFilterExpanded = ref(false);
 
 const typeOptions = [
   { label: 'Semua Tipe', value: 'ALL' },
   { label: 'Pemasukan', value: 'INCOME' },
   { label: 'Pengeluaran', value: 'EXPENSE' },
+];
+
+const scopeOptions = [
+  { label: 'Siklus Aktif', value: 'cycle' },
+  { label: 'Semua Waktu', value: 'all' },
 ];
 
 // Opsi untuk dropdown limit
@@ -55,7 +61,8 @@ const selectedTransactionId = computed(() => selectedTransactionToEdit.value?.id
 // Fungsi Load Data
 const loadTransactions = (page = 1, force = false) => {
   let startDate, endDate;
-  if (dateRange.value && dateRange.value.length === 2) {
+  // Saat scope=all, jangan kirim filter tanggal apapun
+  if (scopeFilter.value !== 'all' && dateRange.value && dateRange.value.length === 2) {
     startDate = dateRange.value[0];
     endDate = dateRange.value[1];
   }
@@ -66,7 +73,8 @@ const loadTransactions = (page = 1, force = false) => {
     startDate: startDate,
     endDate: endDate,
     search: searchQuery.value,
-    type: typeFilter.value
+    type: typeFilter.value,
+    scope: scopeFilter.value,
   }, force);
 };
 
@@ -87,11 +95,12 @@ const isFilterActive = computed(() => {
   const hasLimitFilter = limitPerPage.value !== 10;
   const hasSearchFilter = searchQuery.value.trim() !== '';
   const hasTypeFilter = typeFilter.value !== 'ALL';
+  const hasScopeFilter = scopeFilter.value !== 'cycle';
 
-  return hasDateFilter || hasLimitFilter || hasSearchFilter || hasTypeFilter;
+  return hasDateFilter || hasLimitFilter || hasSearchFilter || hasTypeFilter || hasScopeFilter;
 });
 
-watch([dateRangeStable, limitPerPage, searchQuery, typeFilter], () => {
+watch([dateRangeStable, limitPerPage, searchQuery, typeFilter, scopeFilter], () => {
   debouncedLoadTransactions();
 });
 
@@ -100,6 +109,7 @@ const clearFilters = () => {
   limitPerPage.value = 10;
   searchQuery.value = '';
   typeFilter.value = 'ALL';
+  scopeFilter.value = 'cycle';
 };
 
 const nextPage = () => { if (budgetStore.hasNextPage) loadTransactions(budgetStore.currentPage + 1); };
@@ -252,6 +262,15 @@ onActivated(() => {
             <div class="w-full">
               <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Tampilkan Data</label>
               <DropdownSelect :wFull="true" label="Tampilkan" :options="limitOptions" v-model="limitPerPage" />
+            </div>
+
+            <!-- Rentang Waktu (Scope) -->
+            <div class="w-full">
+              <label class="block text-sm font-medium mb-1.5 text-gray-600 dark:text-gray-300">Rentang Waktu</label>
+              <DropdownSelect :wFull="true" label="Rentang Waktu" :options="scopeOptions" v-model="scopeFilter" />
+              <p v-if="scopeFilter === 'all'" class="mt-1.5 text-xs text-violet-600 dark:text-violet-400">
+                📅 Menampilkan semua transaksi dari seluruh waktu
+              </p>
             </div>
 
           </div>

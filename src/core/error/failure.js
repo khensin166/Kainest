@@ -6,8 +6,13 @@ export class Failure {
   }
 }
 
-// Kegagalan spesifik dari server (misal: error 500)
-export class ServerFailure extends Failure {}
+// Kegagalan spesifik dari server (misal: error 422, 500)
+export class ServerFailure extends Failure {
+  constructor(message, code) {
+    super(message);
+    this.code = code ?? null; // Kode error semantik (misal: 'TRANSACTION_CLOSED_PERIOD')
+  }
+}
 
 // Kegagalan karena tidak ada koneksi internet
 export class NetworkFailure extends Failure {
