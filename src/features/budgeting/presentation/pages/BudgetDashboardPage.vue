@@ -9,6 +9,7 @@ import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 import PocketManagementModal from '../components/PocketManagementModal.vue';
 import BudgetSetupModal from '../components/BudgetSetupModal.vue';
+import AiSuggestionBanner from '../components/AiSuggestionBanner.vue';
 import PageGuide from '@/components/PageGuide.vue';
 import Tooltip from '@/components/Tooltip.vue';
 import { pageGuides } from '@/config/pageGuides';
@@ -106,6 +107,9 @@ onMounted(async () => {
   }
   checkAndForceSetup();
 
+  // 🧠 Ambil saran AI budget terbaru (jika ada) saat pertama kali buka
+  budgetStore.fetchAiSuggestion();
+
   // 🌟 Onboarding Seamless: Cek apakah user sudah isi gaji tapi belum buat kantong
   // Ini memastikan flow tetap berjalan meski user me-refresh halaman
   if (budgetStore.salary > 0 && !isPocketModalOpen.value) {
@@ -122,6 +126,9 @@ onActivated(async () => {
 
   await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
+  
+  // 🧠 Ambil saran AI budget terbaru (jika ada)
+  budgetStore.fetchAiSuggestion();
 
   // Guard: jangan panggil checkAndForceSetup jika pocket modal baru saja ditutup
   if (!isPocketModalOpen.value) {
@@ -142,6 +149,9 @@ onActivated(async () => {
 
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+
+    <!-- 🧠 AI Suggestion Banner (Hanya Muncul Jika Ada Saran) -->
+    <AiSuggestionBanner />
 
     <div class="sm:flex sm:justify-between sm:items-start mb-8">
       <div class="mb-4 sm:mb-0">
@@ -279,7 +289,7 @@ onActivated(async () => {
         :preventClose="isSetupForced">
         <template #header>Pengaturan Budget Bulanan</template>
         <template #body>
-          <BudgetSetupModal @close="closeSetupModal" :forced="isSetupForced" />
+          <BudgetSetupModal v-if="isSetupModalOpen" @close="closeSetupModal" :forced="isSetupForced" />
         </template>
       </BaseModal>
     </div>

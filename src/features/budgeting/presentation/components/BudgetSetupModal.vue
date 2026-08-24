@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineEmits, defineProps, onMounted, nextTick } from 'vue';
+import { ref, computed, defineEmits, defineProps, onMounted, nextTick, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 import { formatRupiahNoSymbol } from '@/utils/Utils';
@@ -91,17 +91,18 @@ const paydayOptions = computed(() => {
     return options;
 });
 
-onMounted(async () => {
-    // Isi gaji dari store jika sudah ada
-    if (budgetStore.salary && budgetStore.salary > 0) {
-        salary.value = budgetStore.salary;
-        displaySalary.value = formatRupiahNoSymbol(budgetStore.salary);
+watch(() => budgetStore.salary, (newVal) => {
+    if (newVal && newVal > 0 && !salary.value) { // only sync if local is empty to prevent overriding user input
+        salary.value = newVal;
+        displaySalary.value = formatRupiahNoSymbol(newVal);
     }
-    // Isi payday dari store/profil jika sudah ada
-    if (budgetStore.payday) {
-        payday.value = budgetStore.payday;
+}, { immediate: true });
+
+watch(() => budgetStore.payday, (newVal) => {
+    if (newVal) {
+        payday.value = Number(newVal);
     }
-});
+}, { immediate: true });
 
 const onSalaryInput = (e) => {
     const input = e.target;

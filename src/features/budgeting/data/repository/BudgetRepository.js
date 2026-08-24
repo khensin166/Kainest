@@ -31,6 +31,8 @@ export class BudgetRepository {
         // Kita kembalikan objek data lengkap (totals + categories) agar Store bisa pakai keduanya
         return right({
           salary: response.data.salary,
+          payday: response.data.payday,
+          cycle: response.data.cycle,
           month: response.data.month,
           totals: response.data.totals,
           categories: entities,
@@ -390,10 +392,6 @@ export class BudgetRepository {
   // 📅 MONTHLY HISTORY
   // ==========================================
 
-  /**
-   * Mengambil semua riwayat keuangan bulanan user
-   * @returns {Promise<Either<Failure, Array>>}
-   */
   async getMonthlyHistory() {
     try {
       const response = await this.remoteSource.getMonthlyHistory();
@@ -401,6 +399,34 @@ export class BudgetRepository {
         return right(response.data || []);
       }
       return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  // ==========================================
+  // 🧠 AI SUGGESTION
+  // ==========================================
+
+  async getAiSuggestion() {
+    try {
+      const response = await this.remoteSource.getAiSuggestion();
+      if (response.success) {
+        return right(response.data); // data can be null if no suggestion exists
+      }
+      return left(new ServerFailure(response.message || "Gagal memuat saran AI."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async applyAiSuggestion(suggestionId) {
+    try {
+      const response = await this.remoteSource.applyAiSuggestion(suggestionId);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal menerapkan saran AI."));
     } catch (error) {
       return left(new ServerFailure(error.response?.data?.message || error.message));
     }
