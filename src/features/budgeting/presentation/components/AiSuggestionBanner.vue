@@ -65,9 +65,8 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBudgetStore } from '../stores/useBudgetStore';
-import { useToast } from 'vue-toastification';
+import { toast } from 'vue3-toastify';
 
-const toast = useToast();
 const budgetStore = useBudgetStore();
 const { aiSuggestion, isApplyingSuggestion } = storeToRefs(budgetStore);
 
