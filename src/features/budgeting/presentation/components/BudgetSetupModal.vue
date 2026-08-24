@@ -100,7 +100,7 @@ watch(() => budgetStore.salary, (newVal) => {
 
 watch(() => budgetStore.payday, (newVal) => {
     if (newVal) {
-        payday.value = newVal;
+        payday.value = Number(newVal);
     }
 }, { immediate: true });
 
