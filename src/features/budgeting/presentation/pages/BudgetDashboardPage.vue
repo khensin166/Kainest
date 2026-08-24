@@ -107,6 +107,9 @@ onMounted(async () => {
   }
   checkAndForceSetup();
 
+  // 🧠 Ambil saran AI budget terbaru (jika ada) saat pertama kali buka
+  budgetStore.fetchAiSuggestion();
+
   // 🌟 Onboarding Seamless: Cek apakah user sudah isi gaji tapi belum buat kantong
   // Ini memastikan flow tetap berjalan meski user me-refresh halaman
   if (budgetStore.salary > 0 && !isPocketModalOpen.value) {

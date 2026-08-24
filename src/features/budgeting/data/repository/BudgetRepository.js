@@ -389,6 +389,22 @@ export class BudgetRepository {
   }
 
   // ==========================================
+  // 📅 MONTHLY HISTORY
+  // ==========================================
+
+  async getMonthlyHistory() {
+    try {
+      const response = await this.remoteSource.getMonthlyHistory();
+      if (response.success) {
+        return right(response.data || []);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  // ==========================================
   // 🧠 AI SUGGESTION
   // ==========================================
 
