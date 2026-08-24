@@ -387,20 +387,28 @@ export class BudgetRepository {
   }
 
   // ==========================================
-  // 📅 MONTHLY HISTORY
+  // 🧠 AI SUGGESTION
   // ==========================================
 
-  /**
-   * Mengambil semua riwayat keuangan bulanan user
-   * @returns {Promise<Either<Failure, Array>>}
-   */
-  async getMonthlyHistory() {
+  async getAiSuggestion() {
     try {
-      const response = await this.remoteSource.getMonthlyHistory();
+      const response = await this.remoteSource.getAiSuggestion();
       if (response.success) {
-        return right(response.data || []);
+        return right(response.data); // data can be null if no suggestion exists
       }
-      return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
+      return left(new ServerFailure(response.message || "Gagal memuat saran AI."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
+
+  async applyAiSuggestion(suggestionId) {
+    try {
+      const response = await this.remoteSource.applyAiSuggestion(suggestionId);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal menerapkan saran AI."));
     } catch (error) {
       return left(new ServerFailure(error.response?.data?.message || error.message));
     }

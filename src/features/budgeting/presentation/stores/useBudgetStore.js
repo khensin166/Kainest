@@ -21,7 +21,9 @@ import {
   deletePocketUseCase,
   bulkSetupPocketsUseCase,
   updatePocketKeywordsUseCase,
-  getMonthlyHistoryUseCase
+  getMonthlyHistoryUseCase,
+  getAiSuggestionUseCase,
+  applyAiSuggestionUseCase,
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -41,6 +43,8 @@ const deletePocketUseCaseInstance = deletePocketUseCase;
 const bulkSetupPocketsUseCaseInstance = bulkSetupPocketsUseCase;
 const updatePocketKeywordsUseCaseInstance = updatePocketKeywordsUseCase;
 const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
+const getAiSuggestionUseCaseInstance = getAiSuggestionUseCase;
+const applyAiSuggestionUseCaseInstance = applyAiSuggestionUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -70,10 +74,16 @@ export const useBudgetStore = defineStore("budget", () => {
   const historyList = ref([]);
   const isLoadingHistory = ref(false);
 
+  // AI Suggestion State
+  const aiSuggestion = ref(null);
+  const isLoadingAiSuggestion = ref(false);
+  const isApplyingSuggestion = ref(false);
+
   // =========================================
   // 🧠 GETTERS
   // =========================================
   const salary = computed(() => summaryData.value?.salary || 0);
+  const payday = computed(() => summaryData.value?.payday || 31); // 🆕 Pre-fill BudgetSetupModal
   const budgetCategories = computed(() => summaryData.value?.categories || []);
   const totalRemaining = computed(
     () => summaryData.value?.totals?.remaining || 0
@@ -555,6 +565,35 @@ export const useBudgetStore = defineStore("budget", () => {
     }
   }
 
+  // ==========================================
+  // 🧠 AI SUGGESTION ACTIONS
+  // ==========================================
+
+  const fetchAiSuggestion = async () => {
+    isLoadingAiSuggestion.value = true;
+    const result = await getAiSuggestionUseCaseInstance.execute();
+    if (result.right) {
+      aiSuggestion.value = result.right;
+    } else {
+      console.error(result.left?.message);
+      aiSuggestion.value = null;
+    }
+    isLoadingAiSuggestion.value = false;
+  };
+
+  const applyAiSuggestion = async (suggestionId) => {
+    isApplyingSuggestion.value = true;
+    const result = await applyAiSuggestionUseCaseInstance.execute(suggestionId);
+    isApplyingSuggestion.value = false;
+    if (result.right) {
+      // Setelah apply berhasil, refresh summary & hapus banner
+      await fetchDashboardSummary();
+      aiSuggestion.value = null; 
+      return { success: true, data: result.right };
+    }
+    return { success: false, message: result.left?.message };
+  };
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -582,8 +621,14 @@ export const useBudgetStore = defineStore("budget", () => {
     historyList,
     isLoadingHistory,
 
+    // AI Suggestion State
+    aiSuggestion,
+    isLoadingAiSuggestion,
+    isApplyingSuggestion,
+
     // Getters
     salary,
+    payday,   // 🆕
     budgetCategories,
     totalRemaining,
     unallocatedBudget,
@@ -625,5 +670,9 @@ export const useBudgetStore = defineStore("budget", () => {
 
     // History Actions
     fetchMonthlyHistory,
+    
+    // AI Actions
+    fetchAiSuggestion,
+    applyAiSuggestion,
   };
 });
