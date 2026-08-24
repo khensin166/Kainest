@@ -286,7 +286,7 @@ onActivated(async () => {
         :preventClose="isSetupForced">
         <template #header>Pengaturan Budget Bulanan</template>
         <template #body>
-          <BudgetSetupModal @close="closeSetupModal" :forced="isSetupForced" />
+          <BudgetSetupModal v-if="isSetupModalOpen" @close="closeSetupModal" :forced="isSetupForced" />
         </template>
       </BaseModal>
     </div>
