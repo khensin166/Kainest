@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="aiSuggestion" class="ai-suggestion-banner rounded-xl bg-white dark:bg-gray-800 mb-6 shadow-sm border border-gray-100 dark:border-gray-700/60 overflow-hidden">
 
     <!-- Banner utama -->
@@ -63,7 +63,21 @@
           </svg>
           {{ isApplying ? 'Menerapkan...' : 'Apply 1-Click' }}
         </button>
-        <p class="text-xs text-gray-500 dark:text-gray-400 text-center sm:text-right">
+        <button
+          @click="handleDismiss"
+          :disabled="isApplying || isDismissing"
+          class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          <svg v-if="isDismissing" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          {{ isDismissing ? 'Mengabaikan...' : 'Abaikan' }}
+        </button>
+        <p class="text-xs text-gray-500 dark:text-gray-400 text-center sm:text-right mt-1.5">
           Otomatis update limit kantongmu
         </p>
       </div>
@@ -118,9 +132,10 @@ import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';
 
 const budgetStore = useBudgetStore();
-const { aiSuggestion, isApplyingSuggestion } = storeToRefs(budgetStore);
+const { aiSuggestion, isApplyingSuggestion, isDismissingSuggestion } = storeToRefs(budgetStore);
 
 const isApplying = computed(() => isApplyingSuggestion.value);
+const isDismissing = computed(() => isDismissingSuggestion.value);
 const showDetails = ref(false);
 
 const changedPockets = computed(() =>
@@ -138,6 +153,17 @@ const handleApply = async () => {
     toast.success(`Berhasil menerapkan ${result.data.appliedCount} rekomendasi budget dari AI!`);
   } else {
     toast.error(result.message || 'Gagal menerapkan rekomendasi budget.');
+  }
+};
+
+const handleDismiss = async () => {
+  if (!aiSuggestion.value?.id) return;
+  const result = await budgetStore.dismissAiSuggestion(aiSuggestion.value.id);
+  if (result.success) {
+    showDetails.value = false;
+    toast.success(`Saran AI diabaikan.`);
+  } else {
+    toast.error(result.message || 'Gagal mengabaikan rekomendasi budget.');
   }
 };
 </script>

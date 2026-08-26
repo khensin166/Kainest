@@ -1,4 +1,5 @@
 // useBudgetStore.js
+
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
@@ -24,6 +25,7 @@ import {
   getMonthlyHistoryUseCase,
   getAiSuggestionUseCase,
   applyAiSuggestionUseCase,
+  dismissAiSuggestionUseCase,
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -45,6 +47,7 @@ const updatePocketKeywordsUseCaseInstance = updatePocketKeywordsUseCase;
 const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
 const getAiSuggestionUseCaseInstance = getAiSuggestionUseCase;
 const applyAiSuggestionUseCaseInstance = applyAiSuggestionUseCase;
+const dismissAiSuggestionUseCaseInstance = dismissAiSuggestionUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -78,6 +81,7 @@ export const useBudgetStore = defineStore("budget", () => {
   const aiSuggestion = ref(null);
   const isLoadingAiSuggestion = ref(false);
   const isApplyingSuggestion = ref(false);
+  const isDismissingSuggestion = ref(false);
 
   // =========================================
   // 🧠 GETTERS
@@ -602,6 +606,18 @@ export const useBudgetStore = defineStore("budget", () => {
     return { success: false, message: result.left?.message };
   };
 
+  const dismissAiSuggestion = async (suggestionId) => {
+    isDismissingSuggestion.value = true;
+    const result = await dismissAiSuggestionUseCaseInstance.execute(suggestionId);
+    isDismissingSuggestion.value = false;
+    if (result.right) {
+      // Hilangkan banner langsung dari state
+      aiSuggestion.value = null; 
+      return { success: true, data: result.right };
+    }
+    return { success: false, message: result.left?.message };
+  };
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -633,6 +649,7 @@ export const useBudgetStore = defineStore("budget", () => {
     aiSuggestion,
     isLoadingAiSuggestion,
     isApplyingSuggestion,
+    isDismissingSuggestion,
 
     // Getters
     salary,
@@ -682,5 +699,6 @@ export const useBudgetStore = defineStore("budget", () => {
     // AI Actions
     fetchAiSuggestion,
     applyAiSuggestion,
+    dismissAiSuggestion,
   };
 });

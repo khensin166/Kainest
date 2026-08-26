@@ -170,4 +170,9 @@ export class BudgetRemoteSource {
     const response = await apiClient.post("/budget/ai-suggestion/apply", { suggestionId });
     return response.data;
   }
+
+  async dismissAiSuggestion(suggestionId) {
+    const response = await apiClient.post("/budget/ai-suggestion/dismiss", { suggestionId });
+    return response.data;
+  }
 }

@@ -38,6 +38,7 @@ import { ClassifyTransactionUseCase } from "../../features/budgeting/domain/use-
 import { GetMonthlyHistoryUseCase } from "../../features/budgeting/domain/use-cases/GetMonthlyHistoryUseCase";
 import { GetAiSuggestionUseCase } from "../../features/budgeting/domain/use-cases/GetAiSuggestionUseCase";
 import { ApplyAiSuggestionUseCase } from "../../features/budgeting/domain/use-cases/ApplyAiSuggestionUseCase";
+import { DismissAiSuggestionUseCase } from "../../features/budgeting/domain/use-cases/DismissAiSuggestionUseCase";
 
 import { GetNotesUseCase } from "../../features/notes/domain/use-cases/GetNotesUseCase";
 import { GetNoteByIdUseCase } from "../../features/notes/domain/use-cases/GetNoteByIdUseCase";
@@ -102,6 +103,7 @@ export const classifyTransactionUseCase = new ClassifyTransactionUseCase(budgetR
 export const getMonthlyHistoryUseCase = new GetMonthlyHistoryUseCase(budgetRepository);
 export const getAiSuggestionUseCase = new GetAiSuggestionUseCase(budgetRepository);
 export const applyAiSuggestionUseCase = new ApplyAiSuggestionUseCase(budgetRepository);
+export const dismissAiSuggestionUseCase = new DismissAiSuggestionUseCase(budgetRepository);
 
 export const getNotesUseCase = new GetNotesUseCase(noteRepository);
 export const getNoteByIdUseCase = new GetNoteByIdUseCase(noteRepository);
