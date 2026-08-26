@@ -39,6 +39,10 @@ const props = defineProps({
   }
 })
 
+// Helper: ambil CSS variable dari tema aktif (light/dark)
+const getCssVar = (name) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+
 // Konfigurasi Opsi Visual Grafik (Agar terlihat modern & bersih)
 const chartOptions = {
   responsive: true,
@@ -57,10 +61,10 @@ const chartOptions = {
     tooltip: {
       mode: 'index',
       intersect: false,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      titleColor: '#1f2937', // gray-800
-      bodyColor: '#1f2937',
-      borderColor: '#e5e7eb', // gray-200
+      get backgroundColor() { return getCssVar('--color-chart-tooltip-bg') || 'rgba(255,255,255,0.9)' },
+      get titleColor()      { return getCssVar('--color-chart-tooltip-text') || '#1f2937' },
+      get bodyColor()       { return getCssVar('--color-chart-tooltip-text') || '#1f2937' },
+      get borderColor()     { return getCssVar('--color-chart-tooltip-border') || '#e5e7eb' },
       borderWidth: 1,
       callbacks: {
         // Format angka di tooltip jadi Rupiah
@@ -89,7 +93,7 @@ const chartOptions = {
     y: {
       beginAtZero: true, // Sumbu Y selalu mulai dari 0
       grid: {
-        color: 'rgba(200, 200, 200, 0.2)', // Garis grid horizontal tipis
+        get color() { return getCssVar('--color-chart-grid') || 'rgba(200,200,200,0.2)' }, // Garis grid horizontal tipis
         borderDash: [5, 5] // Garis putus-putus
       },
       ticks: {

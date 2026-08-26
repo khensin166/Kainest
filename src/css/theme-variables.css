@@ -1,0 +1,129 @@
+﻿/**
+ * Kainest Design System - Centralized Theme Variables
+ *
+ * Cara pakai:
+ * 1. Untuk mengubah tema, cukup edit nilai di sini.
+ * 2. Untuk menambah tema baru (misal "pink theme"), buat :root.theme-pink {} dan isi ulang variabelnya.
+ * 3. Semua variabel di sini otomatis tersedia sebagai Tailwind utility class
+ *    via @theme di style.css (mis: bg-brand-primary, text-brand-muted, dll).
+ *
+ * KELOMPOK VARIABEL:
+ *  --color-brand-*         -> Warna aksen utama merek (violet)
+ *  --color-surface-*       -> Latar belakang halaman/kartu/input
+ *  --color-border-*        -> Warna border elemen
+ *  --color-text-*          -> Warna teks berbagai hierarki
+ *  --color-status-*        -> Warna status (danger, success, warning, info)
+ *  --color-chart-*         -> Warna untuk Chart.js (diakses via JS getComputedStyle)
+ */
+
+/* ===========================
+   LIGHT MODE (default)
+   =========================== */
+:root {
+  /* Brand / Aksen Utama (Violet) */
+  --color-brand-primary:       #6b2d7d;
+  --color-brand-primary-hover: #541c67;
+  --color-brand-light:         #f9d3ff;
+  --color-brand-soft:          #d080d7;
+  --color-brand-muted:         #9b55a9;
+  --color-brand-text:          #6b2d7d;
+
+  /* Surface (Latar Belakang) */
+  --color-surface-page:        #f9fafb;
+  --color-surface-card:        #ffffff;
+  --color-surface-input:       #ffffff;
+  --color-surface-hover:       #f3f4f6;
+  --color-surface-subtle:      #f9fafb;
+
+  /* Border */
+  --color-border-default:      #e5e7eb;
+  --color-border-muted:        #f3f4f6;
+  --color-border-strong:       #bfc4cd;
+
+  /* Text */
+  --color-text-primary:        #111827;
+  --color-text-secondary:      #1f2937;
+  --color-text-muted:          #6b7280;
+  --color-text-faint:          #9ca3af;
+  --color-text-inverse:        #ffffff;
+
+  /* Status */
+  --color-status-danger:       #fa4949;
+  --color-status-danger-bg:    #ffe8e8;
+  --color-status-danger-text:  #941818;
+  --color-status-success:      #34bd68;
+  --color-status-success-bg:   #d2ffe2;
+  --color-status-success-text: #0f5429;
+  --color-status-warning:      #dfad2b;
+  --color-status-warning-bg:   #fff2c9;
+  --color-status-warning-text: #4f3d0e;
+  --color-status-info:         #3193da;
+  --color-status-info-bg:      #e3f3ff;
+  --color-status-info-text:    #124d79;
+
+  /* Chart */
+  --color-chart-expense:       #834193;
+  --color-chart-expense-fill:  rgba(131, 65, 147, 0.12);
+  --color-chart-income:        #34bd68;
+  --color-chart-income-fill:   rgba(52, 189, 104, 0.08);
+  --color-chart-grid:          rgba(191, 196, 205, 0.2);
+  --color-chart-tooltip-bg:    rgba(255, 255, 255, 0.95);
+  --color-chart-tooltip-text:  #1f2937;
+  --color-chart-tooltip-border:#e5e7eb;
+}
+
+/* ===========================
+   DARK MODE
+   =========================== */
+:root.dark {
+  /* Brand */
+  --color-brand-primary:       #834193;
+  --color-brand-primary-hover: #9b55a9;
+  --color-brand-light:         rgba(107, 45, 125, 0.25);
+  --color-brand-soft:          #3d0d51;
+  --color-brand-muted:         #b46abf;
+  --color-brand-text:          #e87fcd;
+
+  /* Surface */
+  --color-surface-page:        #111827;
+  --color-surface-card:        #1f2937;
+  --color-surface-input:       #1f2937;
+  --color-surface-hover:       #374151;
+  --color-surface-subtle:      #374151;
+
+  /* Border */
+  --color-border-default:      rgba(55, 65, 81, 0.6);
+  --color-border-muted:        rgba(55, 65, 81, 0.4);
+  --color-border-strong:       #4b5563;
+
+  /* Text */
+  --color-text-primary:        #f9fafb;
+  --color-text-secondary:      #f3f4f6;
+  --color-text-muted:          #9ca3af;
+  --color-text-faint:          #6b7280;
+  --color-text-inverse:        #111827;
+
+  /* Status */
+  --color-status-danger:       #ff5656;
+  --color-status-danger-bg:    rgba(250, 73, 73, 0.15);
+  --color-status-danger-text:  #ffd1d1;
+  --color-status-success:      #3ec972;
+  --color-status-success-bg:   rgba(52, 189, 104, 0.15);
+  --color-status-success-text: #b1fdcd;
+  --color-status-warning:      #f0bb33;
+  --color-status-warning-bg:   rgba(223, 173, 43, 0.15);
+  --color-status-warning-text: #ffe7a0;
+  --color-status-info:         #56b1f3;
+  --color-status-info-bg:      rgba(49, 147, 218, 0.15);
+  --color-status-info-text:    #d1ecff;
+
+  /* Chart */
+  --color-chart-expense:       #b46abf;
+  --color-chart-expense-fill:  rgba(180, 106, 191, 0.15);
+  --color-chart-income:        #4bd37d;
+  --color-chart-income-fill:   rgba(75, 211, 125, 0.1);
+  --color-chart-grid:          rgba(75, 85, 99, 0.25);
+  --color-chart-tooltip-bg:    rgba(17, 24, 39, 0.95);
+  --color-chart-tooltip-text:  #f3f4f6;
+  --color-chart-tooltip-border:#374151;
+}
