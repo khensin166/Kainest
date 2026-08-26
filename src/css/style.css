@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=fallback");
 
 @import "tailwindcss";
+@import "./theme-variables.css";
 @import "./additional-styles/flatpickr.css";
 @import "./additional-styles/utility-patterns.css" layer(components);
 
@@ -120,6 +121,48 @@
   --text-6xl--letter-spacing: -0.02em;
 
   --breakpoint-xs: 480px;
+
+  /* ── Semantic Brand/Theme Tokens (dari theme-variables.css) ── */
+  /* Brand */
+  --color-brand-primary:       var(--color-brand-primary);
+  --color-brand-primary-hover: var(--color-brand-primary-hover);
+  --color-brand-light:         var(--color-brand-light);
+  --color-brand-soft:          var(--color-brand-soft);
+  --color-brand-muted:         var(--color-brand-muted);
+  --color-brand-text:          var(--color-brand-text);
+
+  /* Surface */
+  --color-surface-page:        var(--color-surface-page);
+  --color-surface-card:        var(--color-surface-card);
+  --color-surface-input:       var(--color-surface-input);
+  --color-surface-hover:       var(--color-surface-hover);
+  --color-surface-subtle:      var(--color-surface-subtle);
+
+  /* Border */
+  --color-border-default:      var(--color-border-default);
+  --color-border-muted:        var(--color-border-muted);
+  --color-border-strong:       var(--color-border-strong);
+
+  /* Text */
+  --color-text-primary:        var(--color-text-primary);
+  --color-text-secondary:      var(--color-text-secondary);
+  --color-text-muted:          var(--color-text-muted);
+  --color-text-faint:          var(--color-text-faint);
+  --color-text-inverse:        var(--color-text-inverse);
+
+  /* Status */
+  --color-status-danger:       var(--color-status-danger);
+  --color-status-danger-bg:    var(--color-status-danger-bg);
+  --color-status-danger-text:  var(--color-status-danger-text);
+  --color-status-success:      var(--color-status-success);
+  --color-status-success-bg:   var(--color-status-success-bg);
+  --color-status-success-text: var(--color-status-success-text);
+  --color-status-warning:      var(--color-status-warning);
+  --color-status-warning-bg:   var(--color-status-warning-bg);
+  --color-status-warning-text: var(--color-status-warning-text);
+  --color-status-info:         var(--color-status-info);
+  --color-status-info-bg:      var(--color-status-info-bg);
+  --color-status-info-text:    var(--color-status-info-text);
 }
 
 /*

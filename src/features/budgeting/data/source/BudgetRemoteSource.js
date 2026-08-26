@@ -156,4 +156,23 @@ export class BudgetRemoteSource {
     const response = await apiClient.get("/budget/history");
     return response.data;
   }
+
+  // ==========================================
+  // 🧠 AI SUGGESTION ENDPOINTS
+  // ==========================================
+
+  async getAiSuggestion() {
+    const response = await apiClient.get("/budget/ai-suggestion");
+    return response.data;
+  }
+
+  async applyAiSuggestion(suggestionId) {
+    const response = await apiClient.post("/budget/ai-suggestion/apply", { suggestionId });
+    return response.data;
+  }
+
+  async dismissAiSuggestion(suggestionId) {
+    const response = await apiClient.post("/budget/ai-suggestion/dismiss", { suggestionId });
+    return response.data;
+  }
 }

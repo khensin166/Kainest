@@ -431,4 +431,16 @@ export class BudgetRepository {
       return left(new ServerFailure(error.response?.data?.message || error.message));
     }
   }
+
+  async dismissAiSuggestion(suggestionId) {
+    try {
+      const response = await this.remoteSource.dismissAiSuggestion(suggestionId);
+      if (response.success) {
+        return right(response.data);
+      }
+      return left(new ServerFailure(response.message || "Gagal mengabaikan saran AI."));
+    } catch (error) {
+      return left(new ServerFailure(error.response?.data?.message || error.message));
+    }
+  }
 }

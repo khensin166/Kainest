@@ -1,4 +1,5 @@
 // useBudgetStore.js
+
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
@@ -24,6 +25,7 @@ import {
   getMonthlyHistoryUseCase,
   getAiSuggestionUseCase,
   applyAiSuggestionUseCase,
+  dismissAiSuggestionUseCase,
 } from "../../../../core/di/di";
 
 // No more manual instantiation - Clean! ✨
@@ -45,6 +47,7 @@ const updatePocketKeywordsUseCaseInstance = updatePocketKeywordsUseCase;
 const getMonthlyHistoryUseCaseInstance = getMonthlyHistoryUseCase;
 const getAiSuggestionUseCaseInstance = getAiSuggestionUseCase;
 const applyAiSuggestionUseCaseInstance = applyAiSuggestionUseCase;
+const dismissAiSuggestionUseCaseInstance = dismissAiSuggestionUseCase;
 
 export const useBudgetStore = defineStore("budget", () => {
   // =========================================
@@ -78,6 +81,7 @@ export const useBudgetStore = defineStore("budget", () => {
   const aiSuggestion = ref(null);
   const isLoadingAiSuggestion = ref(false);
   const isApplyingSuggestion = ref(false);
+  const isDismissingSuggestion = ref(false);
 
   // =========================================
   // 🧠 GETTERS
@@ -120,6 +124,10 @@ export const useBudgetStore = defineStore("budget", () => {
     const hasIncome = incomeTrendData.value.length > 0;
     if (!hasExpense && !hasIncome) return null;
 
+    // Ambil warna dari CSS variable tema aktif
+    const getCssVar = (name) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
     // Gabungkan semua label tanggal dari kedua dataset
     const allDates = new Set([
       ...expenseTrendData.value.map(d => d.date),
@@ -134,28 +142,32 @@ export const useBudgetStore = defineStore("budget", () => {
     const datasets = [];
 
     if (hasExpense) {
+      const expenseColor = getCssVar('--color-chart-expense') || '#834193';
+      const expenseFill  = getCssVar('--color-chart-expense-fill') || 'rgba(131,65,147,0.12)';
       datasets.push({
         label: "Pengeluaran",
         data: labels.map(d => expenseMap[d] || 0),
-        borderColor: "#ef4444",        // Merah
-        backgroundColor: "rgba(239, 68, 68, 0.1)",
+        borderColor: expenseColor,
+        backgroundColor: expenseFill,
         borderWidth: 2,
         tension: 0.3,
         fill: true,
-        pointBackgroundColor: "#ef4444",
+        pointBackgroundColor: expenseColor,
       });
     }
 
     if (hasIncome) {
+      const incomeColor = getCssVar('--color-chart-income') || '#34bd68';
+      const incomeFill  = getCssVar('--color-chart-income-fill') || 'rgba(52,189,104,0.08)';
       datasets.push({
         label: "Pemasukan",
         data: labels.map(d => incomeMap[d] || 0),
-        borderColor: "#22c55e",        // Hijau
-        backgroundColor: "rgba(34, 197, 94, 0.08)",
+        borderColor: incomeColor,
+        backgroundColor: incomeFill,
         borderWidth: 2,
         tension: 0.3,
         fill: true,
-        pointBackgroundColor: "#22c55e",
+        pointBackgroundColor: incomeColor,
       });
     }
 
@@ -594,6 +606,18 @@ export const useBudgetStore = defineStore("budget", () => {
     return { success: false, message: result.left?.message };
   };
 
+  const dismissAiSuggestion = async (suggestionId) => {
+    isDismissingSuggestion.value = true;
+    const result = await dismissAiSuggestionUseCaseInstance.execute(suggestionId);
+    isDismissingSuggestion.value = false;
+    if (result.right) {
+      // Hilangkan banner langsung dari state
+      aiSuggestion.value = null; 
+      return { success: true, data: result.right };
+    }
+    return { success: false, message: result.left?.message };
+  };
+
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
     // State
@@ -625,6 +649,7 @@ export const useBudgetStore = defineStore("budget", () => {
     aiSuggestion,
     isLoadingAiSuggestion,
     isApplyingSuggestion,
+    isDismissingSuggestion,
 
     // Getters
     salary,
@@ -674,5 +699,6 @@ export const useBudgetStore = defineStore("budget", () => {
     // AI Actions
     fetchAiSuggestion,
     applyAiSuggestion,
+    dismissAiSuggestion,
   };
 });
