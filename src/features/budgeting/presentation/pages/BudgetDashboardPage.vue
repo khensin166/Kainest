@@ -56,17 +56,22 @@ const closeSetupModal = async (payload) => {
   await nextTick();
 
   if (payload && payload.refresh) {
-    // Juga ambil data kantong terbaru agar cek onboarding akurat
-    await budgetStore.fetchPockets();
+    // Refresh dashboard agar data salary/payday terbaru langsung tampil
+    await budgetStore.fetchDashboardSummary();
   }
 
-  if (isSetupForced.value) {
+  // Hanya paksa setup kembali jika konteksnya memang forced DAN salary masih 0
+  if (isSetupForced.value && budgetStore.salary === 0) {
     checkAndForceSetup();
+  } else {
+    // Setup berhasil, lepaskan flag forced
+    isSetupForced.value = false;
   }
 
   // 🌟 Onboarding Seamless: Jika gaji sudah diisi tapi belum ada kantong sama sekali,
   // langsung buka PocketManagementModal agar user tidak perlu mencari tombolnya.
-  if (budgetStore.salary > 0 && budgetStore.pocketsList.length === 0) {
+  // Menggunakan budgetCategories dari summary yang baru saja di-refresh.
+  if (budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0)) {
     console.log("🎯 Onboarding: Gaji terisi tapi kantong masih kosong. Buka Pocket Modal otomatis...");
     await nextTick();
     isPocketModalOpen.value = true;
@@ -101,20 +106,20 @@ provide('closeModalFunc', closeTransactionModal);
 
 // Panggil data saat komponen dimount (dibuka pertama kali)
 onMounted(async () => {
+  // 🧠 Ambil saran AI budget terbaru lebih dulu — paralel, tidak perlu await
+  // agar Banner AI langsung muncul tanpa menunggu loading data utama
+  budgetStore.fetchAiSuggestion();
+
   if (!budgetStore.hasData) {
     await budgetStore.fetchDashboardSummary();
     budgetStore.fetchSpendingTrend();
   }
   checkAndForceSetup();
 
-  // 🧠 Ambil saran AI budget terbaru (jika ada) saat pertama kali buka
-  budgetStore.fetchAiSuggestion();
-
   // 🌟 Onboarding Seamless: Cek apakah user sudah isi gaji tapi belum buat kantong
-  // Ini memastikan flow tetap berjalan meski user me-refresh halaman
+  // Menggunakan budgetCategories dari data summary yang sudah dimuat di atas
   if (budgetStore.salary > 0 && !isPocketModalOpen.value) {
-    await budgetStore.fetchPockets();
-    if (budgetStore.pocketsList.length === 0) {
+    if (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) {
       console.log('🎯 Onboarding: Gaji ada tapi kantong kosong, buka Pocket Modal...');
       isPocketModalOpen.value = true;
     }
@@ -124,23 +129,21 @@ onMounted(async () => {
 onActivated(async () => {
   console.log('👀 User kembali melihat Dashboard, cek data baru...');
 
+  // 🧠 Ambil saran AI budget terbaru lebih dulu — paralel, tidak perlu await
+  budgetStore.fetchAiSuggestion();
+
   await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
-  
-  // 🧠 Ambil saran AI budget terbaru (jika ada)
-  budgetStore.fetchAiSuggestion();
 
   // Guard: jangan panggil checkAndForceSetup jika pocket modal baru saja ditutup
   if (!isPocketModalOpen.value) {
     checkAndForceSetup();
 
     // 🌟 Onboarding Seamless: Jika gaji sudah ada tapi kantong masih 0
-    if (budgetStore.salary > 0) {
-      await budgetStore.fetchPockets();
-      if (budgetStore.pocketsList.length === 0) {
-        console.log('🎯 Onboarding (activated): Kantong kosong, buka Pocket Modal...');
-        isPocketModalOpen.value = true;
-      }
+    // Menggunakan budgetCategories dari summary yang baru saja di-refresh
+    if (budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0)) {
+      console.log('🎯 Onboarding (activated): Kantong kosong, buka Pocket Modal...');
+      isPocketModalOpen.value = true;
     }
   }
 });
