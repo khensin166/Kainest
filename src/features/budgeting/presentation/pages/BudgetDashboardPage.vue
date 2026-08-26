@@ -53,12 +53,13 @@ const isSetupForced = ref(false);
 const closeSetupModal = async (payload) => {
   isSetupModalOpen.value = false;
 
+  // Tunggu animasi penutupan modal selesai (BaseModal pakai duration-200)
   await nextTick();
 
-  if (payload && payload.refresh) {
-    // Refresh dashboard agar data salary/payday terbaru langsung tampil
-    await budgetStore.fetchDashboardSummary();
-  }
+  // Catatan: fetchDashboardSummary TIDAK dipanggil di sini.
+  // BudgetSetupModal sudah memanggil action di Store saat submit,
+  // sehingga data salary sudah terupdate di Store. Memanggil ulang di sini
+  // hanya akan menyebabkan loading state berkedip (double-fetch).
 
   // Hanya paksa setup kembali jika konteksnya memang forced DAN salary masih 0
   if (isSetupForced.value && budgetStore.salary === 0) {
@@ -69,11 +70,12 @@ const closeSetupModal = async (payload) => {
   }
 
   // 🌟 Onboarding Seamless: Jika gaji sudah diisi tapi belum ada kantong sama sekali,
-  // langsung buka PocketManagementModal agar user tidak perlu mencari tombolnya.
-  // Menggunakan budgetCategories dari summary yang baru saja di-refresh.
+  // otomatis buka PocketManagementModal setelah jeda singkat.
+  // Jeda 700ms memberikan kesan visual yang jelas: Modal Gaji sudah TERTUTUP PENUH,
+  // baru kemudian Modal Kantong muncul sebagai langkah berikutnya.
   if (budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0)) {
-    console.log("🎯 Onboarding: Gaji terisi tapi kantong masih kosong. Buka Pocket Modal otomatis...");
-    await nextTick();
+    console.log("🎯 Onboarding: Gaji terisi tapi kantong masih kosong. Membuka Pocket Modal dalam 700ms...");
+    await new Promise(resolve => setTimeout(resolve, 700));
     isPocketModalOpen.value = true;
   }
 };
