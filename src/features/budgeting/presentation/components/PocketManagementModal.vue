@@ -5,9 +5,9 @@
     </div>
 
     <!-- 🌟 Onboarding Banner: Tampil hanya saat kantong masih kosong -->
-    <div v-if="isOnboarding" class="mb-5 p-4 rounded-xl border border-border-default bg-surface-subtle">
+    <div v-if="isOnboarding" class="mb-5 p-4 rounded-md border border-border-default bg-surface-subtle">
       <div class="flex items-start gap-3">
-        <span class="text-2xl mt-0.5">👋</span>
+        <IconWave class="w-6 h-6 mt-0.5 shrink-0 text-brand-primary" aria-hidden="true" />
         <div>
           <p class="text-sm font-semibold text-text-primary">Selamat datang! Ayo buat kantong keuangan pertamamu</p>
           <p class="text-xs text-text-primary mt-1 leading-relaxed">
@@ -22,18 +22,18 @@
     <div class="mb-6 p-4 rounded-lg bg-surface-subtle border border-border-default">
       <div class="flex items-center justify-between">
         <span class="text-sm font-medium text-text-secondary">Total Persentase Terpakai:</span>
-        <span class="text-lg font-bold" :class="totalPercentage > 100 ? 'text-red-600' : 'text-text-primary font-bold'">
+        <span class="text-lg font-bold" :class="totalPercentage > 100 ? 'text-status-danger' : 'text-text-primary font-bold'">
           {{ totalPercentage }}%
         </span>
       </div>
-      <p v-if="totalPercentage > 100" class="text-xs text-red-500 mt-1">
+      <p v-if="totalPercentage > 100" class="text-xs text-status-danger mt-1">
         Total persentase tidak boleh melebihi 100%.
       </p>
     </div>
 
     <form @submit.prevent="handleSubmit">
       <!-- Blueprint Recommendations — Collapsible -->
-      <div class="mb-6 border border-border-default rounded-xl overflow-hidden">
+      <div class="mb-6 border border-border-default rounded-md overflow-hidden">
         <!-- Toggle Header -->
         <button
           type="button"
@@ -41,17 +41,11 @@
           class="w-full flex items-center justify-between px-4 py-3 bg-surface-card hover:bg-surface-hover transition-colors"
         >
           <span class="text-sm font-medium text-text-primary flex items-center gap-2">
-            <span class="animate-pulse text-status-warning">⚡</span>
+            <IconBolt class="w-4 h-4 text-status-warning" aria-hidden="true" />
             Rekomendasi Blueprint Cepat
             <span class="ml-1 inline-flex h-2 w-2 rounded-full bg-brand-primary animate-ping opacity-75"></span>
           </span>
-          <svg
-            class="w-4 h-4 text-text-muted transition-transform duration-200"
-            :class="{ 'rotate-180': isBlueprintExpanded }"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+          <IconChevronDown class="w-4 h-4 text-text-muted transition-transform duration-200" aria-hidden="true" />
         </button>
 
         <!-- Collapsible Content -->
@@ -65,11 +59,11 @@
         >
           <div v-show="isBlueprintExpanded" class="px-4 py-3 border-t border-border-default">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button type="button" @click="applyBlueprint('503020')" class="p-3 border border-border-default rounded-xl bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
+              <button type="button" @click="applyBlueprint('503020')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
                 <h4 class="font-medium text-sm text-text-primary">Aturan 50-30-20</h4>
                 <p class="text-xs text-text-muted mt-1">Ideal: 50% Pokok, 30% Hiburan, 20% Tabungan.</p>
               </button>
-              <button type="button" @click="applyBlueprint('hemat')" class="p-3 border border-border-default rounded-xl bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
+              <button type="button" @click="applyBlueprint('hemat')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
                 <h4 class="font-medium text-sm text-text-primary">Mahasiswa Kos (Hemat)</h4>
                 <p class="text-xs text-text-muted mt-1">Fokus: 70% Pokok, 10% Hiburan, 20% Tabungan.</p>
               </button>
@@ -80,35 +74,35 @@
 
       <!-- Action Buttons moved to TOP (above pocket list) -->
       <div class="mb-4 flex flex-col sm:flex-row gap-2">
-        <button type="button" @click="addPocket" class="flex-1 py-2.5 border-2 border-dashed border-border-default rounded-xl text-text-muted hover:border-brand-primary hover:text-text-primary transition-all flex items-center justify-center gap-2 font-medium text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <button type="button" @click="addPocket" class="flex-1 py-2.5 border-2 border-dashed border-border-default rounded-md text-text-muted hover:border-brand-primary hover:text-text-primary transition-all flex items-center justify-center gap-2 font-medium text-sm">
+          <IconAdd class="w-4 h-4" aria-hidden="true" />
           Tambah Kantong Baru
         </button>
-        <button v-if="!showNewCategoryForm" type="button" @click="showNewCategoryForm = true; categoryFormError = ''" class="flex-1 py-2.5 border-2 border-dashed border-border-strong rounded-xl text-text-primary hover:border-brand-primary hover:bg-surface-hover transition-all flex items-center justify-center gap-2 font-medium text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        <button v-if="!showNewCategoryForm" type="button" @click="showNewCategoryForm = true; categoryFormError = ''" class="flex-1 py-2.5 border-2 border-dashed border-border-strong rounded-md text-text-primary hover:border-brand-primary hover:bg-surface-hover transition-all flex items-center justify-center gap-2 font-medium text-sm">
+          <IconAdd class="w-4 h-4" aria-hidden="true" />
           Buat Kategori Kustom
         </button>
       </div>
 
       <!-- Custom Category Inline Form (at top, appears when active) -->
-      <div v-if="showNewCategoryForm" class="mb-4 p-4 rounded-xl border border-border-default bg-surface-subtle">
+      <div v-if="showNewCategoryForm" class="mb-4 p-4 rounded-md border border-border-default bg-surface-subtle">
         <h4 class="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+          <IconTag class="w-4 h-4" aria-hidden="true" />
           Buat Kategori Kustom
         </h4>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-text-muted mb-1">Nama Kategori <span class="text-red-500">*</span></label>
+            <label class="block text-xs font-medium text-text-muted mb-1">Nama Kategori <span class="text-status-danger">*</span></label>
             <input v-model="newCategoryName" type="text" class="form-input w-full text-sm rounded-lg" placeholder="cth: Uang Kucing" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-text-muted mb-1">Ikon (Emoji) <span class="text-red-500">*</span></label>
+            <label class="block text-xs font-medium text-text-muted mb-1">Ikon (Emoji) <span class="text-status-danger">*</span></label>
             <input v-model="newCategoryIcon" type="text" class="form-input w-full text-sm rounded-lg text-center" placeholder="cth: 😺" maxlength="2" />
           </div>
         </div>
         <!-- Validation Error Message -->
-        <p v-if="categoryFormError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
-          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <p v-if="categoryFormError" class="mt-2 text-xs text-status-danger flex items-center gap-1">
+          <IconWarning class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           {{ categoryFormError }}
         </p>
         <div class="flex justify-end gap-2 mt-3">
@@ -122,22 +116,19 @@
       <div class="space-y-6">
         <!-- Loading state saat kategori belum ready -->
         <div v-if="isLoadingCategories" class="flex items-center justify-center py-8 text-text-muted gap-2">
-          <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-          </svg>
+          <Spinner class="w-5 h-5" />
           <span class="text-sm">Memuat data kategori...</span>
         </div>
 
         <template v-else>
-          <div v-for="(pocket, index) in pocketsData" :key="index" class="p-4 rounded-xl border border-border-default bg-surface-card">
+          <div v-for="(pocket, index) in pocketsData" :key="index" class="p-4 rounded-md border border-border-default bg-surface-card">
             <div class="flex justify-between items-center mb-3">
               <h3 class="font-medium text-text-primary flex items-center gap-2">
                 <span class="text-xl">{{ getCategoryIcon(pocket.categoryId) }}</span>
                 <span>{{ getCategoryName(pocket.categoryId) || 'Pilih Kategori' }}</span>
               </h3>
-              <button type="button" @click="removePocket(index)" class="text-red-500 hover:text-red-700 text-sm p-1">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              <button type="button" @click="removePocket(index)" class="text-status-danger hover:text-status-danger text-sm p-1">
+                <IconDelete class="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -145,7 +136,7 @@
               <!-- Pilihan Kategori — pakai @update:modelValue agar bisa intercept untuk konfirmasi -->
               <div class="sm:col-span-2 relative">
                 <label class="block text-xs font-medium text-text-muted mb-0.5">Kategori</label>
-                <p class="text-[10px] text-text-muted mb-2">Pilih kategori pengeluaran (misal: Makanan, Transportasi, atau Tabungan).</p>
+                <p class="text-xs text-text-muted mb-2">Pilih kategori pengeluaran (misal: Makanan, Transportasi, atau Tabungan).</p>
                 <DropdownSelect
                   :modelValue="pocket.categoryId"
                   :options="availableCategories.map(c => ({ label: c.icon + ' ' + c.name, value: c.id }))"
@@ -159,7 +150,7 @@
               <!-- Tipe Limit -->
               <div class="relative">
                 <label class="block text-xs font-medium text-text-muted mb-0.5">Tipe Batas</label>
-                <p class="text-[10px] text-text-muted mb-2 leading-tight">Gunakan "Persentase" untuk alokasi dari gaji bulanan Anda, atau "Nominal" untuk nilai tetap/pasti.</p>
+                <p class="text-xs text-text-muted mb-2 leading-tight">Gunakan "Persentase" untuk alokasi dari gaji bulanan Anda, atau "Nominal" untuk nilai tetap/pasti.</p>
                 <DropdownSelect
                   v-model="pocket.limitType"
                   :options="[{label: 'Persentase (%)', value: 'percentage'}, {label: 'Nominal (Rp)', value: 'nominal'}]"
@@ -173,10 +164,10 @@
                 <label class="block text-xs font-medium text-text-muted mb-0.5">
                   {{ pocket.limitType === 'percentage' ? 'Persentase (%)' : 'Batas Maksimal (Rp)' }}
                 </label>
-                <p class="text-[10px] text-text-muted mb-2 leading-tight">Sesuaikan dengan target atau batas rencana pengeluaran bulanan Anda.</p>
+                <p class="text-xs text-text-muted mb-2 leading-tight">Sesuaikan dengan target atau batas rencana pengeluaran bulanan Anda.</p>
                 <div v-if="pocket.limitType === 'percentage'">
                   <input v-model.number="pocket.percentage" type="number" min="1" max="100" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 15" required />
-                  <div class="mt-1 text-[11px] font-semibold text-status-success">
+                  <div class="mt-1 text-xs font-semibold text-status-success">
                     ~ {{ formatRupiah((pocket.percentage / 100) * budgetStore.salary) }}
                   </div>
                 </div>
@@ -193,7 +184,7 @@
               <!-- Kata Kunci Kustom (Optional) -->
               <div class="sm:col-span-2 mt-2">
                 <label class="block text-xs font-medium text-text-muted mb-0.5">Kata Kunci AI (Pisahkan dengan koma)</label>
-                <p class="text-[10px] text-text-muted mb-2 leading-tight">Bot WhatsApp akan otomatis mendeteksi dan memasukkan pengeluaran ke kantong ini jika Anda mengetik kata kunci tersebut saat mencatat via chat.</p>
+                <p class="text-xs text-text-muted mb-2 leading-tight">Bot WhatsApp akan otomatis mendeteksi dan memasukkan pengeluaran ke kantong ini jika Anda mengetik kata kunci tersebut saat mencatat via chat.</p>
                 <input v-model="pocket.keywordsInput" type="text" class="form-input w-full text-sm rounded-lg" placeholder="Cth: kfc, gofood, bensin, pulsa" />
               </div>
             </div>
@@ -221,10 +212,8 @@
         <button type="button"
           @click="$emit('close')"
           :disabled="isSubmitting"
-          class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg text-text-secondary bg-surface-card border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+          class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg text-text-secondary bg-surface-card border border-border-default hover:bg-surface-hover transition-colors disabled:opacity-50">
+          <IconClose class="w-6 h-6" aria-hidden="true" />
         </button>
 
         <!-- Simpan FAB -->
@@ -234,9 +223,7 @@
           :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
           class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg text-text-inverse font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-surface-subtle text-text-faint' : 'bg-brand-primary hover:bg-brand-primary-hover'">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-          </svg>
+          <IconCheck class="w-6 h-6" aria-hidden="true" />
         </button>
       </div>
     </Transition>
@@ -258,7 +245,7 @@
         <button type="button"
           @click="$emit('close')"
           :disabled="isSubmitting"
-          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-text-secondary bg-surface-card border border-border-default hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 font-medium text-sm">
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-text-secondary bg-surface-card border border-border-default hover:bg-surface-hover transition-colors disabled:opacity-50 font-medium text-sm">
           Batal
         </button>
 
@@ -267,7 +254,7 @@
           type="button"
           @click="handleSubmit"
           :disabled="isSubmitting || totalPercentage > 100 || !hasChanges"
-          class="flex-[2] sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-text-inverse font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          class="flex-[2] sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-md text-text-inverse font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           :class="isSubmitting || totalPercentage > 100 || !hasChanges ? 'bg-surface-subtle text-text-faint' : 'bg-brand-primary hover:bg-brand-primary-hover'">
           {{ isSubmitting ? 'Menyimpan...' : 'Simpan Kantong' }}
         </button>
@@ -288,18 +275,16 @@
         <p class="text-sm text-text-muted mb-4">Anda akan mengganti kategori kantong ini:</p>
 
         <!-- Perbandingan Sebelum → Sesudah -->
-        <div class="flex items-center gap-3 p-3 rounded-xl bg-surface-subtle mb-5">
+        <div class="flex items-center gap-3 p-3 rounded-md bg-surface-subtle mb-5">
           <div class="text-center flex-1">
-            <p class="text-[10px] text-text-muted uppercase tracking-wide mb-1">Sebelum</p>
+            <p class="text-xs text-text-muted mb-1">Sebelum</p>
             <p class="text-sm font-semibold text-text-primary">
               {{ getCategoryIcon(confirmDialog.oldId) }} {{ getCategoryName(confirmDialog.oldId) || '—' }}
             </p>
           </div>
-          <svg class="w-5 h-5 text-text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <IconArrowRight class="w-5 h-5 text-text-muted shrink-0" aria-hidden="true" />
           <div class="text-center flex-1">
-            <p class="text-[10px] text-text-muted uppercase tracking-wide mb-1">Sesudah</p>
+            <p class="text-xs text-text-muted mb-1">Sesudah</p>
             <p class="text-sm font-semibold text-text-primary">
               {{ getCategoryIcon(confirmDialog.newId) }} {{ getCategoryName(confirmDialog.newId) }}
             </p>
@@ -315,6 +300,8 @@
 </template>
 
 <script setup>
+import { Spinner } from '@/ui';
+import { IconAdd, IconArrowRight, IconBolt, IconCheck, IconChevronDown, IconClose, IconDelete, IconTag, IconWarning, IconWave } from '@/ui/icons';
 import { ref, computed, onMounted, defineEmits, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';

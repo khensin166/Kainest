@@ -7,7 +7,7 @@
       <ThemeToggle />
     </div>
 
-    <div class="flex flex-col items-center gap-5 p-12 bg-surface-card border border-border-default rounded-3xl text-center max-w-[360px] w-[90%] shadow-none z-10">
+    <div class="flex flex-col items-center gap-5 p-12 bg-surface-card border border-border-default rounded-lg text-center max-w-[360px] w-[90%] z-10">
       <div class="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
       <h2 class="text-2xl font-semibold text-text-primary m-0">Memproses Login...</h2>
       <p class="text-sm text-text-muted m-0">Sedang memverifikasi sesi Anda, harap tunggu.</p>
@@ -36,7 +36,6 @@ onMounted(async () => {
       // Simpan token ke localStorage agar interceptor apiClient bisa mengirimnya
       // sebagai "Authorization: Bearer <token>" di setiap request berikutnya.
       localStorage.setItem('authToken', token);
-      console.log('[AuthCallback] Token dari social login berhasil disimpan.');
 
       // Reset status auth agar initializeAuth() melakukan pengecekan ulang
       // dengan token baru yang sudah ada di localStorage.
@@ -44,7 +43,6 @@ onMounted(async () => {
       await authStore.initializeAuth();
 
       if (authStore.isAuthenticated) {
-        console.log('[AuthCallback] Autentikasi berhasil, redirect ke dashboard.');
         router.replace('/app/dashboard');
       } else {
         console.warn('[AuthCallback] Token tidak valid, redirect ke login.');

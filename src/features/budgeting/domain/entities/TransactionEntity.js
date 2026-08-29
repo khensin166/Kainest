@@ -1,5 +1,5 @@
 export class TransactionEntity {
-  constructor({ id, amount, note, date, categoryName, categoryIcon, categoryId, type }) {
+  constructor({ id, amount, note, date, categoryName, categoryIcon, createdAt, categoryId, type }) {
     this.id = id;
     this.amount = amount;
     this.note = note || "-";
@@ -8,6 +8,9 @@ export class TransactionEntity {
     this.date = date ? new Date(date) : new Date();
     this.categoryName = categoryName || "Unknown";
     this.categoryIcon = categoryIcon || "💸";
+    // Waktu record dibuat — dipakai widget "Aktivitas Terbaru" untuk waktu relatif.
+    // Berbeda dari `date` (tanggal transaksi, bisa di-backdate).
+    this.createdAt = createdAt ?? null;
   }
 
   // Helper untuk format tanggal (Opsional, bisa juga pakai library kayak date-fns di UI)

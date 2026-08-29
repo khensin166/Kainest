@@ -11,13 +11,11 @@ export async function customUploader(file) {
     // 1. Minta izin/signature dari backend Hono Anda
     // Kita coba kirim parameter folder yang diinginkan: 'kainest_notes'
     const targetFolder = "kainest_notes";
-    console.log("Requesting signature for folder:", targetFolder);
 
     const { data: signData } = await apiClient.post("/profile/signature", {
         folder: targetFolder
     });
     
-    console.log("Signature received:", signData);
 
     if (!signData.success) {
       throw new Error("Gagal mendapatkan signature dari server.");
@@ -36,9 +34,7 @@ export async function customUploader(file) {
     formData.append("folder", targetFolder);
 
     // Debug: Cek isi formData
-    console.log("FormData entries:");
     for (var pair of formData.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
     }
 
     // 3. Upload langsung ke Cloudinary

@@ -1,10 +1,12 @@
+import { IBudgetRepository } from "../../domain/repository/IBudgetRepository";
 // src/features/budgeting/data/repository/BudgetRepository.js
 import { BudgetRemoteSource } from "../source/BudgetRemoteSource";
 import { BudgetMapper } from "../mappers/BudgetMapper";
 import { left, right, ServerFailure } from "../../../../core/error/failure";
 
-export class BudgetRepository {
+export class BudgetRepository extends IBudgetRepository {
   constructor() {
+    super();
     // Dependency Injection manual (bisa diganti pakai library kalau mau lebih canggih)
     this.remoteSource = new BudgetRemoteSource();
   }

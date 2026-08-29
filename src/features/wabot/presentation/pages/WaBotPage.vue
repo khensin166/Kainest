@@ -1,18 +1,21 @@
 <template>
-  <div class="flex flex-col min-h-[80vh] px-4 sm:px-6 lg:px-8 py-8 w-full max-w-7xl mx-auto">
+  <div class="flex flex-col min-h-[80vh] px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-text-primary mb-1">
-          WhatsApp Device Hub
-        </h1>
+        <div class="flex items-center gap-3 mb-1">
+          <h1 class="text-2xl font-bold text-text-primary tracking-tight">
+            WhatsApp Device Hub
+          </h1>
+          <PageGuide :steps="pageGuides.wabot" />
+        </div>
         <p class="text-text-muted text-sm">
           Kelola koneksi multi-device GOWA secara real-time.
         </p>
       </div>
       <div class="flex items-center gap-3">
         <!-- Status Server -->
-        <div class="flex items-center gap-2 bg-surface-card px-4 py-2 rounded-xl shadow-none border border-border-default">
+        <div class="flex items-center gap-2 bg-surface-card px-4 py-2 rounded-md border border-border-default">
           <span class="relative flex h-2.5 w-2.5">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-status-success"></span>
@@ -20,7 +23,7 @@
           <span class="text-sm font-medium text-text-primary">GOWA Server Online</span>
         </div>
         <!-- Tambah Device -->
-        <button @click="promptAddDevice" class="bg-brand-primary hover:bg-brand-primary-hover text-text-inverse px-4 py-2 rounded-xl shadow-none border-none transition-colors text-sm font-medium flex items-center gap-2">
+        <button @click="promptAddDevice" class="bg-brand-primary hover:bg-brand-primary-hover text-text-inverse px-4 py-2 rounded-md border-none transition-colors text-sm font-medium flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Tambah Device
         </button>
       </div>
@@ -33,7 +36,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="gowaStore.devices.length === 0" class="flex flex-col items-center justify-center py-20 text-text-muted bg-surface-card rounded-3xl border border-border-default shadow-none">
+    <div v-else-if="gowaStore.devices.length === 0" class="flex flex-col items-center justify-center py-20 text-text-muted bg-surface-card rounded-lg border border-border-default">
       <i class="fa-solid fa-mobile-screen text-5xl mb-4 text-text-muted/50"></i>
       <p class="text-lg font-medium mb-1">Belum Ada Device</p>
       <p class="text-sm mb-6">Tambahkan device baru untuk menghubungkan WhatsApp Bot.</p>
@@ -44,19 +47,19 @@
 
     <!-- Device Grid -->
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-      <div v-for="device in gowaStore.devices" :key="device.id" class="bg-surface-card rounded-3xl p-6 shadow-none border border-border-default flex flex-col hover:border-border-strong transition-shadow relative overflow-hidden">
+      <div v-for="device in gowaStore.devices" :key="device.id" class="bg-surface-card rounded-lg p-6 border border-border-default flex flex-col hover:border-border-strong transition-shadow relative overflow-hidden">
         
         <!-- Decoration Blur -->
         <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="flex justify-between items-start mb-6">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" :class="getDeviceColors(device.id, device.status).bg">
+            <div class="w-12 h-12 rounded-md flex items-center justify-center text-xl font-bold" :class="getDeviceColors(device.id, device.status).bg">
               <i class="fa-brands fa-whatsapp" :class="getDeviceColors(device.id, device.status).text"></i>
             </div>
             <div>
               <h3 class="font-bold text-text-primary text-lg leading-tight">{{ device.id }}</h3>
-              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mt-0.5">ID Device</p>
+              <p class="text-xs text-text-muted font-semibold mt-0.5">ID Device</p>
             </div>
           </div>
           
@@ -72,7 +75,7 @@
           </div>
         </div>
 
-        <div class="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 bg-surface-subtle p-4 rounded-2xl border border-border-default">
+        <div class="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 bg-surface-subtle p-4 rounded-lg border border-border-default">
           
           <!-- Content Left -->
           <div class="flex-1 space-y-2 text-center md:text-left">
@@ -81,7 +84,7 @@
               <p class="text-sm text-text-muted leading-relaxed">
                 Koneksi WebSocket stabil. Bot akan merespons pesan otomatis berdasarkan fitur aktif.
               </p>
-              <button @click="confirmLogoutDevice(device.id)" class="mt-4 px-4 py-2 bg-surface-card border border-border-default rounded-xl text-sm font-medium text-text-primary hover:bg-surface-hover transition-colors shadow-none w-full md:w-auto">
+              <button @click="confirmLogoutDevice(device.id)" class="mt-4 px-4 py-2 bg-surface-card border border-border-default rounded-md text-sm font-medium text-text-primary hover:bg-surface-hover transition-colors w-full md:w-auto">
                 Keluar Perangkat (Logout)
               </button>
             </template>
@@ -103,7 +106,7 @@
           </div>
 
           <!-- Content Right (QR/Status Icon) -->
-          <div class="flex-shrink-0 flex items-center justify-center p-2 bg-surface-card rounded-xl shadow-none border border-border-default" style="width: 160px; height: 160px;">
+          <div class="flex-shrink-0 flex items-center justify-center p-2 bg-surface-card rounded-md border border-border-default" style="width: 160px; height: 160px;">
             <template v-if="device.status === 'CONNECTED'">
               <div class="text-status-success text-6xl">
                 <i class="fa-solid fa-circle-check"></i>
@@ -130,6 +133,8 @@
 </template>
 
 <script setup>
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
 import { onMounted, onUnmounted } from 'vue';
 import { useGowaStore } from '../stores/useGowaStore';
 import { useModalStore } from '@/stores/modalStore';

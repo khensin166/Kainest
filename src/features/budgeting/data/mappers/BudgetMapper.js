@@ -62,6 +62,7 @@ export const BudgetMapper = {
       categoryId: apiTransaction.categoryId,
       categoryName: apiTransaction.category?.name,
       categoryIcon: apiTransaction.category?.icon,
+      createdAt: apiTransaction.createdAt,
     });
   },
 

@@ -1,4 +1,5 @@
 <script setup>
+import { IconChevronDown } from '@/ui/icons';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // Props agar dinamis
@@ -56,19 +57,11 @@ const selectOption = (value) => {
 
 <template>
   <div class="relative" :class="wFull ? 'flex w-full' : 'inline-flex'">
-    <button ref="trigger" type="button" class="btn px-3 flex items-center transition-colors duration-200" :class="[
-      wFull ? 'w-full justify-between' : '',
-      dropdownOpen
-        ? 'bg-brand-soft text-brand-primary border-brand-primary hover:bg-brand-light' // Style saat AKTIF (Terbuka)
-        : 'bg-surface-card border-border-default hover:border-border-strong text-text-muted' // Style DEFAULT (Tertutup)
-    ]" aria-haspopup="true" @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen">
+    <button ref="trigger" type="button" class="inline-flex items-center h-10 px-3 text-sm font-medium rounded-md border cursor-pointer transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary" :class="[ wFull ? 'w-full justify-between' : '', dropdownOpen ? 'bg-brand-soft text-brand-primary border-brand-primary hover:bg-brand-light' : 'bg-surface-card border-border-default hover:border-border-strong text-text-muted' ]" aria-haspopup="true" @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen">
 
       <slot name="trigger" :value="modelValue">
         <span class="mr-2 truncate text-left" :class="wFull ? '' : 'max-w-[200px]'">{{ selectedLabel }}</span>
-        <svg class="fill-current shrink-0 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"
-          width="12" height="8" viewBox="0 0 12 8">
-          <path d="M1.4 0L6 4.6 10.6 0 12 1.4 6 7.4 0 1.4z" />
-        </svg>
+        <IconChevronDown class="fill-current shrink-0 transition-transform duration-200" aria-hidden="true" />
       </slot>
 
     </button>
@@ -78,17 +71,12 @@ const selectOption = (value) => {
       leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
       <div v-show="dropdownOpen" ref="dropdown"
         class="origin-top-right z-50 absolute top-full min-w-[9rem] bg-surface-card border border-border-default py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
-        :class="[
-          align === 'right' ? 'right-0' : 'left-0',
-          wFull ? 'w-full' : ''
-        ]">
+        :class="[ align === 'right' ? 'right-0' : 'left-0', wFull ? 'w-full' : '' ]">
         <ul class="text-sm font-medium">
           <li v-for="option in options" :key="option.value">
             <button type="button" @click="selectOption(option.value)"
               class="flex items-center w-full px-3 py-2 hover:bg-surface-hover transition-colors duration-150"
-              :class="modelValue === option.value
-                ? 'text-brand-primary bg-brand-soft'
-                : 'text-text-primary'">
+              :class="modelValue === option.value ? 'text-brand-primary bg-brand-soft' : 'text-text-primary'">
 
               <span class="grow text-left">{{ option.label }}</span>
 

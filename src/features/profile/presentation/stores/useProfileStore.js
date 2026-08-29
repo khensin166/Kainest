@@ -27,7 +27,6 @@ export const useProfileStore = defineStore("profile", () => {
    * Aksi untuk mengambil data profil lengkap
    */
   async function fetchProfile() {
-    console.log("Memanggil profileStore.fetchProfile() untuk data lengkap...");
     isLoading.value = true;
     
     const result = await getProfileUseCase.execute();

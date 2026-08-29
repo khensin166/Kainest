@@ -35,6 +35,12 @@
   --color-surface-input:       #ffffff;
   --color-surface-hover:       #f3f4f6;
   --color-surface-subtle:      #f9fafb;
+  --color-surface-brand:       #2d1236;   /* panel branding gelap (teks putih) */
+
+  /* AI — satu warna untuk SEMUA fitur AI, sama di ketiga tema */
+  --color-ai:                  #7c3aed;
+  --color-ai-soft:             rgba(124, 58, 237, 0.10);
+  --color-brand-surface:       #f4e9f7;   /* isian lembut untuk ikon/badge brand */
 
   /* Border */
   --color-border-default:      #e5e7eb;
@@ -63,8 +69,8 @@
   --color-status-info-text:    #124d79;
 
   /* Chart */
-  --color-chart-expense:       #834193;
-  --color-chart-expense-fill:  rgba(131, 65, 147, 0.12);
+  --color-chart-expense:       #d94a4a;
+  --color-chart-expense-fill:  rgba(217, 74, 74, 0.12);
   --color-chart-income:        #34bd68;
   --color-chart-income-fill:   rgba(52, 189, 104, 0.08);
   --color-chart-grid:          rgba(191, 196, 205, 0.2);
@@ -92,6 +98,12 @@
   --color-surface-input:       #1f2937;
   --color-surface-hover:       #374151;
   --color-surface-subtle:      #374151;
+  --color-surface-brand:       #1b0a22;
+
+  /* AI */
+  --color-ai:                  #8b5cf6;
+  --color-ai-soft:             rgba(139, 92, 246, 0.12);
+  --color-brand-surface:       rgba(131, 65, 147, 0.18);
 
   /* Border */
   --color-border-default:      rgba(55, 65, 81, 0.6);
@@ -120,8 +132,8 @@
   --color-status-info-text:    #d1ecff;
 
   /* Chart */
-  --color-chart-expense:       #b46abf;
-  --color-chart-expense-fill:  rgba(180, 106, 191, 0.15);
+  --color-chart-expense:       #ff5656;
+  --color-chart-expense-fill:  rgba(255, 86, 86, 0.15);
   --color-chart-income:        #4bd37d;
   --color-chart-income-fill:   rgba(75, 211, 125, 0.1);
   --color-chart-grid:          rgba(75, 85, 99, 0.25);
@@ -148,11 +160,17 @@
   --color-brand-light:         rgba(238, 238, 238, 0.10);
   --color-brand-soft:          rgba(238, 238, 238, 0.06);
   --color-brand-muted:         #b8b3b0;   /* Pale Stone */
-  --color-brand-text:          #101010;   /* Obsidian Canvas — teks di atas tombol putih */
+  --color-brand-text:          #eeeeee;   /* Bone — teks BERWARNA brand (bukan teks di atas tombol; itu tugas --color-text-inverse) */
 
-  /* AI Violet — HANYA untuk fitur/ikon AI spesifik, bukan brand umum */
-  --color-ai-violet:           #8b5cf6;
-  --color-ai-violet-soft:      rgba(139, 92, 246, 0.10);
+  /* AI — HANYA untuk fitur/ikon AI spesifik, bukan brand umum.
+     Nama diselaraskan dengan light & dark agar paritas token terjaga. */
+  --color-ai:                  #8b5cf6;
+  --color-ai-soft:             rgba(139, 92, 246, 0.12);
+
+  /* Isian brand & permukaan branding — sebelumnya HILANG di Factory,
+     membuat bg-brand-surface / bg-surface-brand transparan di tema ini. */
+  --color-brand-surface:       rgba(238, 238, 238, 0.08);
+  --color-surface-brand:       #161412;
 
   /* Primitive Palette (untuk akses langsung jika diperlukan) */
   --color-obsidian-canvas:     #101010;
@@ -192,16 +210,16 @@
   --color-status-success:      #a0ca92;   /* Metric Green */
   --color-status-success-bg:   rgba(160, 202, 146, 0.12);
   --color-status-success-text: #d1f5c7;
-  --color-status-warning:      #ee6018;   /* Signal Orange */
-  --color-status-warning-bg:   rgba(238, 96, 24, 0.12);
+  --color-status-warning:      #ef9430;   /* Signal Orange dilembutkan — tetap hangat, tidak tertukar dengan danger */
+  --color-status-warning-bg:   rgba(239, 148, 48, 0.12);
   --color-status-warning-text: #fed7aa;
   --color-status-info:         #60a5fa;
   --color-status-info-bg:      rgba(96, 165, 250, 0.12);
   --color-status-info-text:    #bfdbfe;
 
   /* Chart */
-  --color-chart-expense:       #ee6018;
-  --color-chart-expense-fill:  rgba(238, 96, 24, 0.1);
+  --color-chart-expense:       #ef4444;
+  --color-chart-expense-fill:  rgba(239, 68, 68, 0.1);
   --color-chart-income:        #a0ca92;
   --color-chart-income-fill:   rgba(160, 202, 146, 0.1);
   --color-chart-grid:          rgba(61, 58, 57, 0.5);
@@ -209,3 +227,80 @@
   --color-chart-tooltip-text:  #eeeeee;
   --color-chart-tooltip-border:#3d3a39;
 }
+
+/* ===========================
+   SPIDEY — "Web Strike"  (kelas: .dark.theme-spidey)
+   Basis hitam bernuansa hangat kemerahan. Merah Marvel #E62429 dipakai MURNI
+   tanpa dicerahkan — untuk bar, aksen, dan grafik pengeluaran. Itu mungkin
+   justru karena latarnya hitam: di versi medan-biru sebelumnya merah hanya
+   2.76:1 dan harus diencerkan sampai berhenti terasa merah Marvel.
+   Aksi memegang biru elektrik #4DA3FF dengan teks gelap (7.49 : 1).
+   =========================== */
+:root.theme-spidey {
+  /* Brand — biru elektrik */
+  --color-brand-primary:       #4DA3FF;
+  --color-brand-primary-hover: #6FB5FF;
+  --color-brand-light:         rgba(77, 163, 255, 0.22);
+  --color-brand-soft:          #16232F;
+  --color-brand-muted:         #8FC4FF;
+  --color-brand-text:          #7FBDFF;
+  --color-brand-surface:       rgba(77, 163, 255, 0.14);
+
+  /* Aksen — Merah Marvel MURNI */
+  --color-accent-primary:      #E62429;
+
+  /* Surface — hitam hangat */
+  --color-surface-page:        #09090B;
+  --color-surface-card:        #17161A;
+  --color-surface-input:       #121115;
+  --color-surface-hover:       #221F26;
+  --color-surface-subtle:      #1B191E;
+  --color-surface-brand:       #140F11;
+
+  /* Border */
+  --color-border-default:      #2C2830;
+  --color-border-muted:        #211E25;
+  --color-border-strong:       #423C46;
+
+  /* Text */
+  --color-text-primary:        #F5F2F4;
+  --color-text-secondary:      #C0BAC5;
+  --color-text-muted:          #95909C;
+  --color-text-faint:          #6B6672;
+  --color-text-inverse:        #09090B;   /* teks GELAP di atas tombol biru elektrik */
+
+  /* Status — merah murni untuk permukaan, varian terang untuk teks */
+  --color-status-danger:       #E62429;
+  --color-status-danger-bg:    rgba(230, 36, 41, 0.18);
+  --color-status-danger-text:  #FF6B6F;
+  --color-status-success:      #34D399;
+  --color-status-success-bg:   rgba(52, 211, 153, 0.16);
+  --color-status-success-text: #A7F3D0;
+  --color-status-warning:      #FBBF24;
+  --color-status-warning-bg:   rgba(251, 191, 36, 0.16);
+  --color-status-warning-text: #FDE68A;
+  --color-status-info:         #22D3EE;
+  --color-status-info-bg:      rgba(34, 211, 238, 0.16);
+  --color-status-info-text:    #A5F3FC;
+
+  /* AI — violet, sama di semua tema */
+  --color-ai:                  #A78BFA;
+  --color-ai-soft:             rgba(167, 139, 250, 0.16);
+
+  /* Chart — merah Marvel murni; latar hitam memberinya ruang */
+  --color-chart-expense:       #E62429;
+  --color-chart-expense-fill:  rgba(230, 36, 41, 0.14);
+  --color-chart-income:        #34D399;
+  --color-chart-income-fill:   rgba(52, 211, 153, 0.12);
+  --color-chart-grid:          rgba(44, 40, 48, 0.85);
+  --color-chart-tooltip-bg:    rgba(23, 22, 26, 0.98);
+  --color-chart-tooltip-text:  #F5F2F4;
+  --color-chart-tooltip-border:#2C2830;
+}
+
+/* ===========================
+   TOKEN NON-WARNA
+   Radius, tinggi kontrol, dan tipografi TIDAK di sini.
+   Di Tailwind v4 mereka harus hidup di blok @theme agar menghasilkan
+   utility class — lihat `src/css/style.css`. File ini khusus WARNA.
+   =========================== */

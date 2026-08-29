@@ -1,9 +1,9 @@
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-6">
       <div class="mb-4 sm:mb-0 flex items-center gap-3">
-        <h1 class="text-2xl md:text-3xl text-text-primary font-bold">
+        <h1 class="text-2xl font-bold text-text-primary tracking-tight">
           Rekap Bulanan
         </h1>
         <PageGuide :steps="pageGuides.history" />
@@ -19,21 +19,21 @@
     </div>
 
     <!-- Empty State -->
-    <BaseEmptyState v-else-if="budgetStore.historyList.length === 0" icon="📭" title="Belum ada riwayat"
+    <BaseEmptyState v-else-if="budgetStore.historyList.length === 0" :icon="IconChart" title="Belum ada riwayat"
       message="Riwayat akan muncul otomatis setiap bulan Anda menggunakan dashboard." />
 
     <template v-else>
       <!-- ─────────────────────────────────────────── -->
       <!-- GRAFIK MAKRO: Ringkasan Semua Bulan -->
       <!-- ─────────────────────────────────────────── -->
-      <div class="bg-surface-card rounded-2xl border border-border-default p-6 mb-8">
+      <div class="bg-surface-card rounded-lg border border-border-default p-6 mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
           <div>
             <h2 class="text-base font-semibold text-text-primary mb-1">Perbandingan Bulanan</h2>
             <p class="text-xs text-text-muted">
-              Batang <span class="text-emerald-500 font-medium">Hijau Terang</span> = Pemasukan &nbsp;|&nbsp;
-              Batang <span class="text-red-400 font-medium">Merah</span> = Pengeluaran &nbsp;|&nbsp;
-              Batang <span class="text-emerald-700 font-medium">Hijau Gelap</span> = Tabungan
+              Batang <span class="text-chart-income font-medium">Hijau Terang</span> = Pemasukan &nbsp;|&nbsp;
+              Batang <span class="text-chart-expense font-medium">Merah</span> = Pengeluaran &nbsp;|&nbsp;
+              Batang <span class="text-chart-income font-medium">Hijau Gelap</span> = Tabungan
             </p>
           </div>
           <div class="w-full sm:w-48 shrink-0 relative z-20">
@@ -51,7 +51,7 @@
       <!-- ─────────────────────────────────────────── -->
       <div class="space-y-4">
         <div v-for="item in budgetStore.historyList" :key="item.id"
-          class="bg-surface-card rounded-2xl border border-border-default overflow-hidden transition-all duration-200">
+          class="bg-surface-card rounded-lg border border-border-default overflow-hidden transition-all duration-200">
           <!-- Header Kartu: Selalu Terlihat -->
           <button
             class="w-full flex items-center justify-between px-6 py-4 hover:bg-surface-hover transition-colors"
@@ -59,7 +59,7 @@
             <div class="flex items-center gap-4">
               <!-- Periode Bulan -->
               <div
-                class="w-12 h-12 rounded-xl bg-brand-soft flex items-center justify-center shrink-0">
+                class="w-12 h-12 rounded-md bg-brand-soft flex items-center justify-center shrink-0">
                 <span class="text-lg font-bold text-brand-primary">
                   {{ formatMonthShort(item.period) }}
                 </span>
@@ -72,25 +72,25 @@
             <!-- Ringkasan Numerik -->
             <div class="hidden sm:flex items-center gap-6 text-right">
               <div>
-                <p class="text-[10px] text-text-faint uppercase tracking-wide">Pemasukan</p>
+                <p class="text-xs text-text-faint">Pemasukan</p>
                 <p class="text-sm font-bold text-status-success">{{ formatRupiah(item.totalIncome) }}</p>
               </div>
               <div>
-                <p class="text-[10px] text-text-faint uppercase tracking-wide">Pengeluaran</p>
+                <p class="text-xs text-text-faint">Pengeluaran</p>
                 <p class="text-sm font-bold"
                   :class="(item.totalSpent > item.totalIncome && item.totalIncome > 0) ? 'text-status-danger' : 'text-status-warning'">
                   {{ formatRupiah(item.totalSpent) }}
                 </p>
               </div>
               <div>
-                <p class="text-[10px] text-text-faint uppercase tracking-wide">Tabungan</p>
+                <p class="text-xs text-text-faint">Tabungan</p>
                 <p class="text-sm font-bold text-status-success">{{ formatRupiah(item.totalSaved) }}
                 </p>
               </div>
-              <ChevronDownIcon class="w-5 h-5 text-text-faint transition-transform duration-200"
+              <IconChevronDown class="w-5 h-5 text-text-faint transition-transform duration-200"
                 :class="{ 'rotate-180': expandedIds.has(item.id) }" />
             </div>
-            <ChevronDownIcon class="sm:hidden w-5 h-5 text-text-faint transition-transform duration-200"
+            <IconChevronDown class="sm:hidden w-5 h-5 text-text-faint transition-transform duration-200"
               :class="{ 'rotate-180': expandedIds.has(item.id) }" />
           </button>
 
@@ -104,15 +104,15 @@
                 <!-- Ringkasan Mobile -->
                 <div class="sm:hidden grid grid-cols-3 gap-3">
                   <div class="text-center p-2 bg-status-success-bg rounded-lg">
-                    <p class="text-[10px] text-text-faint uppercase tracking-wide">Pemasukan</p>
+                    <p class="text-xs text-text-faint">Pemasukan</p>
                     <p class="text-sm font-bold text-status-success">{{ formatRupiah(item.totalIncome) }}</p>
                   </div>
                   <div class="text-center p-2 rounded-lg bg-status-danger-bg">
-                    <p class="text-[10px] text-text-faint uppercase tracking-wide">Pengeluaran</p>
+                    <p class="text-xs text-text-faint">Pengeluaran</p>
                     <p class="text-sm font-bold text-status-danger">{{ formatRupiah(item.totalSpent) }}</p>
                   </div>
                   <div class="text-center p-2 bg-status-success-bg rounded-lg">
-                    <p class="text-[10px] text-text-faint uppercase tracking-wide">Tabungan</p>
+                    <p class="text-xs text-text-faint">Tabungan</p>
                     <p class="text-sm font-bold text-status-success">{{ formatRupiah(item.totalSaved)
                       }}</p>
                   </div>
@@ -124,7 +124,7 @@
                   <!-- Donut Chart -->
                   <div class="md:col-span-4 lg:col-span-3 flex flex-col items-center">
                     <p
-                      class="text-xs font-semibold text-text-muted uppercase tracking-wide mb-4 w-full text-center">
+                      class="text-xs font-semibold text-text-muted mb-4 w-full text-center">
                       Alokasi Pengeluaran
                     </p>
                     <div class="relative w-48 h-48 mb-2">
@@ -138,14 +138,14 @@
 
                   <!-- Rincian Kantong List -->
                   <div class="md:col-span-8 lg:col-span-9">
-                    <p class="text-xs font-semibold text-text-muted uppercase tracking-wide mb-4">
+                    <p class="text-xs font-semibold text-text-muted mb-4">
                       🗂️ Peringkat Pengeluaran Kantong
                     </p>
 
                     <div v-if="parsedPockets(item.pocketsSnapshot).length > 0"
                       class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div v-for="(pocket, index) in sortedPockets(item.pocketsSnapshot)" :key="pocket.categoryId"
-                        class="flex items-center gap-3 p-3 bg-surface-subtle rounded-xl border border-border-default">
+                        class="flex items-center gap-3 p-3 bg-surface-subtle rounded-md border border-border-default">
                         <div class="text-lg w-8 text-center font-bold text-text-faint">#{{ index + 1 }}
                         </div>
                         <span class="text-2xl">{{ pocket.icon || '💼' }}</span>
@@ -158,7 +158,7 @@
                             <span class="text-status-danger font-semibold">
                               {{ formatRupiah(pocket.spent || 0) }}
                             </span>
-                            <span class="text-[10px] ml-1 opacity-70">dari {{ formatRupiah(pocket.limitAmount) }}</span>
+                            <span class="text-xs ml-1 opacity-70">dari {{ formatRupiah(pocket.limitAmount) }}</span>
                           </p>
                           <!-- Progress Bar -->
                           <div class="w-full bg-surface-input rounded-full h-1.5 mt-1.5 overflow-hidden">
@@ -170,15 +170,15 @@
                         </div>
                       </div>
                     </div>
-                    <p v-else class="text-xs text-text-faint italic">Tidak ada data kantong.</p>
+                    <p v-else class="text-xs text-text-faint">Tidak ada data kantong.</p>
                   </div>
                 </div>
 
                 <!-- Evaluasi AI (jika tersedia) -->
                 <div v-if="item.aiEvaluation"
-                  class="p-4 rounded-xl bg-status-warning-bg border border-status-warning mt-4">
+                  class="p-4 rounded-md bg-status-warning-bg border border-status-warning mt-4">
                   <div class="flex items-start gap-2">
-                    <span class="text-lg shrink-0">🤖</span>
+                    <IconAi class="w-5 h-5 shrink-0 text-ai" aria-hidden="true" />
                     <div>
                       <p class="text-xs font-semibold text-status-warning-text mb-1">Evaluasi AI</p>
                       <p class="text-sm text-status-warning-text leading-relaxed">{{ item.aiEvaluation }}</p>
@@ -188,8 +188,8 @@
 
                 <!-- Rincian Pemasukan -->
                 <div v-if="item.salarySnapshot > 0"
-                  class="flex items-center gap-2 p-3 bg-status-success-bg border border-status-success rounded-xl mt-4">
-                  <span class="text-base">💰</span>
+                  class="flex items-center gap-2 p-3 bg-status-success-bg border border-status-success rounded-md mt-4">
+                  <IconMoney class="w-4 h-4 text-status-success" aria-hidden="true" />
                   <div class="text-xs text-status-success-text flex flex-wrap gap-x-4 gap-y-1">
                     <span>Gaji: <strong>{{ formatRupiah(item.salarySnapshot) }}</strong></span>
                     <span v-if="item.additionalIncome > 0">+ Pemasukan Tambahan: <strong>{{ formatRupiah(item.additionalIncome) }}</strong></span>
@@ -200,8 +200,8 @@
                 <!-- Overbudget Warning -->
                 <div
                   v-if="(item.totalSpent > item.totalIncome && item.totalIncome > 0) || (item.totalSpent > item.totalBudgeted && item.totalIncome === 0)"
-                  class="flex items-center gap-2 p-3 bg-status-danger-bg border border-status-danger rounded-xl mt-4">
-                  <span class="text-base">⚠️</span>
+                  class="flex items-center gap-2 p-3 bg-status-danger-bg border border-status-danger rounded-md mt-4">
+                  <IconWarning class="w-4 h-4 text-status-warning" aria-hidden="true" />
                   <p class="text-xs text-status-danger-text">
                     Pengeluaran bulan ini melebihi pemasukan/budget sebesar
                     <strong>{{ formatRupiah(item.totalSpent - (item.totalIncome || item.totalBudgeted)) }}</strong>
@@ -217,10 +217,10 @@
 </template>
 
 <script setup>
+import { IconAi, IconChart, IconChevronDown, IconMoney, IconWarning } from '@/ui/icons';
 import { ref, computed, onMounted } from 'vue';
 import { Bar, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend, ArcElement, DoughnutController } from 'chart.js';
-import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
 import PageGuide from '@/components/PageGuide.vue';

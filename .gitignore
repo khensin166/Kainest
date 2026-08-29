@@ -12,3 +12,6 @@ dist-ssr/
 
 # OS files
 .DS_Store
+
+# artefak uji browser
+.playwright-mcp/

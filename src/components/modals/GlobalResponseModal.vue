@@ -7,11 +7,11 @@
         class="text-lg font-medium leading-6 flex items-center space-x-3"
         :class="headerClass"
       >
-        <CheckCircleIcon
+        <IconCheckCircle
           v-if="modalStore.status === 'success'"
           class="h-6 w-6"
         />
-        <XCircleIcon v-if="modalStore.status === 'error'" class="h-6 w-6" />
+        <IconCancel v-if="modalStore.status === 'error'" class="h-6 w-6" />
         <span>{{ modalStore.title }}</span>
       </DialogTitle>
     </template>
@@ -43,11 +43,11 @@
 </template>
 
 <script setup>
+import { IconCancel, IconCheckCircle } from '@/ui/icons';
 import { computed, ref, watch, onUnmounted } from "vue";
 import { useModalStore } from "../../stores/modalStore";
 import BaseModal from "./BaseModal.vue";
-import { DialogTitle } from "@headlessui/vue";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/vue/24/outline";
+import { DialogTitle } from "reka-ui";
 
 const modalStore = useModalStore();
 

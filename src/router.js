@@ -9,10 +9,9 @@ import LoginPage from "./features/auth/presentation/pages/LoginPage.vue";
 import RegisterPage from "./features/auth/presentation/pages/RegisterPage.vue";
 import GetStartedPage from "./features/auth/presentation/pages/GetStartedPage.vue";
 import Dashboard from "./pages/Dashboard.vue";
-import TodoListPage from "./pages/Dashboard.vue";
-import GalleryPage from "./pages/Dashboard.vue";
-import CalendarPage from "./pages/Dashboard.vue";
-import VaultPage from "./pages/Dashboard.vue";
+// Tiga rute ini fiturnya belum ada — diarahkan ke placeholder yang jujur,
+// bukan ke Dashboard yang membuat pengguna mengira aplikasi rusak.
+import ComingSoonPage from "./pages/ComingSoonPage.vue";
 import SettingsPage from "./features/settings/presentation/pages/SettingsPage.vue";
 import Forbidden from "./partials/Forbidden.vue";
 import NotFound from "./partials/Forbidden.vue";
@@ -20,7 +19,13 @@ import SharedNotePage from "./features/notes/presentation/pages/SharedNotePage.v
 import ValentinePage from "./features/valentine/presentation/pages/ValentinePage.vue";
 import AuthCallbackPage from "./features/auth/presentation/pages/AuthCallbackPage.vue";
 
+// Halaman demo design system — hanya ada saat development
+const devRoutes = import.meta.env.DEV
+  ? [{ path: "/dev/ui", component: () => import("./pages/DevUiPage.vue") }]
+  : [];
+
 const routes = [
+  ...devRoutes,
   // Halaman publik yang tidak menggunakan layout utama
   {
     // ✅ INI JADI SATU-SATUNYA HALAMAN UTAMA SAAT WEB DIBUKA
@@ -120,17 +125,17 @@ const routes = [
       {
         path: "gallery",
         name: "Gallery",
-        component: GalleryPage,
+        component: ComingSoonPage,
       },
       {
         path: "calendar",
         name: "Calendar",
-        component: CalendarPage,
+        component: ComingSoonPage,
       },
       {
         path: "vault",
         name: "Vault",
-        component: VaultPage,
+        component: ComingSoonPage,
       },
       {
         path: "settings",

@@ -13,9 +13,7 @@
     >
       <slot name="trigger">
         <button class="block" @click.prevent>
-          <svg class="fill-current text-text-muted" width="16" height="16" viewBox="0 0 16 16">
-            <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-          </svg>
+          <IconInfo class="fill-current text-text-muted" aria-hidden="true" />
         </button>
       </slot>
     </div>
@@ -29,12 +27,8 @@
         leave-to-class="opacity-0"
       >
         <div
-          v-show="tooltipOpen" class="rounded-lg border overflow-hidden shadow-none"
-          :class="[
-            colorClasses(bg),
-            sizeClasses(size),
-            positionInnerClasses(position)
-          ]"          
+          v-show="tooltipOpen" class="rounded-lg border overflow-hidden"
+          :class="[ colorClasses(bg), sizeClasses(size), positionInnerClasses(position) ]"          
         >
           <slot />
         </div>
@@ -44,6 +38,7 @@
 </template>
 
 <script>
+import { IconInfo } from '@/ui/icons'
 import { ref } from 'vue'
 
 export default {

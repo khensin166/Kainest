@@ -1,9 +1,11 @@
+import { IWaBotRepository } from "../../domain/repository/IWaBotRepository";
 // src/features/wabot/data/repository/WaBotRepository.js
 import { WaGroupEntity } from "../../domain/entities/WaGroupEntity";
 import { WaBotRemoteSource } from "../sources/WaBotRemoteSource";
 
-export class WaBotRepository {
+export class WaBotRepository extends IWaBotRepository {
   constructor() {
+    super();
     this.remoteSource = new WaBotRemoteSource();
   }
 

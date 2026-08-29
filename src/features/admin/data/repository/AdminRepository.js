@@ -1,7 +1,9 @@
+import { IAdminRepository } from "../../domain/repository/IAdminRepository";
 import { left, right, ServerFailure } from "../../../../core/error/failure";
 
-export class AdminRepository {
+export class AdminRepository extends IAdminRepository {
   constructor(remoteSource) {
+    super();
     this.remoteSource = remoteSource;
   }
 

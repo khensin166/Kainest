@@ -10,13 +10,13 @@
       <p class="text-text-muted mb-6">
         {{ error }}
       </p>
-      <router-link to="/" class="btn btn-primary bg-brand-primary text-text-inverse border-none shadow-none">
+      <Button as="router-link" to="/">
         Kembali ke Beranda
-      </router-link>
+      </Button>
     </div>
 
     <article v-else-if="note"
-      class="bg-surface-card shadow-none border border-border-default rounded-xl max-w-3xl mx-auto p-6 md:p-10 transition-colors duration-300">
+      class="bg-surface-card border border-border-default rounded-md max-w-3xl mx-auto p-6 md:p-10 transition-colors duration-300">
       <header class="border-b border-border-default pb-4 mb-6">
         <div class="flex justify-between items-start mb-3">
           <h1 class="text-4xl font-bold text-text-primary">
@@ -27,7 +27,7 @@
           <button @click="toggleDark()"
             class="p-2 rounded-lg bg-surface-subtle text-text-primary hover:bg-surface-hover transition-colors"
             title="Toggle Theme">
-            <component :is="isDark ? Sun : Moon" class="w-5 h-5" />
+            <component :is="isDark ? IconSun : IconMoon" class="w-5 h-5" />
           </button>
         </div>
 
@@ -45,11 +45,12 @@
 </template>
 
 <script setup>
+import { Button } from '@/ui';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useColorMode, useToggle } from '@vueuse/core'
 import { computed } from 'vue'; // VueUse
-import { Sun, Moon } from 'lucide-vue-next'; // Icons
+import { IconSun, IconMoon } from '@/ui/icons'; // Icons
 import { useNoteStore } from '../stores/useNoteStore';
 import NoteRenderer from '../components/NoteRenderer.vue'; // Impor renderer
 import defaultAvatar from '@/images/user-avatar-32.png'; // Impor avatar default

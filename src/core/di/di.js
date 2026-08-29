@@ -7,6 +7,8 @@ import { WaBotRepository } from "../../features/wabot/data/repository/WaBotRepos
 import { SecurityRepository } from "../../features/security/data/repository/SecurityRepository";
 import { AdminRepository } from "../../features/admin/data/repository/AdminRepository";
 import { AdminRemoteSource } from "../../features/admin/data/source/AdminRemoteSource";
+import { DashboardRepository } from "../../features/dashboard/data/repository/DashboardRepository";
+import { NotificationRepository } from "../../features/notifications/data/repository/NotificationRepository";
 
 // Import Use Cases
 import { LoginUserUseCase } from "../../features/auth/domain/use-cases/LoginUserUseCase";
@@ -57,6 +59,13 @@ import { SendMessageUseCase } from "../../features/wabot/domain/use-cases/SendMe
 
 import { ChangePasswordUseCase } from "../../features/security/domain/use-cases/ChangePasswordUseCase";
 
+import { GetSystemUpdatesUseCase } from "../../features/dashboard/domain/use-cases/GetSystemUpdatesUseCase";
+import { SyncSystemUpdatesUseCase } from "../../features/dashboard/domain/use-cases/SyncSystemUpdatesUseCase";
+import { GetFeedbacksUseCase } from "../../features/dashboard/domain/use-cases/GetFeedbacksUseCase";
+import { SubmitFeedbackUseCase } from "../../features/dashboard/domain/use-cases/SubmitFeedbackUseCase";
+import { HideFeedbackUseCase } from "../../features/dashboard/domain/use-cases/HideFeedbackUseCase";
+import { GetNotificationsUseCase } from "../../features/notifications/domain/use-cases/GetNotificationsUseCase";
+import { MarkNotificationReadUseCase } from "../../features/notifications/domain/use-cases/MarkNotificationReadUseCase";
 import { GetUsersUseCase } from "../../features/admin/domain/use-cases/GetUsersUseCase";
 import { UpdateUserAccessUseCase } from "../../features/admin/domain/use-cases/UpdateUserAccessUseCase";
 
@@ -122,8 +131,20 @@ export const sendMessageUseCase = new SendMessageUseCase(waBotRepository);
 
 export const changePasswordUseCase = new ChangePasswordUseCase(securityRepository);
 
+const dashboardRepository = new DashboardRepository();
+const notificationRepository = new NotificationRepository();
+
+export const getSystemUpdatesUseCase = new GetSystemUpdatesUseCase(dashboardRepository);
+export const syncSystemUpdatesUseCase = new SyncSystemUpdatesUseCase(dashboardRepository);
+export const getFeedbacksUseCase = new GetFeedbacksUseCase(dashboardRepository);
+export const submitFeedbackUseCase = new SubmitFeedbackUseCase(dashboardRepository);
+export const hideFeedbackUseCase = new HideFeedbackUseCase(dashboardRepository);
+
+export const getNotificationsUseCase = new GetNotificationsUseCase(notificationRepository);
+export const markNotificationReadUseCase = new MarkNotificationReadUseCase(notificationRepository);
+
 export const getUsersUseCase = new GetUsersUseCase(adminRepository);
 export const updateUserAccessUseCase = new UpdateUserAccessUseCase(adminRepository);
 
 // Export repository if needed elsewhere (though relying on use cases is better)
-export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository, adminRepository };
+export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository, adminRepository, dashboardRepository, notificationRepository };
