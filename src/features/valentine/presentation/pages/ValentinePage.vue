@@ -25,7 +25,7 @@
             <div class="relative w-full aspect-[4/5] mx-auto perspective-1000">
                 <transition-group name="card-stack" tag="div" class="relative w-full h-full">
                     <div v-for="(card, index) in visibleCards" :key="card.id"
-                        class="absolute inset-0 bg-white p-4 pb-12 shadow-xl rounded-lg transform transition-all duration-500 ease-in-out border-4 border-white"
+                        class="absolute inset-0 bg-surface-card p-4 pb-12 shadow-none rounded-lg transform transition-all duration-500 ease-in-out border-4 border-surface-card"
                         :style="getCardStyle(index)">
 
                         <!-- =========================== -->
@@ -44,8 +44,8 @@
 
                             <!-- Text Area -->
                             <div class="text-center mt-auto">
-                                <h2 class="text-xl font-bold text-gray-800">{{ card.text }}</h2>
-                                <p v-if="card.subtext" class="text-sm text-gray-500 mt-1">{{ card.subtext }}</p>
+                                <h2 class="text-xl font-bold text-text-primary">{{ card.text }}</h2>
+                                <p v-if="card.subtext" class="text-sm text-text-muted mt-1">{{ card.subtext }}</p>
                             </div>
 
                             <!-- Decor -->
@@ -58,7 +58,7 @@
                         <!-- =========================== -->
                         <div v-else-if="card.type === 'ask-out'" class="w-full h-full flex flex-col relative">
                             <!-- Helper Text (Absolute Top) -->
-                            <div class="absolute top-0 right-0 text-xs text-gray-300">
+                            <div class="absolute top-0 right-0 text-xs text-text-muted/50">
                                 *Jawab jujur!
                             </div>
 
@@ -72,7 +72,7 @@
 
                             <!-- Question Text -->
                             <div class="text-center mb-8">
-                                <h2 class="text-xl font-bold text-gray-800">
+                                <h2 class="text-xl font-bold text-text-primary">
                                     {{ card.text }}
                                 </h2>
                             </div>
@@ -81,14 +81,14 @@
                             <div class="relative h-16 w-full flex justify-center items-center">
                                 <!-- Tombol NO -->
                                 <button @click="handleNoClick" @mouseover="handleNoHover"
-                                    class="absolute bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-full shadow-md hover:bg-gray-300 transition-all duration-200 z-10"
+                                    class="absolute bg-surface-subtle text-text-primary font-bold py-2 px-6 rounded-full shadow-none hover:bg-surface-hover transition-all duration-200 z-10"
                                     :style="noButtonStyle">
                                     {{ noButtonText }}
                                 </button>
 
                                 <!-- Tombol YES -->
                                 <button @click="handleYesClick" @mouseover="handleYesHover"
-                                    class="absolute bg-pink-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:bg-pink-600 transition-all duration-300 z-20"
+                                    class="absolute bg-pink-500 text-white font-bold py-2 px-6 rounded-full shadow-none hover:bg-pink-600 transition-all duration-300 z-20"
                                     :style="yesButtonStyle">
                                     {{ yesButtonText }}
                                 </button>
@@ -108,10 +108,10 @@
                                     <div
                                         class="w-32 h-24 bg-rose-100/50 rounded flex flex-col items-center justify-center gap-2">
                                         <div class="flex gap-1">
-                                            <div class="w-1 h-12 bg-gray-300 rounded-full"></div>
-                                            <div class="w-1 h-10 bg-gray-300 rounded-full"></div>
-                                            <div class="w-1 h-14 bg-gray-300 rounded-full"></div>
-                                            <div class="w-1 h-11 bg-gray-300 rounded-full"></div>
+                                            <div class="w-1 h-12 bg-border-strong rounded-full"></div>
+                                            <div class="w-1 h-10 bg-border-strong rounded-full"></div>
+                                            <div class="w-1 h-14 bg-border-strong rounded-full"></div>
+                                            <div class="w-1 h-11 bg-border-strong rounded-full"></div>
                                         </div>
                                         <span class="text-[10px] text-rose-400 font-bold tracking-widest">LOVE
                                             SONG</span>
@@ -131,21 +131,21 @@
                                         :style="{ transform: `rotate(${rotation}deg)` }">
                                         <!-- Arm -->
                                         <div
-                                            class="absolute top-[50%] left-[50%] w-16 h-4 bg-gray-400 rounded-full origin-left transform -translate-y-1/2 border-2 border-gray-500 shadow-md">
+                                            class="absolute top-[50%] left-[50%] w-16 h-4 bg-border-default rounded-full origin-left transform -translate-y-1/2 border-2 border-border-strong shadow-none">
                                         </div>
                                         <!-- Knob (Handle Grip) -->
                                         <div
-                                            class="absolute top-[50%] right-[-10px] w-8 h-8 bg-rose-500 rounded-full transform -translate-y-1/2 shadow-lg border-2 border-rose-600">
+                                            class="absolute top-[50%] right-[-10px] w-8 h-8 bg-rose-500 rounded-full transform -translate-y-1/2 shadow-none border-2 border-rose-600">
                                         </div>
                                         <!-- Axis -->
                                         <div
-                                            class="absolute top-[50%] left-[50%] w-6 h-6 bg-gray-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 border-2 border-gray-600">
+                                            class="absolute top-[50%] left-[50%] w-6 h-6 bg-border-strong rounded-full transform -translate-x-1/2 -translate-y-1/2 border-2 border-text-muted">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <p class="text-sm text-gray-500 mt-12 font-bold z-10 animate-pulse text-center">
+                            <p class="text-sm text-text-muted mt-12 font-bold z-10 animate-pulse text-center">
                                 <span v-if="isPlayingVoice">🎶 Sedang memutar... 🎶</span>
                                 <span v-else>Putar tuasnya buat dengerin ❤️</span>
                             </p>
@@ -165,12 +165,12 @@
                             <h2 class="text-2xl font-bold text-pink-500 mb-2">Kita Udah Bareng</h2>
 
                             <div class="bg-pink-50 p-4 rounded-xl w-full border border-pink-100 my-4">
-                                <p class="text-lg font-mono text-gray-700 font-bold text-center leading-relaxed">
+                                <p class="text-lg font-mono text-text-primary font-bold text-center leading-relaxed">
                                     {{ timeTogether }}
                                 </p>
                             </div>
 
-                            <p class="text-gray-500 text-sm opacity-80 mt-2">
+                            <p class="text-text-muted text-sm opacity-80 mt-2">
                                 Dan masih akan terus berlanjut... ❤️
                             </p>
 
@@ -185,7 +185,7 @@
             <div class="absolute top-4 right-4 z-50 flex gap-2">
                 <!-- Music Toggle -->
                 <button @click="toggleMusic"
-                    class="bg-white/80 p-2 rounded-full shadow-sm text-pink-400 hover:bg-white transition backdrop-blur-sm">
+                    class="bg-surface-card/80 p-2 rounded-full shadow-none text-pink-400 hover:bg-surface-hover transition backdrop-blur-sm">
                     <span v-if="isMusicPlaying">🔊</span>
                     <span v-else>🔇</span>
                 </button>
@@ -200,7 +200,7 @@
                 <transition name="fade">
                     <div v-if="showNavigation" class="flex items-center gap-6">
                         <button @click="prevCard"
-                            class="w-12 h-12 rounded-full bg-pink-300 text-white flex items-center justify-center shadow-lg hover:bg-pink-400 transition transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                            class="w-12 h-12 rounded-full bg-pink-300 text-white flex items-center justify-center shadow-none hover:bg-pink-400 transition transform hover:scale-110 active:scale-95 disabled:opacity-50"
                             :disabled="currentIndex === 0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -210,7 +210,7 @@
                         </button>
 
                         <button @click="nextCard"
-                            class="w-12 h-12 rounded-full bg-pink-300 text-white flex items-center justify-center shadow-lg hover:bg-pink-400 transition transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                            class="w-12 h-12 rounded-full bg-pink-300 text-white flex items-center justify-center shadow-none hover:bg-pink-400 transition transform hover:scale-110 active:scale-95 disabled:opacity-50"
                             :disabled="currentIndex === cards.length - 1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -224,7 +224,7 @@
                 <!-- Call to Action (Hanya di akhir) -->
                 <transition name="fade">
                     <a v-if="currentIndex === cards.length - 1" :href="whatsappLink" target="_blank"
-                        class="px-6 py-3 bg-red-400 text-white rounded-full font-semibold shadow-lg hover:bg-red-500 transition transform hover:-translate-y-1 active:translate-y-0 w-full text-center max-w-xs block">
+                        class="px-6 py-3 bg-red-400 text-white rounded-full font-semibold shadow-none hover:bg-red-500 transition transform hover:-translate-y-1 active:translate-y-0 w-full text-center max-w-xs block">
                         Kirim Pesan 💌
                     </a>
                 </transition>

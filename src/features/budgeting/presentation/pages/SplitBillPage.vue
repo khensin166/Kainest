@@ -3,24 +3,24 @@
     <!-- Header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-8">
       <div class="mb-4 sm:mb-0">
-        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold flex items-center gap-2">
-          <SparklesIcon class="w-8 h-8 text-violet-500" />
+        <h1 class="text-2xl md:text-3xl text-text-primary font-bold flex items-center gap-2">
+          <SparklesIcon class="w-8 h-8 text-brand-primary" />
           Split Bill AI
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Otomatis deteksi struk, bagi tagihan lebih adil tanpa pusing.</p>
+        <p class="text-sm text-text-muted mt-1">Otomatis deteksi struk, bagi tagihan lebih adil tanpa pusing.</p>
       </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-surface-card rounded-2xl border border-border-default overflow-hidden">
       
       <!-- STEPPER -->
-      <div class="flex border-b border-gray-200 dark:border-gray-700">
+      <div class="flex border-b border-border-default">
         <div 
           v-for="(step, index) in steps" 
           :key="index"
           class="flex-1 py-4 px-4 text-center text-sm font-semibold transition-colors duration-200"
-          :class="currentStep >= index ? 'text-violet-600 dark:text-violet-400 border-b-2 border-violet-600' : 'text-gray-400 border-b-2 border-transparent'"
+          :class="currentStep >= index ? 'text-brand-primary border-b-2 border-brand-primary' : 'text-text-faint border-b-2 border-transparent'"
         >
           {{ index + 1 }}. {{ step }}
         </div>
@@ -30,19 +30,19 @@
         
         <!-- STEP 1: UPLOAD -->
         <div v-if="currentStep === 0" class="space-y-6">
-          <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-12 text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+          <div class="border-2 border-dashed border-border-default rounded-2xl p-12 text-center hover:bg-surface-hover transition-colors cursor-pointer"
                @click="triggerFileInput"
                @dragover.prevent
                @drop.prevent="handleDrop">
             
             <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileChange" />
             
-            <DocumentArrowUpIcon class="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <DocumentArrowUpIcon class="w-16 h-16 mx-auto text-text-faint mb-4" />
             
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Upload Foto Struk</h3>
-            <p class="text-sm text-gray-500 mt-1">Klik untuk memilih atau drag & drop file (JPG, PNG)</p>
+            <h3 class="text-lg font-medium text-text-primary">Upload Foto Struk</h3>
+            <p class="text-sm text-text-muted mt-1">Klik untuk memilih atau drag & drop file (JPG, PNG)</p>
             
-            <div v-if="selectedFile" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-lg text-sm">
+            <div v-if="selectedFile" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-soft text-brand-text rounded-lg text-sm">
               <CheckCircleIcon class="w-5 h-5" />
               {{ selectedFile.name }}
             </div>
@@ -52,7 +52,7 @@
             <button 
               @click="scanReceipt" 
               :disabled="!selectedFile || isScanning"
-              class="btn bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 px-6 py-2.5 rounded-xl shadow-lg shadow-violet-500/30 transition-all"
+              class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all"
             >
               <ArrowPathIcon v-if="isScanning" class="w-5 h-5 animate-spin" />
               <SparklesIcon v-else class="w-5 h-5" />
@@ -65,27 +65,27 @@
         <div v-if="currentStep === 1" class="space-y-8 animate-fade-in-up">
           
           <!-- Rincian Nota -->
-          <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-5 border border-gray-200 dark:border-gray-600">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-              <ReceiptRefundIcon class="w-5 h-5 text-gray-500" />
+          <div class="bg-surface-subtle rounded-xl p-5 border border-border-default">
+            <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+              <ReceiptRefundIcon class="w-5 h-5 text-text-muted" />
               Rincian Tagihan
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Tempat</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Nama Tempat</label>
                 <input type="text" v-model="receiptData.merchant" class="form-input w-full rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subtotal (Rp)</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Subtotal (Rp)</label>
                 <input type="number" v-model="receiptData.subtotal" class="form-input w-full rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pajak (Rp)</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Pajak (Rp)</label>
                 <input type="number" v-model="receiptData.tax" class="form-input w-full rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Keseluruhan (Rp)</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Total Keseluruhan (Rp)</label>
                 <input type="number" v-model="receiptData.total" class="form-input w-full rounded-lg" />
               </div>
             </div>
@@ -93,16 +93,16 @@
 
           <!-- Tambah Teman -->
           <div>
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-              <UsersIcon class="w-5 h-5 text-gray-500" />
+            <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+              <UsersIcon class="w-5 h-5 text-text-muted" />
               Siapa Saja yang Ikut?
             </h3>
             
             <div class="flex flex-wrap gap-3 mb-4">
               <div v-for="(member, idx) in members" :key="idx" 
-                   class="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-sm">
+                   class="bg-brand-soft text-brand-text px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-sm">
                 {{ member }}
-                <button @click="removeMember(idx)" class="text-indigo-400 hover:text-indigo-600 focus:outline-none">
+                <button @click="removeMember(idx)" class="text-brand-primary hover:text-brand-primary-hover focus:outline-none">
                   <XMarkIcon class="w-4 h-4" />
                 </button>
               </div>
@@ -111,17 +111,17 @@
             <div class="flex gap-2">
               <input type="text" v-model="newMemberName" @keyup.enter="addMember" placeholder="Ketik nama lalu Enter..." 
                      class="form-input flex-1 rounded-lg" />
-              <button @click="addMember" class="btn bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 rounded-lg px-4">
+              <button @click="addMember" class="btn bg-brand-primary text-text-inverse hover:bg-brand-primary-hover rounded-lg px-4">
                 Tambah
               </button>
             </div>
           </div>
           
           <div class="flex justify-between items-center mt-8">
-            <button @click="currentStep = 0" class="btn border-gray-200 dark:border-gray-700 hover:border-gray-300 text-gray-600 dark:text-gray-300">
+            <button @click="currentStep = 0" class="btn border-border-default hover:border-border-strong text-text-secondary">
               Kembali
             </button>
-            <button @click="goToAssignment" :disabled="members.length < 1" class="btn bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg shadow-violet-500/30 px-6">
+            <button @click="goToAssignment" :disabled="members.length < 1" class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-xl px-6">
               Lanjut Bagi Menu
             </button>
           </div>
@@ -129,21 +129,21 @@
 
         <!-- STEP 3: ASSIGNMENT -->
         <div v-if="currentStep === 2" class="space-y-6 animate-fade-in-up">
-          <p class="text-gray-600 dark:text-gray-400 mb-6">Pilih siapa saja yang mengkonsumsi masing-masing menu di bawah ini. AI akan otomatis membagi harganya secara rata.</p>
+          <p class="text-text-secondary mb-6">Pilih siapa saja yang mengkonsumsi masing-masing menu di bawah ini. AI akan otomatis membagi harganya secara rata.</p>
           
           <div class="space-y-4">
             <div v-for="(item, idx) in receiptData.items" :key="idx" 
-                 class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                 class="bg-surface-card border border-border-default rounded-xl p-4 transition-shadow hover:border-border-strong">
               
               <div class="flex justify-between items-start mb-3">
                 <div>
-                  <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ item.name }}</h4>
-                  <p class="text-sm text-gray-500 font-mono">Rp {{ formatNumber(item.price) }}</p>
+                  <h4 class="font-medium text-text-primary">{{ item.name }}</h4>
+                  <p class="text-sm text-text-muted font-mono">Rp {{ formatNumber(item.price) }}</p>
                 </div>
               </div>
               
               <!-- Checkboxes for members -->
-              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+              <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border-default">
                 <label v-for="member in members" :key="member" 
                        class="inline-flex items-center cursor-pointer select-none">
                   <input type="checkbox" 
@@ -151,10 +151,9 @@
                          v-model="itemAssignments[idx]" 
                          class="peer sr-only" />
                   <div class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-                              bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400
-                              peer-checked:bg-violet-100 peer-checked:text-violet-700 
-                              dark:peer-checked:bg-violet-900/40 dark:peer-checked:text-violet-400
-                              border border-transparent peer-checked:border-violet-300 dark:peer-checked:border-violet-700/50">
+                              bg-surface-subtle text-text-muted
+                              peer-checked:bg-brand-soft peer-checked:text-brand-text 
+                              border border-transparent peer-checked:border-brand-primary">
                     {{ member }}
                   </div>
                 </label>
@@ -162,11 +161,11 @@
             </div>
           </div>
           
-          <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <button @click="currentStep = 1" class="btn border-gray-200 dark:border-gray-700 hover:border-gray-300 text-gray-600 dark:text-gray-300">
+          <div class="flex justify-between items-center mt-8 pt-6 border-t border-border-default">
+            <button @click="currentStep = 1" class="btn border-border-default hover:border-border-strong text-text-secondary">
               Kembali
             </button>
-            <button @click="processSplit" :disabled="isProcessing" class="btn bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg shadow-green-500/30 px-6 flex items-center gap-2">
+            <button @click="processSplit" :disabled="isProcessing" class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-xl px-6 flex items-center gap-2">
               <ArrowPathIcon v-if="isProcessing" class="w-5 h-5 animate-spin" />
               <CheckCircleIcon v-else class="w-5 h-5" />
               {{ isProcessing ? 'Memproses...' : 'Selesai & Bagi Tagihan' }}
@@ -178,37 +177,37 @@
     </div>
 
     <!-- HISTORY SECTION -->
-    <div class="mt-12 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="mt-12 bg-surface-card rounded-2xl border border-border-default overflow-hidden">
       <div class="p-6 md:p-8">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
-          <ReceiptRefundIcon class="w-6 h-6 text-violet-500" />
+        <h2 class="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+          <ReceiptRefundIcon class="w-6 h-6 text-brand-primary" />
           Riwayat Split Bill
         </h2>
         
         <div v-if="isLoadingHistory" class="animate-pulse flex space-x-4">
           <div class="flex-1 space-y-4 py-1">
-            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div class="h-4 bg-surface-subtle rounded w-3/4"></div>
             <div class="space-y-2">
-              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+              <div class="h-4 bg-surface-subtle rounded"></div>
+              <div class="h-4 bg-surface-subtle rounded w-5/6"></div>
             </div>
           </div>
         </div>
         
         <div v-else-if="historyList.length === 0" class="text-center py-8">
-          <p class="text-gray-500 dark:text-gray-400">Belum ada riwayat Split Bill. Yuk coba scan struk pertamamu!</p>
+          <p class="text-text-muted">Belum ada riwayat Split Bill. Yuk coba scan struk pertamamu!</p>
         </div>
         
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div v-for="history in historyList" :key="history.id" 
                @click="openHistory(history.id)"
-               class="bg-gray-50 dark:bg-gray-700/30 border border-gray-200 dark:border-gray-700 p-5 rounded-xl cursor-pointer hover:border-violet-400 dark:hover:border-violet-500 transition-colors">
+               class="bg-surface-subtle border border-border-default p-5 rounded-xl cursor-pointer hover:border-brand-primary transition-colors">
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg">{{ history.merchant || 'Tempat Makan' }}</h3>
-              <span class="text-xs text-gray-500">{{ formatDate(history.createdAt) }}</span>
+              <h3 class="font-bold text-text-primary text-lg">{{ history.merchant || 'Tempat Makan' }}</h3>
+              <span class="text-xs text-text-faint">{{ formatDate(history.createdAt) }}</span>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Total: <span class="font-bold text-violet-600 dark:text-violet-400">Rp {{ formatNumber(history.totalAmount) }}</span></p>
-            <div class="text-xs text-gray-500 truncate">
+            <p class="text-sm text-text-secondary mb-4">Total: <span class="font-bold text-brand-primary">Rp {{ formatNumber(history.totalAmount) }}</span></p>
+            <div class="text-xs text-text-muted truncate">
               {{ parseSummary(history.summaryText) }}
             </div>
           </div>

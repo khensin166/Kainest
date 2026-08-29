@@ -3,7 +3,7 @@
     <button
       ref="trigger"
       class="rounded-full"
-      :class="dropdownOpen ? 'bg-gray-100 dark:bg-gray-700/60 text-gray-500 dark:text-gray-400' : 'text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400'"      
+      :class="dropdownOpen ? 'bg-surface-hover text-text-primary' : 'text-text-muted hover:text-text-primary'"      
       aria-haspopup="true"
       @click.prevent="dropdownOpen = !dropdownOpen"
       :aria-expanded="dropdownOpen"
@@ -23,7 +23,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1" :class="align === 'right' ? 'right-0' : 'left-0'">
+      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-36 bg-surface-card border border-border-default py-1.5 rounded-lg shadow-none overflow-hidden mt-1" :class="align === 'right' ? 'right-0' : 'left-0'">
         <ul
           ref="dropdown"
           @focusin="dropdownOpen = true"

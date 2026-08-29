@@ -1,10 +1,10 @@
 <!-- EditProfileForm   -->
 <template>
   <div>
-    <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold">
+    <h2 class="text-xl text-text-primary font-bold">
       Edit Profil
     </h2>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
+    <p class="text-sm text-text-muted mt-1 mb-6">
       Perbarui nama panggilan, sesuaikan preferensi, dan atur informasi pribadi Anda.
     </p>
     <div v-if="!user" class="text-center">Memuat data profil...</div>
@@ -13,7 +13,7 @@
         <img class="w-20 h-20 rounded-full object-cover" :src="userPhoto" alt="User" referrerpolicy="no-referrer" />
         <div>
           <button type="button" @click="triggerFileInput" :disabled="profileStore.isUploadingPhoto"
-            class="px-3 py-2 text-sm font-medium text-violet-600 border border-violet-300 rounded-md disabled:opacity-50">
+            class="px-3 py-2 text-sm font-medium text-brand-primary border border-brand-primary/30 rounded-md disabled:opacity-50">
             {{
               profileStore.isUploadingPhoto ? "Mengunggah..." : "Ubah Foto"
             }}
@@ -25,7 +25,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-medium mb-1" for="name">Nama Lengkap</label>
-          <input id="name" class="form-input w-full bg-gray-100 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+          <input id="name" class="form-input w-full bg-surface-subtle text-text-muted cursor-not-allowed"
             type="text" v-model="formData.name" disabled readonly />
         </div>
         <div>
@@ -34,7 +34,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="email">Email</label>
-          <input id="email" class="form-input w-full disabled:bg-gray-100 dark:disabled:bg-gray-700" type="email"
+          <input id="email" class="form-input w-full disabled:bg-surface-subtle" type="email"
             v-model="formData.email" disabled />
         </div>
         <div>
@@ -44,7 +44,7 @@
             </label>
             <!-- Status: Sudah Terverifikasi -->
             <div v-if="user.whatsappJid"
-              class="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-1 rounded flex items-center gap-1">
+              class="text-xs font-semibold text-status-success bg-status-success-bg px-2 py-1 rounded flex items-center gap-1">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
@@ -53,7 +53,7 @@
             <!-- Status: Belum Terverifikasi - Tombol Buka Panduan -->
             <div v-else class="text-xs">
               <button type="button" @click="showWaModal = true"
-                class="text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1 transition-colors">
+                class="text-brand-primary hover:text-brand-primary-hover font-medium flex items-center gap-1 transition-colors">
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                   <path
                     d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -65,14 +65,14 @@
           <input id="phone" class="form-input w-full" type="text" v-model="formData.phoneNumber"
             placeholder="Cth: 628123456789" />
 
-          <div v-if="phoneError" class="text-sm text-red-500 mt-1">
+          <div v-if="phoneError" class="text-sm text-status-danger mt-1">
             {{ phoneError }}
           </div>
         </div>
       </div>
       <div class="flex justify-end mt-6">
         <button type="submit" :disabled="profileStore.isUpdatingProfile || !isDirty"
-          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          class="px-4 py-2 text-sm font-medium text-text-inverse bg-brand-primary hover:bg-brand-primary-hover rounded-md disabled:opacity-70 disabled:cursor-not-allowed transition-colors">
           {{
             profileStore.isUpdatingProfile ? "Menyimpan..." : "Simpan Perubahan"
           }}
@@ -84,15 +84,15 @@
       <template #header>
         <div class="flex items-center gap-3 w-full">
           <div
-            class="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24">
+            class="w-10 h-10 bg-status-success-bg rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-status-success" fill="currentColor" viewBox="0 0 24 24">
               <path
                 d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
             </svg>
           </div>
           <div>
-            <h3 class="font-bold text-lg text-gray-900 dark:text-gray-100">Tautkan WhatsApp Bot</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 font-normal">Ikuti langkah di bawah ini</p>
+            <h3 class="font-bold text-lg text-text-primary">Tautkan WhatsApp Bot</h3>
+            <p class="text-sm text-text-muted font-normal">Ikuti langkah di bawah ini</p>
           </div>
         </div>
       </template>
@@ -101,17 +101,17 @@
         <div class="space-y-4 pt-2 pb-2">
           <!-- Langkah 1: Salin kode !link -->
           <div
-            class="flex gap-3 p-3 bg-violet-50 dark:bg-violet-900/20 rounded-xl border border-violet-100 dark:border-violet-800 text-left">
+            class="flex gap-3 p-3 bg-brand-primary/10 rounded-xl border border-brand-primary/30 text-left">
             <div
-              class="w-7 h-7 rounded-full bg-violet-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center">
+              class="w-7 h-7 rounded-full bg-brand-primary text-text-inverse font-bold text-sm flex-shrink-0 flex items-center justify-center">
               1</div>
             <div class="flex-1">
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Salin kode tautan kamu</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Kamu akan mengirimkan kode ini langsung ke dalam <strong>grup WhatsApp</strong> nanti.</p>
-              <div class="flex items-center gap-2 bg-gray-900 rounded-lg px-3 py-2">
-                <code class="text-green-400 text-xs font-mono flex-1">!link {{ user.invitationCode }}</code>
+              <p class="text-sm font-semibold text-text-primary">Salin kode tautan kamu</p>
+              <p class="text-xs text-text-muted mb-2">Kamu akan mengirimkan kode ini langsung ke dalam <strong>grup WhatsApp</strong> nanti.</p>
+              <div class="flex items-center gap-2 bg-surface-page rounded-lg px-3 py-2">
+                <code class="text-status-success text-xs font-mono flex-1">!link {{ user.invitationCode }}</code>
                 <button @click="copyLinkCode" type="button"
-                  class="text-gray-400 hover:text-white transition-colors flex-shrink-0">
+                  class="text-text-muted hover:text-text-primary transition-colors flex-shrink-0">
                   <svg v-if="!copiedCode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -127,14 +127,14 @@
           <!-- Langkah 2: Buat Grup Baru dengan Bot -->
           <div class="flex gap-3 text-left">
             <div
-              class="w-7 h-7 rounded-full bg-green-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center mt-0.5">
+              class="w-7 h-7 rounded-full bg-status-success text-text-inverse font-bold text-sm flex-shrink-0 flex items-center justify-center mt-0.5">
               2</div>
             <div>
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Buat grup WhatsApp baru & tambahkan Bot</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Simpan nomor Bot di bawah ke kontakmu, lalu buat grup baru dan tambahkan Bot sebagai anggota.</p>
+              <p class="text-sm font-semibold text-text-primary">Buat grup WhatsApp baru & tambahkan Bot</p>
+              <p class="text-xs text-text-muted mb-1.5">Simpan nomor Bot di bawah ke kontakmu, lalu buat grup baru dan tambahkan Bot sebagai anggota.</p>
               <div v-if="botPhoneNumber" class="flex flex-wrap gap-2">
                 <button @click="copyBotNumber" type="button"
-                  class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs rounded-lg font-medium transition-colors border border-gray-300 dark:border-gray-600">
+                  class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-subtle hover:bg-surface-hover text-text-primary text-xs rounded-lg font-medium transition-colors border border-border-default">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -142,20 +142,20 @@
                   {{ copiedBotNum ? 'Tersalin! ✓' : 'Salin Nomor Bot' }}
                 </button>
               </div>
-              <p v-else class="text-xs text-amber-600 dark:text-amber-400">⚠️ Nomor bot belum tersedia. Pastikan bot sedang aktif.</p>
+              <p v-else class="text-xs text-status-warning">⚠️ Nomor bot belum tersedia. Pastikan bot sedang aktif.</p>
             </div>
           </div>
 
           <!-- Langkah 3: Tempel kode di dalam Grup → Aktif Sekaligus! -->
           <div
-            class="flex gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800 text-left">
+            class="flex gap-3 p-3 bg-status-success-bg rounded-xl border border-status-success/30 text-left">
             <div
-              class="w-7 h-7 rounded-full bg-green-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center">
+              class="w-7 h-7 rounded-full bg-status-success text-text-inverse font-bold text-sm flex-shrink-0 flex items-center justify-center">
               3</div>
             <div>
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Kirim kode tautan <span class="text-green-600 dark:text-green-400">di dalam grup</span></p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Paste kode yang sudah kamu salin tadi langsung ke percakapan grup. Akun dan grup akan <strong>langsung aktif sekaligus</strong> — tidak perlu langkah tambahan!</p>
-              <div class="flex items-center gap-1.5 text-xs text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg px-3 py-2">
+              <p class="text-sm font-semibold text-text-primary">Kirim kode tautan <span class="text-status-success">di dalam grup</span></p>
+              <p class="text-xs text-text-muted mb-1.5">Paste kode yang sudah kamu salin tadi langsung ke percakapan grup. Akun dan grup akan <strong>langsung aktif sekaligus</strong> — tidak perlu langkah tambahan!</p>
+              <div class="flex items-center gap-1.5 text-xs text-status-success bg-status-success/20 rounded-lg px-3 py-2">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
@@ -165,7 +165,7 @@
           </div>
 
           <button @click="showWaModal = false"
-            class="w-full mt-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors">
+            class="w-full mt-4 py-2 bg-surface-subtle hover:bg-surface-hover text-text-primary rounded-lg text-sm font-medium transition-colors">
             Tutup
           </button>
         </div>

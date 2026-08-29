@@ -199,6 +199,39 @@
   animation: qr-fade-slide 0.6s ease-out forwards;
 }
 
+/* =========================================================
+   THEME FACTORY — Global Override
+   Menonaktifkan semua efek shadow & glass secara paksa.
+   Ini menggantikan perlu mengedit tiap file .vue.
+   Lihat KAINEST_DESIGN.md untuk panduan lengkap.
+   ========================================================= */
+.theme-factory *,
+.theme-factory *::before,
+.theme-factory *::after {
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Pastikan background gradient dekoratif tidak muncul di Factory */
+.theme-factory [class*="bg-gradient-"] {
+  background-image: none !important;
+  background-color: var(--color-surface-card) !important;
+}
+
+/* Ganti ring/focus glow jadi border solid 1px */
+.theme-factory *:focus {
+  outline: none !important;
+  ring: none !important;
+}
+.theme-factory input:focus,
+.theme-factory textarea:focus,
+.theme-factory select:focus,
+.theme-factory button:focus-visible {
+  border-color: var(--color-brand-primary) !important;
+}
+
+
 @keyframes fade-in {
   from {
     opacity: 0;

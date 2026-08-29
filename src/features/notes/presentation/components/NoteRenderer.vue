@@ -1,5 +1,5 @@
 <template>
-  <div class="note-content prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200" v-html="renderedHtml">
+  <div class="note-content prose dark:prose-invert max-w-none text-text-primary" v-html="renderedHtml">
   </div>
 </template>
 
@@ -62,8 +62,7 @@ const renderedHtml = computed(() => {
 .image-tool__caption {
   text-align: center;
   font-style: italic;
-  color: #6b7280;
-  /* gray-500 */
+  color: var(--color-text-muted);
 }
 
 /* Style tambahan untuk blok yang tidak ditangani 'prose' atau jika plugin tidak ada */
@@ -118,8 +117,7 @@ const renderedHtml = computed(() => {
 }
 
 .note-content a {
-  color: #7c3aed;
-  /* violet-600 */
+  color: var(--color-brand-primary);
   text-decoration: underline;
 }
 
@@ -127,16 +125,10 @@ const renderedHtml = computed(() => {
   font-weight: 500;
   font-style: italic;
   border-left-width: 0.25rem;
-  border-left-color: #e5e7eb;
-  /* gray-200 */
+  border-left-color: var(--color-border-default);
   margin-top: 1.6em;
   margin-bottom: 1.6em;
   padding-left: 1em;
-}
-
-.dark .note-content blockquote {
-  border-left-color: #374151;
-  /* gray-700 */
 }
 
 .image-tool__image-picture {
@@ -151,27 +143,10 @@ const renderedHtml = computed(() => {
 .image-tool__caption {
   text-align: center;
   font-style: italic;
-  color: #6b7280;
-  /* gray-500 */
+  color: var(--color-text-muted);
   margin-top: 0.5em;
   margin-bottom: 2em;
 }
 
-/* Dark mode adjustments applied via parent 'dark' class */
-.dark .note-content h1,
-.dark .note-content h2,
-.dark .note-content h3,
-.dark .note-content strong,
-.dark .note-content b {
-  color: #f3f4f6;
-  /* gray-100 */
-}
-
-.dark .note-content p,
-.dark .note-content ul,
-.dark .note-content ol,
-.dark .note-content li {
-  color: #d1d5db;
-  /* gray-300 */
-}
+/* We remove manual dark mode text colors since we use semantic colors for text */
 </style>

@@ -61,10 +61,10 @@ const handleLogout = async () => {
     >
       <img class="w-8 h-8 rounded-full" :src="userAvatar" width="32" height="32" alt="User" referrerpolicy="no-referrer" />
       <div class="flex items-center truncate">
-        <span class="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
+        <span class="truncate ml-2 text-sm font-medium text-text-primary group-hover:text-text-primary">
             {{ authStore.user?.displayName || 'User' }}
         </span>
-        <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
+        <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted" viewBox="0 0 12 12">
           <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
         </svg>
       </div>
@@ -77,10 +77,10 @@ const handleLogout = async () => {
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-1.5 rounded shadow-lg overflow-hidden mt-1 right-0">
-        <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200 dark:border-slate-700">
-          <div class="font-medium text-slate-800 dark:text-slate-100">{{ authStore.user?.displayName }}</div>
-          <div class="text-xs text-slate-500 dark:text-slate-400 italic capitalize">{{ authStore.user?.role === 'admin' ? 'Administrator' : authStore.user?.role || 'User' }}</div>
+      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded shadow-none overflow-hidden mt-1 right-0">
+        <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-border-default">
+          <div class="font-medium text-text-primary">{{ authStore.user?.displayName }}</div>
+          <div class="text-xs text-text-muted italic capitalize">{{ authStore.user?.role === 'admin' ? 'Administrator' : authStore.user?.role || 'User' }}</div>
         </div>
         <ul
           ref="dropdown"
@@ -89,7 +89,7 @@ const handleLogout = async () => {
         >
           <li>
             <router-link
-              class="font-medium text-sm text-violet-500 hover:text-violet-600 flex items-center py-1 px-3"
+              class="font-medium text-sm text-brand-primary hover:text-brand-primary-hover flex items-center py-1 px-3"
               to="/app/settings"
               @click="_close"
             >
@@ -98,7 +98,7 @@ const handleLogout = async () => {
           </li>
           <li>
             <a
-              class="font-medium text-sm text-violet-500 hover:text-violet-600 flex items-center py-1 px-3 cursor-pointer"
+              class="font-medium text-sm text-brand-primary hover:text-brand-primary-hover flex items-center py-1 px-3 cursor-pointer"
               @click="handleLogout"
             >
               Sign Out

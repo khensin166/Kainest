@@ -4,6 +4,7 @@ import { reactive, computed, onMounted, inject, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { useModalStore } from '../../../../stores/modalStore';
 import { formatRupiah } from '@/utils/Utils';
+import CurrencyInput from '@/components/forms/CurrencyInput.vue';
 
 const budgetStore = useBudgetStore();
 const modalStore = useModalStore();
@@ -151,91 +152,91 @@ const handleSubmit = async () => {
     
     <!-- Tipe Transaksi Toggle -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label class="block text-sm font-medium text-text-secondary mb-1">
         Jenis Transaksi
       </label>
-      <div class="flex p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
-        <button type="button" 
+      <div class="flex p-1 bg-surface-subtle rounded-lg border border-border-default">
+        <button type="button"
           @click="formData.type = 'EXPENSE'"
-          :class="formData.type === 'EXPENSE' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+          :class="formData.type === 'EXPENSE' ? 'bg-surface-card text-text-primary border border-border-default' : 'text-text-muted hover:text-text-secondary'"
           class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold transition-all flex items-center justify-center gap-2">
-          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+          <svg class="w-4 h-4 text-status-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
           Pengeluaran
         </button>
-        <button type="button" 
+        <button type="button"
           @click="formData.type = 'INCOME'"
-          :class="formData.type === 'INCOME' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+          :class="formData.type === 'INCOME' ? 'bg-surface-card text-text-primary border border-border-default' : 'text-text-muted hover:text-text-secondary'"
           class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold transition-all flex items-center justify-center gap-2">
-          <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+          <svg class="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
           Pemasukan
         </button>
       </div>
     </div>
 
     <div>
-      <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label for="amount" class="block text-sm font-medium text-text-secondary mb-1">
         Jumlah {{ formData.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran' }}
       </label>
-      <div class="relative rounded-md shadow-sm">
-        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <span class="text-gray-500 sm:text-sm">Rp</span>
-        </div>
-        <input type="number" id="amount" v-model.number="formData.amount" min="1"
-          class="block w-full rounded-md border-gray-300 dark:border-gray-600 pl-10 pr-4 py-2 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm placeholder-gray-400"
-          placeholder="0" required />
-      </div>
-      <p v-if="formData.amount > 0" class="mt-1 text-xs font-medium" :class="formData.type === 'INCOME' ? 'text-green-600 dark:text-green-400' : 'text-violet-600 dark:text-violet-400'">
+      <CurrencyInput
+        id="amount"
+        v-model="formData.amount"
+        :min="1"
+        :required="true"
+        :placeholder="formData.type === 'INCOME' ? 'Contoh: 1.000.000' : 'Contoh: 50.000'"
+      />
+      <p v-if="formData.amount > 0" class="mt-1 text-xs font-medium"
+         :class="formData.type === 'INCOME' ? 'text-status-success' : 'text-brand-primary'">
         {{ formattedAmountPreview }}
       </p>
     </div>
 
     <div>
-      <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label for="category" class="block text-sm font-medium text-text-secondary mb-1">
         Kategori
       </label>
       <select id="category" v-model="formData.categoryId"
-        class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+        class="block w-full rounded-md border-border-default py-2 pl-3 pr-10 text-base bg-surface-input text-text-primary focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
         required :disabled="budgetStore.isLoadingCategories">
         <option value="" disabled>-- Pilih Kategori --</option>
         <option v-for="cat in activeCategories" :key="cat.id" :value="cat.id">
           {{ cat.displayName || cat.name }} </option>
       </select>
-      <p v-if="budgetStore.isLoadingCategories" class="mt-1 text-xs text-gray-500 animate-pulse">
+      <p v-if="budgetStore.isLoadingCategories" class="mt-1 text-xs text-text-muted animate-pulse">
         Sedang memuat kategori...
       </p>
     </div>
 
     <div>
-      <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label for="date" class="block text-sm font-medium text-text-secondary mb-1">
         Tanggal
       </label>
       <input type="date" id="date" v-model="formData.date"
-        class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+        class="block w-full rounded-md border-border-default py-2 px-3 focus:border-brand-primary focus:ring-brand-primary bg-surface-input text-text-primary sm:text-sm"
         required />
     </div>
 
     <div>
-      <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label for="note" class="block text-sm font-medium text-text-secondary mb-1">
         Catatan (Opsional)
       </label>
       <textarea id="note" v-model="formData.note" rows="2"
-        class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 focus:border-violet-500 focus:ring-violet-500 dark:bg-gray-700 dark:text-white sm:text-sm placeholder-gray-400"
+        class="block w-full rounded-md border-border-default py-2 px-3 focus:border-brand-primary focus:ring-brand-primary bg-surface-input text-text-primary sm:text-sm placeholder:text-text-faint"
         :placeholder="formData.type === 'INCOME' ? 'Contoh: Bonus proyek sampingan, uang saku ekstra...' : 'Contoh: Beli makan siang nasi padang...'"></textarea>
     </div>
 
-    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+    <div class="flex justify-end space-x-3 pt-4 border-t border-border-muted">
       <button type="button" @click="closeModalFunc"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+        class="px-4 py-2 text-sm font-medium text-text-secondary bg-surface-card border border-border-default rounded-md hover:bg-surface-hover focus:outline-none"
         :disabled="budgetStore.isTransactionSubmitting">
         Batal
       </button>
       <button type="submit"
-        class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        :class="formData.type === 'INCOME' ? 'bg-green-600 hover:bg-green-700 focus-visible:ring-green-500' : 'bg-violet-600 hover:bg-violet-700 focus-visible:ring-violet-500'"
+        class="inline-flex justify-center px-4 py-2 text-sm font-medium text-text-inverse border border-transparent rounded-md focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        :class="formData.type === 'INCOME' ? 'bg-status-success hover:bg-status-success/90' : 'bg-brand-primary hover:bg-brand-primary-hover'"
         :disabled="!isFormValid || budgetStore.isTransactionSubmitting">
 
         <span v-if="budgetStore.isTransactionSubmitting" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor"

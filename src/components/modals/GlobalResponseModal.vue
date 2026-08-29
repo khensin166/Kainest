@@ -17,14 +17,14 @@
     </template>
     <template #body>
       <div v-if="timer > 0" class="text-center mt-4">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-text-muted">
           {{ modalStore.message }}
         </p>
-        <p class="text-lg font-medium text-gray-800 dark:text-gray-200 mt-2">
+        <p class="text-lg font-medium text-text-primary mt-2">
           Anda bisa mencoba lagi dalam <strong>{{ timer }}</strong> detik.
         </p>
       </div>
-      <p v-else class="text-sm text-gray-500 dark:text-gray-400 mt-4">
+      <p v-else class="text-sm text-text-muted mt-4">
         {{ modalStore.message }}
       </p>
     </template>
@@ -33,7 +33,7 @@
         @click="modalStore.closeModal"
         type="button"
         :disabled="timer > 0"
-        class="px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+        class="px-4 py-2 text-sm font-medium rounded-md focus:outline-none disabled:opacity-50 disabled:bg-surface-subtle disabled:cursor-not-allowed"
         :class="buttonClass"
       >
         Tutup
@@ -83,22 +83,22 @@ onUnmounted(() => {
 const headerClass = computed(() => {
   switch (modalStore.status) {
     case "success":
-      return "text-green-700 dark:text-green-400";
+      return "text-status-success";
     case "error":
-      return "text-red-700 dark:text-red-400";
+      return "text-status-danger";
     default:
-      return "text-gray-900 dark:text-gray-100";
+      return "text-text-primary";
   }
 });
 
 const buttonClass = computed(() => {
   switch (modalStore.status) {
     case "success":
-      return "bg-green-600 hover:bg-green-700";
+      return "bg-status-success hover:bg-status-success/90 text-status-success-text";
     case "error":
-      return "bg-red-600 hover:bg-red-700";
+      return "bg-status-danger hover:bg-status-danger/90 text-white";
     default:
-      return "bg-gray-600 hover:bg-gray-700";
+      return "bg-surface-card border border-border-default text-text-secondary hover:text-text-primary hover:bg-surface-hover";
   }
 });
 </script>

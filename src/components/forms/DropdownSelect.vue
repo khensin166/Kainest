@@ -59,8 +59,8 @@ const selectOption = (value) => {
     <button ref="trigger" type="button" class="btn px-3 flex items-center transition-colors duration-200" :class="[
       wFull ? 'w-full justify-between' : '',
       dropdownOpen
-        ? 'bg-violet-50 text-violet-600 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-700/50 dark:hover:bg-violet-900/40' // Style saat AKTIF (Terbuka)
-        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-400' // Style DEFAULT (Tertutup)
+        ? 'bg-brand-soft text-brand-primary border-brand-primary hover:bg-brand-light' // Style saat AKTIF (Terbuka)
+        : 'bg-surface-card border-border-default hover:border-border-strong text-text-muted' // Style DEFAULT (Tertutup)
     ]" aria-haspopup="true" @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen">
 
       <slot name="trigger" :value="modelValue">
@@ -77,7 +77,7 @@ const selectOption = (value) => {
       enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
       leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
       <div v-show="dropdownOpen" ref="dropdown"
-        class="origin-top-right z-50 absolute top-full min-w-[9rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
+        class="origin-top-right z-50 absolute top-full min-w-[9rem] bg-surface-card border border-border-default py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
         :class="[
           align === 'right' ? 'right-0' : 'left-0',
           wFull ? 'w-full' : ''
@@ -85,15 +85,15 @@ const selectOption = (value) => {
         <ul class="text-sm font-medium">
           <li v-for="option in options" :key="option.value">
             <button type="button" @click="selectOption(option.value)"
-              class="flex items-center w-full px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors duration-150"
+              class="flex items-center w-full px-3 py-2 hover:bg-surface-hover transition-colors duration-150"
               :class="modelValue === option.value
-                ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-gray-700'
-                : 'text-gray-600 dark:text-gray-300'">
+                ? 'text-brand-primary bg-brand-soft'
+                : 'text-text-primary'">
 
               <span class="grow text-left">{{ option.label }}</span>
 
               <span v-if="modelValue === option.value"
-                class="shrink-0 ml-2 w-2 h-2 rounded-full bg-violet-600 dark:bg-violet-400">
+                class="shrink-0 ml-2 w-2 h-2 rounded-full bg-brand-primary">
               </span>
 
             </button>

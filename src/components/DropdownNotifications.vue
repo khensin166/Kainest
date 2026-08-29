@@ -2,17 +2,17 @@
   <div class="relative inline-flex">
     <button
       ref="trigger"
-      class="relative w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-      :class="{ 'bg-gray-100 dark:bg-gray-700': dropdownOpen }"
+      class="relative w-8 h-8 flex items-center justify-center hover:bg-surface-hover rounded-full transition-colors"
+      :class="{ 'bg-surface-hover': dropdownOpen }"
       aria-haspopup="true"
       @click.stop="toggle"
       :aria-expanded="dropdownOpen"
     >
       <span class="sr-only">Notifikasi</span>
-      <BellIcon class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+      <BellIcon class="w-5 h-5 text-text-muted" />
       <!-- Unread Badge -->
       <span v-if="unreadCount > 0"
-        class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800">
+        class="absolute top-0 right-0 w-2 h-2 bg-status-danger rounded-full border-2 border-surface-card">
       </span>
     </button>
 
@@ -32,21 +32,21 @@
       leave-to-class="transform opacity-0 scale-95"
     >
       <div v-show="dropdownOpen" ref="dropdown"
-        class="z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-2 rounded-2xl shadow-xl overflow-hidden w-80
+        class="z-30 bg-surface-card border border-border-default py-2 rounded-2xl shadow-xl overflow-hidden w-80
                sm:absolute sm:top-full sm:right-0 sm:mt-2 sm:origin-top-right
                fixed left-1/2 -translate-x-1/2 top-16 sm:transform-none"
         @click.stop>
 
         <!-- Header -->
-        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Notifikasi</h2>
+        <div class="flex items-center justify-between px-4 py-2 border-b border-border-default">
+          <h2 class="text-sm font-semibold text-text-primary">Notifikasi</h2>
           <div class="flex items-center gap-2">
             <span v-if="unreadCount > 0"
-              class="text-xs font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 px-2 py-0.5 rounded-full">
+              class="text-xs font-medium text-brand-primary bg-brand-surface px-2 py-0.5 rounded-full">
               {{ unreadCount }} baru
             </span>
             <!-- Close button (mobile) -->
-            <button @click.stop="close" class="sm:hidden w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
+            <button @click.stop="close" class="sm:hidden w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-hover text-text-muted">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -57,39 +57,39 @@
         <!-- Loading -->
         <div v-if="loading" class="p-4 space-y-3">
           <div v-for="i in 3" :key="i" class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse flex-shrink-0"></div>
+            <div class="w-8 h-8 rounded-xl bg-surface-hover animate-pulse flex-shrink-0"></div>
             <div class="flex-1 space-y-1.5">
-              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
-              <div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+              <div class="h-3 bg-surface-hover rounded animate-pulse w-3/4"></div>
+              <div class="h-2.5 bg-surface-hover rounded animate-pulse w-1/2"></div>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
         <div v-else-if="notifications.length === 0" class="py-8 text-center">
-          <div class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-2">
-            <BellSlashIcon class="w-5 h-5 text-gray-400" />
+          <div class="w-10 h-10 rounded-2xl bg-surface-hover flex items-center justify-center mx-auto mb-2">
+            <BellSlashIcon class="w-5 h-5 text-text-muted" />
           </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada notifikasi</p>
+          <p class="text-sm text-text-muted">Tidak ada notifikasi</p>
         </div>
 
         <!-- Notification List -->
-        <ul v-else class="max-h-72 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700/50">
+        <ul v-else class="max-h-72 overflow-y-auto divide-y divide-border-default">
           <li v-for="notif in notifications" :key="notif.id"
-            class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer transition-colors"
-            :class="{ 'bg-violet-50/50 dark:bg-violet-900/10': !notif.isRead }"
+            class="flex items-start gap-3 px-4 py-3 hover:bg-surface-hover cursor-pointer transition-colors"
+            :class="{ 'bg-brand-surface/50': !notif.isRead }"
             @click="markRead(notif)">
             <!-- Icon by type -->
             <div :class="['w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', iconBg(notif.type)]">
               <component :is="iconByType(notif.type)" :class="['w-4 h-4', iconColor(notif.type)]" />
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{{ notif.title }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">{{ notif.message }}</p>
-              <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">{{ formatRelative(notif.createdAt) }}</p>
+              <p class="text-sm font-medium text-text-primary truncate">{{ notif.title }}</p>
+              <p class="text-xs text-text-muted line-clamp-2 mt-0.5">{{ notif.message }}</p>
+              <p class="text-xs text-text-muted/50 mt-1">{{ formatRelative(notif.createdAt) }}</p>
             </div>
             <!-- Unread dot -->
-            <div v-if="!notif.isRead" class="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-1.5"></div>
+            <div v-if="!notif.isRead" class="w-2 h-2 rounded-full bg-brand-primary flex-shrink-0 mt-1.5"></div>
           </li>
         </ul>
       </div>

@@ -3,7 +3,7 @@
     <!-- Trigger Button -->
     <button 
       @click="isOpen = true"
-      class="p-1.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+      class="p-1.5 rounded-full bg-brand-light text-brand-primary hover:bg-brand-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
       title="Buku Panduan"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@
     >
       <template #header>
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+          <h3 class="text-lg font-bold text-text-primary">
             Panduan Halaman
           </h3>
         </div>
@@ -41,26 +41,25 @@
               :key="index" 
               class="w-full shrink-0 snap-center flex flex-col items-center text-center px-4 pt-4 pb-6"
             >
-              <!-- Icon/Emoji Besar -->
-              <div class="w-24 h-24 shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-5xl mb-6 shadow-inner animate-bounce-slow">
+              <div class="w-24 h-24 shrink-0 rounded-full bg-brand-light flex items-center justify-center text-5xl mb-6 shadow-none border border-brand-soft animate-bounce-slow">
                 {{ step.emoji }}
               </div>
               
               <!-- Judul -->
-              <h4 class="text-xl font-extrabold text-gray-900 dark:text-white mb-3">
+              <h4 class="text-xl font-extrabold text-text-primary mb-3">
                 {{ step.title }}
               </h4>
               
               <!-- Deskripsi dengan v-html agar bisa support tag HTML seperti <strong> jika diperlukan -->
               <div 
-                class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed space-y-2 text-left w-full px-2"
+                class="text-sm text-text-muted leading-relaxed space-y-2 text-left w-full px-2"
                 v-html="step.desc"
               ></div>
             </div>
           </div>
 
           <!-- Navigation & Pagination -->
-          <div class="flex flex-col items-center mt-auto w-full space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700/60">
+          <div class="flex flex-col items-center mt-auto w-full space-y-4 pt-4 border-t border-border-default">
             <!-- Dots -->
             <div class="flex space-x-2 flex-wrap justify-center gap-y-2">
               <button 
@@ -69,7 +68,7 @@
                 @click="setStep(index)"
                 :class="[
                   'h-2 rounded-full transition-all duration-300',
-                  currentStep === index ? 'w-6 bg-violet-600' : 'w-2 bg-gray-200 dark:bg-gray-700 hover:bg-violet-400'
+                  currentStep === index ? 'w-6 bg-brand-primary' : 'w-2 bg-surface-subtle hover:bg-brand-primary-hover border border-border-default'
                 ]"
                 :aria-label="'Go to step ' + (index + 1)"
               />
@@ -79,7 +78,7 @@
             <div class="flex w-full justify-between items-center px-2 pb-2">
               <button 
                 @click="prevStep" 
-                class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                class="px-4 py-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors"
                 :class="{ 'opacity-0 pointer-events-none': currentStep === 0 }"
               >
                 Kembali
@@ -87,7 +86,7 @@
               
               <button 
                 @click="nextStep"
-                class="px-6 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+                class="px-6 py-2 bg-brand-primary text-text-inverse text-sm font-semibold rounded-xl hover:bg-brand-primary-hover transition-all shadow-none border-none active:scale-95"
               >
                 {{ currentStep === steps.length - 1 ? 'Selesai' : 'Selanjutnya' }}
               </button>

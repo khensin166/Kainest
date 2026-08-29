@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useDark } from '@vueuse/core'
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { useColorMode } from '@vueuse/core'
 import { getChartColors } from './ChartjsConfig'
 
 import {
@@ -33,7 +33,8 @@ export default {
     const canvas = ref(null)
     const legend = ref(null)
     let chart = null
-    const darkMode = useDark()
+    const mode = useColorMode({ modes: { factory: 'dark theme-factory' } });
+    const darkMode = computed(() => mode.value !== 'light')
     const { tooltipBodyColor, tooltipBgColor, tooltipBorderColor } = getChartColors()
     
     onMounted(() => {

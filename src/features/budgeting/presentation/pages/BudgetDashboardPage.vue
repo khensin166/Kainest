@@ -161,12 +161,12 @@ onActivated(async () => {
     <div class="sm:flex sm:justify-between sm:items-start mb-8">
       <div class="mb-4 sm:mb-0">
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
+          <h1 class="text-2xl md:text-3xl text-text-primary font-bold">
             Kantong Keuangan
           </h1>
           <PageGuide :steps="pageGuides.dashboard" />
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p class="text-sm text-text-muted mt-1">
           Alokasikan dan pantau keuangan Anda ke berbagai kantong agar pengeluaran terkendali.
         </p>
       </div>
@@ -177,8 +177,8 @@ onActivated(async () => {
         <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
             <button @click="isSetupModalOpen = true"
-              class="shrink-0 btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300 font-medium px-3">
-              <svg class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="shrink-0 btn bg-surface-card border-border-default hover:border-border-strong text-text-secondary font-medium px-3">
+              <svg class="w-4 h-4 shrink-0 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               <span class="hidden sm:inline ml-2">Atur Gaji</span>
@@ -191,8 +191,8 @@ onActivated(async () => {
         <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
           <template #trigger>
             <button @click="openPocketModal"
-              class="w-full justify-center btn border-gray-200 dark:border-gray-700 font-medium transition-all"
-              :class="budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/30 shadow-lg animate-pulse border-transparent' : 'bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-indigo-500'">
+              class="w-full justify-center btn border-border-default font-medium transition-all"
+              :class="budgetStore.salary > 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-brand-primary hover:bg-brand-primary-hover text-text-inverse ring-4 ring-brand-primary/20 animate-pulse border-transparent' : 'bg-surface-card hover:border-border-strong text-brand-primary'">
               <!-- Wallet Icon -->
               <svg class="w-4 h-4 shrink-0 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -207,7 +207,7 @@ onActivated(async () => {
         <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
           <template #trigger>
             <button @click="openTransactionModal"
-              class="w-full justify-center btn bg-violet-600 hover:bg-violet-700 text-white">
+              class="w-full justify-center btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse">
               <svg class="w-4 h-4 fill-current opacity-75 shrink-0" viewBox="0 0 16 16">
                 <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
               </svg>
@@ -221,11 +221,11 @@ onActivated(async () => {
     </div>
 
     <div v-if="budgetStore.isLoadingSummary" class="flex justify-center items-center h-64">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
     </div>
 
     <div v-else-if="budgetStore.errorSummary"
-      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      class="bg-status-danger-bg border border-status-danger/30 text-status-danger-text px-4 py-3 rounded relative" role="alert">
       <strong class="font-bold">Terjadi Kesalahan!</strong>
       <span class="block sm:inline"> {{ budgetStore.errorSummary }}</span>
       <button @click="budgetStore.fetchDashboardSummary()" class="mt-2 underline">Coba Lagi</button>
@@ -240,14 +240,14 @@ onActivated(async () => {
         :momRemaining="budgetStore.momRemaining" />
 
       <div
-        class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60">
-        <header class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60 flex items-center">
-          <h2 class="font-semibold text-gray-800 dark:text-gray-100">Tren Pengeluaran Bulan Ini</h2>
+        class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-surface-card rounded-xl border border-border-default">
+        <header class="px-5 py-4 border-b border-border-muted flex items-center">
+          <h2 class="font-semibold text-text-primary">Tren Pengeluaran Bulan Ini</h2>
         </header>
 
         <div class="p-5">
           <div v-if="budgetStore.isLoadingTrend" class="flex justify-center items-center h-72">
-            <div class="animate-pulse flex flex-col items-center text-gray-400">
+            <div class="animate-pulse flex flex-col items-center text-text-muted">
               <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                   d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path>
@@ -260,14 +260,14 @@ onActivated(async () => {
             <SpendingTrendChart :chartData="budgetStore.chartDataCollection" />
           </div>
 
-          <div v-else class="h-72 flex items-center justify-center text-gray-400">
+          <div v-else class="h-72 flex items-center justify-center text-text-muted">
             Belum ada data tren tersedia.
           </div>
         </div>
       </div>
 
       <div class="mb-6 flex justify-between items-end col-span-full">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rincian Kantong</h2>
+        <h2 class="text-xl font-bold text-text-primary">Rincian Kantong</h2>
       </div>
 
       <BudgetCategoryCard v-for="category in budgetStore.budgetCategories" :key="category.categoryId"
