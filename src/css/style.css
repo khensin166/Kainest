@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=fallback");
 
 @import "tailwindcss";
 @import "./theme-variables.css";
@@ -9,7 +8,6 @@
 @plugin "@tailwindcss/forms" {
   strategy: base;
 }
-@plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant sidebar-expanded (&:is(.sidebar-expanded *));
@@ -89,7 +87,29 @@
   --color-yellow-900: #4f3d0e;
   --color-yellow-950: #342809;
 
-  --font-inter: "Inter", "sans-serif";
+  /* --- Lebar container aplikasi ---
+     max-w-9xl dirujuk di 8 halaman tapi tidak pernah terdefinisi,
+     sehingga halaman-halaman itu selebar layar. Sekarang nyata. */
+  --container-9xl: 96rem;
+
+  /* --- RADIUS: hanya 3 nilai + full ---
+     sm  = kontrol kecil (badge, chip, tag)
+     md  = default (tombol, input, select)
+     lg  = kontainer (kartu, modal, panel)
+     full= khusus melingkar (avatar, pill, dot)
+     rounded-2xl / 3xl sengaja dibiarkan hidup sampai Fase 3 selesai;
+     lint:design menandainya sebagai utang. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* --- TINGGI KONTROL: cegah tombol kolaps tanpa padding vertikal --- */
+  --control-h-sm: 2rem;
+  --control-h-md: 2.5rem;
+  --control-h-lg: 3rem;
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
   --text-xs: 0.75rem;
   --text-xs--line-height: 1.5;
@@ -137,6 +157,15 @@
   --color-surface-input:       var(--color-surface-input);
   --color-surface-hover:       var(--color-surface-hover);
   --color-surface-subtle:      var(--color-surface-subtle);
+  --color-surface-brand:       var(--color-surface-brand);
+  --color-brand-surface:       var(--color-brand-surface);
+  --color-accent-primary:      var(--color-accent-primary);
+  --color-ai:                  var(--color-ai);
+  --color-ai-soft:             var(--color-ai-soft);
+
+  /* Chart */
+  --color-chart-income:        var(--color-chart-income);
+  --color-chart-expense:       var(--color-chart-expense);
 
   /* Border */
   --color-border-default:      var(--color-border-default);
@@ -842,3 +871,15 @@
 .float-delay-3 { animation-delay: 2s; }
 .float-delay-4 { animation-delay: 3s; }
 
+
+/* --- Animasi dialog (dipakai BaseModal & ui/Modal) --- */
+@keyframes kainest-fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes kainest-pop-in  {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96) }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+}
+.kainest-fade-in[data-state="open"] { animation: kainest-fade-in 180ms ease-out }
+.kainest-pop-in[data-state="open"]  { animation: kainest-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1) }
+@media (prefers-reduced-motion: reduce) {
+  .kainest-fade-in[data-state="open"], .kainest-pop-in[data-state="open"] { animation: none }
+}

@@ -5,17 +5,13 @@
     @click.self="closeModal" 
     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4"
   >
-    <div class="bg-surface-card rounded-lg shadow-none border border-border-default w-full max-w-md p-6">
+    <div class="bg-surface-card rounded-lg border border-border-default w-full max-w-md p-6">
       <h2 class="text-xl font-bold mb-4 text-text-primary">Bagikan Catatan</h2>
       
-      <div class="form-control mb-4">
-        <label class="label cursor-pointer justify-start space-x-3">
-          <input 
-            type="checkbox" 
-            v-model="shareSettings.is_public"
-            class="toggle toggle-primary" 
-          />
-          <span class="label-text font-semibold">Bagikan ke Publik (Web)</span>
+      <div class="mb-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <Switch v-model="shareSettings.is_public" />
+          <span class="text-sm font-semibold text-text-primary">Bagikan ke Publik (Web)</span>
         </label>
         <p class="text-xs text-text-muted mt-1 ml-1">
           Siapa pun yang memiliki tautan dapat melihat note ini.
@@ -25,32 +21,27 @@
             type="text" 
             :value="publicUrl" 
             readonly 
-            class="input input-sm input-bordered w-full" 
+            class="w-full h-8 px-3 text-xs bg-surface-input border border-border-default rounded-md text-text-primary" 
           />
         </div>
       </div>
 
-      <div class="divider my-2"></div>
+      <div class="h-px bg-border-default my-4"></div>
       
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start space-x-3">
-          <input 
-            type="checkbox" 
-            v-model="shareSettings.shareWithPartner"
-            :disabled="shareSettings.is_public" 
-            class="toggle toggle-secondary" 
-          />
-          <span class="label-text font-semibold">Bagikan ke Pasangan</span>
+      <div >
+        <label class="flex items-center gap-3 cursor-pointer">
+          <Switch v-model="shareSettings.shareWithPartner" :disabled="shareSettings.is_public" />
+          <span class="text-sm font-semibold text-text-primary">Bagikan ke Pasangan</span>
         </label>
         <p class="text-xs text-text-muted mt-1 ml-1">
           Pasangan Anda dapat mengakses note ini dari akun mereka.
         </p>
         
         <div v-if="shareSettings.shareWithPartner && !shareSettings.is_public" class="mt-3 ml-1">
-          <label class="label-text mb-1">Izin Pasangan:</label>
+          <label class="block text-sm text-text-secondary mb-1">Izin Pasangan:</label>
           <select 
             v-model="shareSettings.partnerPermission"
-            class="select select-bordered select-sm w-full max-w-xs"
+            class="h-8 px-3 text-xs bg-surface-input border border-border-default rounded-md text-text-primary w-full"
           >
             <option value="VIEWER">Hanya Bisa Melihat (Viewer)</option>
             <option value="EDITOR">Bisa Mengedit (Editor)</option>
@@ -59,20 +50,17 @@
       </div>
 
       <div class="flex justify-end space-x-3 mt-8">
-        <button @click="closeModal" class="btn btn-ghost">Batal</button>
-        <button 
-          @click="saveSettings" 
-          :disabled="noteStore.isLoadingNote"
-          class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse border-none"
-        >
+        <Button variant="ghost" @click="closeModal">Batal</Button>
+        <Button variant="primary" @click="saveSettings" :disabled="noteStore.isLoadingNote">
           {{ noteStore.isLoadingNote ? 'Menyimpan...' : 'Simpan' }}
-        </button>
+        </Button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { Button, Switch } from '@/ui';
 import { ref, watch, computed } from 'vue';
 import { useNoteStore } from '../stores/useNoteStore';
 

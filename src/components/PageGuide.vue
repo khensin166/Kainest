@@ -6,9 +6,7 @@
       class="p-1.5 rounded-full bg-brand-light text-brand-primary hover:bg-brand-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
       title="Buku Panduan"
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-      </svg>
+      <IconDocument class="w-5 h-5" aria-hidden="true" />
     </button>
 
     <!-- Modal -->
@@ -41,12 +39,12 @@
               :key="index" 
               class="w-full shrink-0 snap-center flex flex-col items-center text-center px-4 pt-4 pb-6"
             >
-              <div class="w-24 h-24 shrink-0 rounded-full bg-brand-light flex items-center justify-center text-5xl mb-6 shadow-none border border-brand-soft animate-bounce-slow">
+              <div class="w-24 h-24 shrink-0 rounded-full bg-brand-light flex items-center justify-center text-5xl mb-6 border border-brand-soft animate-bounce-slow">
                 {{ step.emoji }}
               </div>
               
               <!-- Judul -->
-              <h4 class="text-xl font-extrabold text-text-primary mb-3">
+              <h4 class="text-xl font-bold text-text-primary mb-3">
                 {{ step.title }}
               </h4>
               
@@ -66,30 +64,24 @@
                 v-for="(step, index) in steps" 
                 :key="index"
                 @click="setStep(index)"
-                :class="[
-                  'h-2 rounded-full transition-all duration-300',
-                  currentStep === index ? 'w-6 bg-brand-primary' : 'w-2 bg-surface-subtle hover:bg-brand-primary-hover border border-border-default'
-                ]"
+                :class="[ 'h-2 rounded-full transition-all duration-300', currentStep === index ? 'w-6 bg-brand-primary' : 'w-2 bg-surface-subtle hover:bg-brand-primary-hover border border-border-default' ]"
                 :aria-label="'Go to step ' + (index + 1)"
               />
             </div>
 
             <!-- Action Buttons -->
             <div class="flex w-full justify-between items-center px-2 pb-2">
-              <button 
-                @click="prevStep" 
-                class="px-4 py-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors"
+              <Button
+                variant="ghost"
                 :class="{ 'opacity-0 pointer-events-none': currentStep === 0 }"
+                @click="prevStep"
               >
                 Kembali
-              </button>
-              
-              <button 
-                @click="nextStep"
-                class="px-6 py-2 bg-brand-primary text-text-inverse text-sm font-semibold rounded-xl hover:bg-brand-primary-hover transition-all shadow-none border-none active:scale-95"
-              >
+              </Button>
+
+              <Button @click="nextStep">
                 {{ currentStep === steps.length - 1 ? 'Selesai' : 'Selanjutnya' }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -99,9 +91,17 @@
 </template>
 
 <script setup>
+import { IconDocument } from '@/ui/icons';
 import { ref } from 'vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
+import { Button } from '@/ui';
 
+/**
+ * PERINGATAN: `step.desc` dirender dengan `v-html` agar mendukung <strong>/<em>.
+ * Karena itu isinya HANYA boleh berasal dari `src/config/pageGuides.js` yang
+ * statis. Jangan pernah mengalirkan teks dari API atau input pengguna ke sini —
+ * itu akan membuka celah XSS.
+ */
 const props = defineProps({
   steps: {
     type: Array,
@@ -179,6 +179,10 @@ const setStep = (index) => {
 
 .animate-bounce-slow {
   animation: bounce-slow 3s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-slow { animation: none; }
 }
 
 @keyframes bounce-slow {

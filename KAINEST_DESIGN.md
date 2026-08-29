@@ -1,217 +1,288 @@
 # Kainest Design System
-**Versi:** 2.0 · **Last Updated:** 2026-08-29
+
+**Versi:** 4.4 · **Last Updated:** 2026-08-30
+
+> Dokumen ini mendeskripsikan sistem yang **benar-benar ada di kode**.
+> Kalau ada yang tertulis di sini tapi tidak tercermin di `src/`, itu bug pada
+> dokumen, bukan pada kode.
+>
+> **Koreksi v3.0 → v4.0:** v3.0 menyatakan tema "Factory" tidak pernah
+> diimplementasikan. Itu **keliru** — Factory ada di `theme-variables.css` dan
+> aktif sebagai tema ketiga di `ThemeToggle`. Bagian Factory dikembalikan di sini.
 
 ---
 
-## Ringkasan Arsitektur Tema
+## Tiga lapis
 
-Kainest mendukung **tiga varian tema**. Pergantian tema hanya cukup dilakukan dengan menambahkan/menghapus kelas CSS di elemen `<html>`:
-
-| Kelas HTML | Tema | Deskripsi |
+| Lapis | Lokasi | Isi |
 |---|---|---|
-| *(tidak ada kelas)* | `Light` | Mode terang default |
-| `.dark` | `Dark` | Mode gelap standar (Tailwind dark mode) |
-| `.theme-factory` | `Factory` | **Terminal War Room** — dokumentasi di file ini |
+| **1. Token** | `src/css/theme-variables.css` (warna, per tema) · `src/css/style.css` blok `@theme` (radius, font, tinggi kontrol, jembatan token) | Satu-satunya tempat nilai desain didefinisikan |
+| **2. Primitif** | `src/ui/` | 13 komponen + peta ikon. Satu-satunya tempat *bentuk* diputuskan |
+| **3. Domain** | `src/features/*/presentation/components/` | Dibangun **di atas** lapis 2, tidak menyentuh utility mentah |
 
-> **Penting:** Tema `Factory` adalah **ekstensi**, bukan pengganti. Variabel CSS yang tidak di-override oleh `.theme-factory` akan secara otomatis *fallback* ke nilai dari tema `Dark`.
+Halaman demo: **`/dev/ui`** (hanya saat `npm run dev`).
 
 ---
 
-## Filosofi Desain: Factory
+## Tiga tema
 
-> *"Terminal war room at midnight. Factory is a stark black control surface where a single white card lands like a flashlit dispatch — the only object in the room is the work itself."*
+Pergantian tema menambah kelas di elemen `<html>`. Sumbernya **satu**:
+`src/composables/useTheme.js`, dipanggil di `App.vue` agar berlaku di seluruh
+halaman — sebelumnya `useColorMode` hidup di dalam `ThemeToggle`, sehingga tema
+tersimpan tidak diterapkan pada halaman yang tidak memuat komponen itu.
+`ThemeToggle` adalah *dropdown* pemilih (bukan tombol siklus), memakai
+`DropdownMenuRadioGroup` dari reka-ui.
 
-Factory beroperasi sebagai terminal war room: kanvas hitam pekat, tipografi Geist weight-400 dengan negative tracking, dan ruang negatif yang murah hati agar dua aksen fungsional — **Signal Orange** dan **Metric Green** — bicara di atas kebisingan. Gerakan khas adalah *light card floating on near-black ground* (`#eeeeee` panels di atas `#101010` canvas), menciptakan kontras *figure/ground* yang tegas daripada elevasi lembut.
+| Kelas | Tema | Karakter |
+|---|---|---|
+| *(tanpa kelas)* | **Light** | Permukaan terang, brand ungu |
+| `.dark` | **Dark** | Permukaan navy-abu, brand ungu |
+| `.dark.theme-factory` | **Factory** | Kanvas nyaris hitam hangat, **brand monokrom** |
+| `.dark.theme-spidey` | **Spidey “Web Strike”** | Hitam hangat, biru elektrik untuk aksi, merah Marvel **murni** untuk bar, aksen, dan grafik |
 
-Hampir semua interaksi dijalankan oleh permukaan monokrom; warna kromatis **hanya** dicadangkan untuk status data *live* dan pulsa status, **bukan** dekorasi. Komponen duduk datar dengan radius minimal, border tipis 1px, dan nol ketergantungan shadow — desain mendapatkan kedalamannya melalui kontras dan irama spasi, bukan blur atau glow.
+### Filosofi Factory
 
-### Tiga Aturan Utama
+> *"Terminal war room at midnight."*
 
-1. **Kedalaman via Kontras, Bukan Bayangan**
-   Tidak ada `box-shadow`, tidak ada `backdrop-blur`. Tumpukan elemen dibedakan murni dari warna — kanvas hitam pekat `#101010` vs. permukaan panel `#1d1a18`.
+Kanvas `#101010` dengan panel `#1d1a18`, tipografi Geist, ruang negatif murah hati.
+Aksi utama memakai permukaan **monokrom** (tombol putih `#fafafa`), bukan ungu —
+warna kromatis dicadangkan untuk sinyal data, bukan dekorasi.
 
-2. **Data over Decoration**
-   Warna cerah (*vibrant*) **dilarang** sebagai dekorasi. Warna hanya digunakan sebagai "sinyal" fungsional:
-   - 🟢 Hijau (`#a0ca92`) = pemasukan / positif / Metric Green
-   - 🟠 Orange (`#ee6018`) = peringatan / negatif / Signal Orange
-   - ⚪ Putih (`#fafafa`) = aksi utama / tombol CTA (monochrome)
+**Ini pengecualian yang disengaja:** `brand-primary` sengaja berbeda di Factory.
+Yang **wajib** konsisten lintas tema adalah status, chart, dan warna AI.
 
-3. **Presisi di Setiap Tepi**
-   Border-radius moderat (`4px` tombol, `10px` kartu). Tidak ada sudut terlalu bulat (`rounded-full` di kartu dilarang). Elemen harus terasa seperti *widget instrument*, bukan gelembung mainan.
+Palet primitif Factory (`--color-obsidian-canvas`, `--color-carbon-lift`,
+`--color-signal-orange`, dst.) hanya ada di tema ini — itu nilai referensi, bukan
+token semantik, dan dikecualikan dari aturan paritas.
+
+### Filosofi Spidey — "Web Strike"
+
+**Hitam hangat, bukan medan biru.** Kanvas `#09090B`, panel `#17161A` dengan sedikit
+kehangatan kemerahan. Ini iterasi ketiga, dan dua yang pertama gagal karena alasan
+yang terukur:
+
+| Iterasi | Kenapa gagal |
+|---|---|
+| v1 `#0A0E1A` navy nyaris hitam | Terlalu desaturasi — terbaca sebagai dashboard gelap generik, tanpa identitas |
+| v2 `#16306F` medan biru jenuh | Angka melelahkan dibaca, dan merah Marvel hanya **2.76:1** di atasnya — harus diencerkan sampai berhenti terasa merah Marvel |
+
+**Merah Marvel `#E62429` dipakai MURNI**, tidak dicerahkan. Justru latar hitam yang
+memberinya ruang: 3.99:1 — cukup untuk bar progres, aksen, dan garis grafik
+(ambang grafis 3:1), sementara teks merah memakai `status-danger-text` `#FF6B6F` (6.50).
+
+**Aksi memegang biru elektrik `#4DA3FF` dengan teks gelap** (7.58:1). Pilihan ini juga
+terukur: di basis hitam, biru medium dengan teks putih hanya 3.82:1 — yang bekerja
+justru biru *terang* dengan teks gelap, dan kebetulan itu pula yang paling menyala.
+
+Merah tetap bukan warna tombol. Di aplikasi keuangan merah sudah berarti bahaya,
+overbudget, dan pengeluaran; menjadikannya warna aksi membuat tombol "Simpan" dan
+"Hapus" tampak sama — kesalahan yang sama seperti `chart-expense` ungu yang dibuang
+di v4.0.
+
+Audit kontras Web Strike: **14 pemeriksaan, 0 gagal.** Dua di ambang justru sesuai
+perannya — `text-faint` 3.23 (dekoratif) dan merah murni 3.99 (bar & grafik).
+
+
+---
+
+## Warna: satu peran, satu keluarga
+
+Nilai boleh menyesuaikan tema; **keluarga warnanya tidak boleh berpindah.**
+
+| Peran | Keluarga | Dipakai untuk |
+|---|---|---|
+| `--color-status-success` | hijau | pemasukan, aman, berhasil |
+| `--color-status-warning` | amber | mendekati batas |
+| `--color-status-danger` | merah | overbudget, hapus, gagal |
+| `--color-status-info` | biru | informasional netral |
+| `--color-ai` | violet `#8b5cf6` | **semua** fitur AI, di ketiga tema |
+| `--color-chart-income` | = `success` | grafik pemasukan |
+| `--color-chart-expense` | = `danger` | grafik pengeluaran |
+
+Dua perubahan penting di v4.0:
+
+- **`chart-expense` berhenti memakai ungu.** Ungu di Kainest berarti *brand*;
+  memakainya untuk "pengeluaran" membuat satu warna punya dua makna.
+- **`--color-ai` hadir di ketiga tema.** Sebelumnya `--color-ai-violet` hanya ada
+  di Factory dan tidak pernah dipakai, sementara fitur AI memakai warna brand biasa.
+
+Warna status mewarnai **sinyal**, bukan permukaan. Kartu kantong tetap netral;
+statusnya muncul lewat titik, bar progres, dan angka persentase. Enam kantong sehat
+tidak boleh menjadi enam blok hijau.
+
+Delta 0% tidak ditampilkan — "0% vs bulan lalu" bukan informasi.
+
+**Dilarang** memakai palet statis Tailwind (`text-gray-500`, `bg-violet-500`, …) —
+nilainya tidak ikut berganti saat tema berganti.
+
+---
+
+## Kontras — diukur, bukan dikira
+
+Setiap tema baru wajib diaudit rasio kontrasnya sebelum dinyatakan selesai. Audit
+Spidey menemukan empat masalah yang tidak terlihat dari melihat layar:
+
+| Temuan | Sebelum | Sesudah |
+|---|---|---|
+| `text-inverse` di atas tombol brand | 4.23 gagal | `#FFFFFF` → **4.55** |
+| `text-muted` di atas kartu | 4.16 gagal | `#8592AD` → **5.65** |
+| `text-faint` di atas kartu | 2.35 gagal | `#667490` → **3.76** (dekoratif) |
+| `brand-text` Factory | 1.05 — gelap di atas gelap | `#eeeeee` → semantik diperbaiki |
+
+Audit ulang setelah revisi Spider-Verse: **14 pemeriksaan, 0 gagal** — 13 lolos AA
+penuh, `text-faint` 3.47 (dekoratif, ambang 3:1).
+
+**Dua token yang mirip tapi beda tugas:**
+
+- `--color-brand-primary` / `--color-status-danger` = warna **PERMUKAAN**
+  (isian tombol, bar progres). Dipakai sebagai teks, kontrasnya kurang.
+- `--color-brand-text` / `--color-status-danger-text` = warna **TEKS**.
+  Varian `link` pada `Button` memakai `brand-text`, bukan `brand-primary`.
+
+**Keterbatasan yang diketahui:** 51 lokasi masih memakai `text-status-danger`
+(warna permukaan) sebagai warna teks — rasio ~3.9, lolos untuk ikon dan angka besar
+(ambang 3:1) tetapi tidak untuk teks kecil. Ini **bukan** khas Spidey; tema Dark
+pun ~4.0. Perbaikannya: ganti ke `text-status-danger-text` pada teks kecil,
+dikerjakan per lokasi karena sebagian memang ikon.
+
+---
+
+## Ikon — Material Symbols, satu pintu
+
+Set: **Material Symbols** (Google), di-compile jadi komponen SVG saat build oleh
+`unplugin-icons`. Tree-shaken, tanpa request jaringan, tanpa runtime.
+
+Semua ikon lewat **`src/ui/icons.js`** — 76 ekspor dengan nama yang menggambarkan
+*makna di Kainest*, bukan nama ikon di pustakanya:
+
+```js
+import { IconWallet, IconAi, IconTrendDown } from '@/ui/icons'
+```
+
+Mengganti set ikon di kemudian hari cukup mengubah satu berkas itu.
+
+Impor langsung dari `@heroicons/*`, `lucide-vue-next`, atau `~icons/*` **ditolak lint**
+(kecuali `icons.js` sendiri, yang memang sumbernya).
+
+**Emoji tidak boleh berdiri sendiri sebagai ikon** — rendering berbeda tiap OS, tidak
+bisa diwarnai. Tapi emoji **di dalam kalimat adalah bagian dari teks** dan tidak
+dilarang (`Halo, Kenan 👋`, `🤖 Analisis AI`).
+
+Inline `<svg>` hanya boleh untuk hal yang bukan ikon: **logo merek** (Google, GitHub,
+WhatsApp) dan definisi `<Spinner>`.
+
+---
+
+## Momen kejutan (khas tema Spidey)
+
+Dua GIF Spider-Man dipakai sebagai kejutan, bukan dekorasi. Semua aturannya
+terkumpul di `src/composables/useCelebration.js`, sehingga pemanggil cukup menulis
+`celebrate('spidey-theme')` tanpa perlu tahu syaratnya.
+
+| Momen | GIF | Ukuran | Posisi | Frekuensi |
+|---|---|---|---|---|
+| Beralih ke tema Spidey | turun terbalik memegang jaring | 1,4 MB | menggantung di **tepi atas**, dekat tombol tema | tiap kali beralih |
+| Kantong pertama dibuat | berayun | 137 KB | kanan bawah | sekali seumur akun |
+| Struk Split Bill selesai diurai | berayun | 137 KB | kanan bawah | tiap struk |
+
+**Tiga syarat, diperiksa di satu tempat:**
+
+1. **Tema aktif harus `spidey`.** Ini kejutan khas tema itu; tema lain tetap tenang.
+2. **`prefers-reduced-motion: reduce` → tidak dirender sama sekali.**
+3. Momen bertanda `once` ditandai di `localStorage`.
+
+**Kenapa tepi atas untuk GIF yang turun.** Alasannya fisik, bukan selera: karakternya
+turun sambil memegang jaring, jadi menempelkannya di tepi atas membuat jaring itu
+seolah terikat di luar layar. Ditaruh di tengah atau bawah, jaringnya menggantung ke
+ketiadaan. Dan karena posisinya tepat di bawah tombol yang baru diklik, gerakannya
+terbaca sebagai **respons atas aksi**, bukan animasi yang muncul entah dari mana.
+
+**Tidak pernah untuk kondisi gagal.** Overbudget, error, dan pembayaran tertunggak
+tidak mendapat kejutan. Momen buruk di aplikasi keuangan butuh empati, bukan lelucon.
+
+**Muat malas.** GIF di-`import` biasa dari `src/images/`; Vite memisahkannya jadi
+aset ter-hash karena di atas 4 KB, sehingga **hanya URL-nya yang masuk bundle** —
+1,4 MB baru diunduh saat `<img>` benar-benar dirender. Terverifikasi di hasil build:
+kedua GIF ada sebagai berkas terpisah, dan chunk yang merujuknya hanya 205 KB.
+
+---
+
+## Radius — hanya 3 nilai + full
+
+| Token | Nilai | Untuk |
+|---|---|---|
+| `rounded-sm` | 6px | badge, chip, tag |
+| `rounded-md` | 10px | tombol, input, select |
+| `rounded-lg` | 16px | kartu, modal, panel |
+| `rounded-full` | — | avatar, pill, dot |
 
 ---
 
 ## Tipografi
 
-| Peran | Font | Weight | Style |
-|---|---|---|---|
-| Body, Tombol, Heading | `Geist` | 400 (Normal) | Tegak |
-| Label, Status, Metrik | `Geist Mono` | 400 | `uppercase`, `tracking-tight` |
-
-### Cara Implementasi Font Geist
-Tambahkan di `index.html` atau `main.css`:
-
-```css
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400&display=swap');
-
-.theme-factory {
-  --font-sans: 'Geist', ui-sans-serif, system-ui;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
-}
-```
-
----
-
-## Token Warna (CSS Variables)
-
-### Palet Primitif (Referensi Warna)
-
-| Nama | Hex | Token | Peran |
-|---|---|---|---|
-| Obsidian Canvas | `#101010` | `--color-obsidian-canvas` | Latar utama halaman, footer — kekosongan yang menjadi ukuran segalanya |
-| Carbon Lift | `#1d1a18` | `--color-carbon-lift` | Permukaan gelap terangkat, nav wells, isian tombol — satu tingkat di atas canvas |
-| Ash Stroke | `#3d3a39` | `--color-ash-stroke` | Border garis rambut, outline tombol ghost, garis pemisah |
-| Graphite Mid | `#4d4947` | `--color-graphite-mid` | Isian mid-tone untuk badan chart, permukaan sekunder |
-| Warm Granite | `#8a8380` | `--color-warm-granite` | Teks body muted, copy sekunder, label tidak aktif |
-| Pale Stone | `#b8b3b0` | `--color-pale-stone` | Teks tersier, eyebrow section, copy pendukung redup |
-| Bone | `#eeeeee` | `--color-bone` | Teks utama, permukaan kartu terang |
-| Chalk | `#fafafa` | `--color-chalk` | Isian tombol emphasis tinggi, permukaan netral terangkat |
-| Signal Orange | `#ee6018` | `--color-signal-orange` | Aksen dekoratif oranye untuk ikon, tanda, dan detail grafis kecil |
-| Metric Green | `#a0ca92` | `--color-metric-green` | Aksen dekoratif hijau untuk ikon, tanda, dan detail grafis kecil |
-
-### Token Semantik (Mapping ke Palet)
-
-```css
-:root.theme-factory {
-  /* Brand — Monochrome (interaksi via permukaan monokrom) */
-  --color-brand-primary:       #fafafa;   /* Chalk */
-  --color-brand-primary-hover: #eeeeee;   /* Bone */
-  --color-brand-text:          #101010;   /* Obsidian Canvas — teks di atas tombol putih */
-  --color-brand-muted:         #b8b3b0;   /* Pale Stone */
-
-  /* AI Violet — HANYA untuk fitur/ikon AI spesifik */
-  --color-ai-violet:           #8b5cf6;
-  --color-ai-violet-soft:      rgba(139, 92, 246, 0.10);
-
-  /* Surface */
-  --color-surface-page:        #101010;   /* Obsidian Canvas */
-  --color-surface-card:        #1d1a18;   /* Carbon Lift */
-  --color-surface-input:       #161412;
-  --color-surface-hover:       #272320;
-
-  /* Border */
-  --color-border-default:      #3d3a39;   /* Ash Stroke */
-
-  /* Text */
-  --color-text-primary:        #eeeeee;   /* Bone */
-  --color-text-secondary:      #b8b3b0;   /* Pale Stone */
-  --color-text-muted:          #8a8380;   /* Warm Granite */
-  --color-text-faint:          #4d4947;   /* Graphite Mid */
-
-  /* Status */
-  --color-status-success:      #a0ca92;   /* Metric Green */
-  --color-status-warning:      #ee6018;   /* Signal Orange */
-  --color-status-danger:       #ef4444;
-  --color-status-info:         #60a5fa;
-}
-```
-
----
-
-## Perilaku Global saat `.theme-factory` Aktif
-
-Tambahkan di `src/css/style.css` atau sebuah file `theme-factory.css`:
-
-```css
-/* Matikan efek dekorasi global saat Factory aktif */
-.theme-factory * {
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-}
-
-/* Override komponen Tailwind bermasalah di Factory */
-.theme-factory .shadow,
-.theme-factory .shadow-sm,
-.theme-factory .shadow-md,
-.theme-factory .shadow-lg,
-.theme-factory .shadow-xl {
-  box-shadow: none !important;
-}
-
-/* Ganti efek ring (focus) jadi border tegas */
-.theme-factory input:focus,
-.theme-factory textarea:focus,
-.theme-factory select:focus {
-  outline: none;
-  border-color: var(--color-brand-primary) !important;
-  box-shadow: none !important;
-}
-```
-
----
-
-## Panduan Komponen
-
-### Tombol
-
-```html
-<!-- PRIMARY: Background Chalk, teks Obsidian (monochrome!) -->
-<button class="bg-brand-primary hover:bg-brand-primary-hover text-brand-text">Simpan</button>
-
-<!-- SECONDARY: Border 1px, transparan -->
-<button class="bg-transparent border border-border-default text-text-primary hover:bg-surface-hover">Batal</button>
-```
-
-### Kartu / Panel
-
-```html
-<div class="bg-surface-card border border-border-default rounded-lg p-4">
-  <!-- Konten kartu -->
-</div>
-```
-
-### Label (Gaya Terminal)
-
-```html
-<label class="text-xs font-mono uppercase tracking-tight text-text-muted">
-  Batas Pengeluaran
-</label>
-```
-
-### Sidebar Navigation (Active State)
-
-```html
-<!-- Active: monochrome highlight dengan border kiri tegas -->
-<a class="bg-surface-hover text-text-primary border-l-2 border-text-primary">
-  <icon class="text-text-primary" />
-  Menu Aktif
-</a>
-
-<!-- Inactive: default muted -->
-<a class="text-text-secondary hover:text-text-primary hover:bg-surface-hover">
-  <icon class="text-text-muted group-hover:text-text-primary" />
-  Menu Lain
-</a>
-```
-
----
-
-## Do's & Don'ts
-
-| ✅ DO | ❌ DON'T |
+| Peran | Font |
 |---|---|
-| Gunakan `border` 1px tipis untuk membedakan elemen | Gunakan `shadow-md`, `shadow-lg`, atau `drop-shadow` |
-| Gunakan warna secara semantik (Hijau=positif, Orange=warning) | Gunakan gradasi warna untuk tombol CTA |
-| Beri ruang bernafas (`gap-8`, `py-12`) antar section | Padatkan elemen dengan spacing kecil |
-| Font `Geist` untuk body, `Geist Mono` untuk label & angka | Campur font selain `Geist` dan `Geist Mono` |
-| Gunakan variabel CSS dari `theme-variables.css` | Hardcode warna hex langsung di komponen |
-| Batasi penggunaan ungu HANYA untuk indikator fitur AI | Gunakan ungu sebagai brand color universal |
+| Body, heading, tombol | **Geist Variable** (`--font-sans`) |
+| Label mono, metrik, eyebrow | **Geist Mono Variable** (`--font-mono`) |
+
+Self-hosted lewat `@fontsource-variable/geist`. Skala dikunci `text-xs … text-2xl`.
+Angka finansial memakai `tabular-nums`.
 
 ---
 
-## Panduan Visual Khusus
+## Primitif (`src/ui/`)
 
-### 1. Halaman Otentikasi (Auth Pages)
-Semua halaman otentikasi (Login, Register, Lupa Sandi, Reset Sandi, Get Started) menggunakan filosofi **"Tabrak Warna" (High-Contrast Split-Screen)**:
-- **Panel Kiri (Branding):** Harus selalu dikunci (*hardcode*) dalam estetika gelap (`bg-slate-900`) dan teks `text-white` terlepas dari tema yang aktif. Panel ini wajib menyertakan efek *ambient blobs* dengan warna konstan (`bg-violet-500` dan `bg-fuchsia-400`) menggunakan `mix-blend-screen opacity-40 blur-3xl`. Pengecualian: Hindari *arbitrary values* Tailwind (`bg-[#...]`) pada *mix-blend* jika menyebabkan *rendering bug*; gunakan standar utility Tailwind (contoh: `violet-500`, `fuchsia-400`).
-- **Panel Kanan (Form):** Responsif sepenuhnya terhadap *ThemeToggle*. Di mode *Light*, panel ini putih terang (`bg-surface-page`), menciptakan tabrakan visual ekstrem dengan panel kiri. Di mode *Dark* atau *Factory*, panel kanan menyatu mulus dalam estetika monokrom gelap.
+`Button` · `Badge` · `Card` · `Input` · `Select` · `Switch` · `Tabs` · `Modal`
+`Skeleton` · `Spinner` · `PageShell` · `EmptyState` · `StatCard`
+
+- Varian ditulis dengan **CVA**, digabung `cn()` = `clsx` + `tailwind-merge`.
+- Perilaku & aksesibilitas dari **reka-ui** (Modal, Select, Switch, Tabs).
+- **Tidak dipakai lagi:** daisyUI, HeadlessUI, Heroicons, lucide-vue-next.
+
+---
+
+## Pagar
+
+```bash
+npm run lint:design
+```
+
+**Tujuh belas aturan**, semuanya level `error`:
+
+| Aturan | Menangkap |
+|---|---|
+| `no-missing-import` | Identifier `Icon*`/`Spinner` yang dipakai tapi tidak diimpor, dan `import` di luar blok `<script>`. **`vite build` tidak menangkap ini** — SFC compiler mengabaikan teks di luar blok, jadi build hijau tapi aplikasi mati (layar putih) |
+| `no-theme-parity-gap` | Token semantik yang tidak ada di semua tema — class jadi kosong di tema itu |
+| `no-undefined-token` | Class token yang tidak menghasilkan CSS apa pun |
+| `no-direct-icon-import` | Impor ikon di luar `@/ui/icons` |
+| `no-static-palette` | 21 palet Tailwind statis yang tidak ikut ganti tema |
+| `no-shouty-label` | `uppercase` + `tracking-widest` |
+| `no-extra-weight` | `font-black` / `font-extrabold` |
+| `no-decor-gradient` | Gradien dekoratif |
+| `no-offscale-radius` | Radius di luar skala |
+| `no-arbitrary-text` | `text-[10px]` dan sejenisnya |
+| `no-emoji-icon` · `no-emoji-attr` | Emoji berdiri sendiri sebagai ikon, atau lewat prop |
+| `no-new-daisyui` | Sisa class daisyUI |
+| `no-raw-hex` · `no-shadow-none` · `no-console-log` · `no-alert` | Higiene dasar |
+
+Pengecualian ditulis eksplisit di `scripts/lint-design.mjs` beserta alasannya.
+Sebuah pengecualian tanpa alasan adalah utang yang menyamar.
+
+---
+
+## Aturan kerja
+
+1. **Teks UI dibekukan.** Pekerjaan desain mengubah warna, ikon, dan tata letak —
+   **bukan kata-kata**. Termasuk kapitalisasi, tanda baca, dan emoji di dalam kalimat.
+   Verifikasi dengan mem-*diff* string UI sebelum dan sesudah.
+2. **Kode UI baru wajib memakai `src/ui/`.** Tidak ada utility mentah untuk tombol,
+   kartu, input, atau modal. Ikon selalu dari `@/ui/icons`.
+3. **Kode lama dimigrasi saat disentuh** (strangler).
+4. **Setiap perubahan token diperiksa di ketiga tema**, bukan hanya yang sedang aktif.
+5. **Verifikasi build setelah setiap perubahan struktural template.** Penghapusan blok
+   berbasis regex pernah memutus `</div>` dan memecah build.
+6. **Build hijau BUKAN bukti aplikasi hidup. Buka aplikasinya.**
+   Komponen Options API tidak punya anchor `<script setup>`; skrip migrasi otomatis
+   pernah menaruh `import` di luar blok `<script>` atau melewatkannya sama sekali.
+   `vite build` tetap sukses, aplikasi mati saat dibuka. Minimal buka `/`, `/login`,
+   `/dev/ui`, dan satu halaman di balik autentikasi sebelum menyatakan selesai.

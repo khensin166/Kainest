@@ -1,10 +1,13 @@
 <!-- WaBackupPage.vue -->
 <template>
-    <div class="p-6 max-w-7xl mx-auto space-y-8">
+    <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto space-y-8">
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-text-primary">Backup Chat Manager</h1>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold text-text-primary tracking-tight">Backup Chat Manager</h1>
+                    <PageGuide :steps="pageGuides.wabotBackup" />
+                </div>
                 <p class="text-sm text-text-muted mt-1">Kelola daftar Chat/Grup yang auto-backup ke database Kainest.</p>
             </div>
 
@@ -19,18 +22,13 @@
         </div>
 
         <!-- Peringatan jika belum set Base URL / API Key -->
-        <div v-if="!waStore.apiKey || !waStore.baseUrl" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-md">
+        <div v-if="!waStore.apiKey || !waStore.baseUrl" class="bg-status-warning-bg border-l-4 border-status-warning p-4 rounded-md">
             <div class="flex">
                 <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd" />
-                    </svg>
+                    <IconWarning class="h-5 w-5 text-status-warning-text" aria-hidden="true" />
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-amber-700">
+                    <p class="text-sm text-status-warning-text">
                         Anda harus mengatur Base URL dan API Key Server Bot terlebih dahulu di menu <strong>Konfigurasi
                             API</strong>.
                     </p>
@@ -43,7 +41,7 @@
             <!-- FORM TAMBAH BACKUP -->
             <div class="lg:col-span-1">
                 <div
-                    class="sticky top-6 bg-surface-card rounded-xl shadow-none border border-border-default p-6">
+                    class="sticky top-6 bg-surface-card rounded-md border border-border-default p-6">
                     <h3 class="text-lg font-bold text-text-primary mb-4">Tambah Target Backup</h3>
 
                     <div class="space-y-4">
@@ -88,12 +86,8 @@
                         </div>
 
                         <button @click="handleAddTarget"
-                            class="w-full py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-lg font-medium transition-colors shadow-none disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 border-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
+                            class="w-full py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-lg font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 border-none">
+                            <IconAdd class="h-4 w-4" aria-hidden="true" />
                             Tambah ke Whitelist
                         </button>
                     </div>
@@ -106,19 +100,13 @@
                     <h3 class="text-lg font-bold text-text-primary">Daftar Backup Targets</h3>
                     <button @click="fetchData" :disabled="waStore.isLoading"
                         class="px-3 py-1.5 text-sm bg-surface-subtle border border-border-default rounded-lg hover:bg-surface-hover text-text-primary transition-colors flex items-center gap-2">
-                        <svg v-if="waStore.isLoading" class="animate-spin h-3 w-3" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
+                        <Spinner class="h-3 w-3" />
                         {{ waStore.isLoading ? 'Memuat...' : 'Refresh Data' }}
                     </button>
                 </div>
 
                 <div
-                    class="bg-surface-card rounded-xl shadow-none border border-border-default overflow-hidden">
+                    class="bg-surface-card rounded-md border border-border-default overflow-hidden">
                     <div class="overflow-x-auto min-h-[400px]">
                         <table class="w-full text-left text-sm table-pin-rows">
                             <thead
@@ -137,7 +125,7 @@
                                     class="hover:bg-surface-hover">
                                     <td colspan="4" class="p-0">
                                         <BaseEmptyState 
-                                            icon="📋"
+                                            :icon="IconForum"
                                             title="Belum ada Target Backup"
                                             message="Belum ada whitelist log percakapan. Mulai tambahkan target dari sisi kiri."
                                             heightClass="py-12"
@@ -173,6 +161,11 @@
 </template>
 
 <script setup>
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
+import { Spinner } from '@/ui';
+import { IconAdd, IconForum, IconWarning } from '@/ui/icons';
+import { toast } from 'vue3-toastify';
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useWaBotStore } from '../stores/useWaBotStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
@@ -204,13 +197,13 @@ const onSelectGroup = () => {
 
 const handleAddTarget = async () => {
     if (!formBackup.chatId || !formBackup.sessionId) {
-        alert("Chat ID dan Session ID harus diisi.");
+        toast.warning("Chat ID dan Session ID harus diisi.");
         return;
     }
 
     const success = await waStore.addBackupTarget(formBackup.sessionId, formBackup.chatId, formBackup.chatName);
     if (success) {
-        alert("Berhasil menambahkan target backup!");
+        toast.success("Berhasil menambahkan target backup!");
         // Reset form
         formBackup.chatId = '';
         formBackup.chatName = '';

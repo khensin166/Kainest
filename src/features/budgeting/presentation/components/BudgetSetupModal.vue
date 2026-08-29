@@ -41,22 +41,20 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <button v-if="!forced" type="button"
-                    class="btn-sm border-border-default hover:border-border-strong text-text-secondary"
-                    @click="$emit('close')" :disabled="isSubmitting">
+                <Button variant="secondary" size="sm" v-if="!forced" type="button" @click="$emit('close')" :disabled="isSubmitting">
                     Batal
-                </button>
-                <button type="submit" class="btn-sm bg-brand-primary hover:bg-brand-primary-hover text-text-inverse"
-                    :disabled="isSubmitting">
+                </Button>
+                <Button variant="primary" size="sm" type="submit" :disabled="isSubmitting">
                     <span v-if="isSubmitting">Menyimpan...</span>
                     <span v-else>Simpan Perubahan</span>
-                </button>
+                </Button>
             </div>
         </form>
     </div>
 </template>
 
 <script setup>
+import { Button } from '@/ui';
 import { ref, computed, defineEmits, defineProps, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import { toast } from 'vue3-toastify';

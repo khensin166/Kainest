@@ -1,16 +1,11 @@
 <template>
   <div class="min-w-fit">
-    <div class="fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200"
+    <div class="fixed inset-0 bg-black/40 z-40 lg:hidden lg:z-auto transition-opacity duration-200"
       :class="sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'" aria-hidden="true"></div>
 
     <div id="sidebar" ref="sidebar"
       class="flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:w-64! shrink-0 bg-surface-card p-4 transition-all duration-200 ease-in-out"
-      :class="[
-        variant === 'v2'
-          ? 'border-r border-border-default'
-          : 'rounded-r-2xl shadow-none',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-64',
-      ]">
+      :class="[ variant === 'v2' ? 'border-r border-border-default' : 'rounded-r-lg', sidebarOpen ? 'translate-x-0' : '-translate-x-64', ]">
       <div v-if="!authStore.user" class="flex justify-center items-center h-full">
         <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-text-primary"></div>
       </div>
@@ -21,7 +16,7 @@
             class="lg:hidden text-text-secondary hover:text-text-primary p-2 rounded-lg hover:bg-surface-hover transition-colors"
             @click.stop="$emit('close-sidebar')" aria-controls="sidebar" :aria-expanded="sidebarOpen">
             <span class="sr-only">Close sidebar</span>
-            <ChevronLeftIcon class="w-5 h-5" />
+            <IconChevronLeft class="w-5 h-5" />
           </button>
 
           <router-link class="block" to="/app/dashboard">
@@ -36,14 +31,8 @@
                 <li>
                   <a :href="href" @click="navigate"
                     class="flex items-center text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg px-3 py-2.5 transition-all duration-200 group"
-                    :class="isExactActive
-                      ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary'
-                      : ''
-                      ">
-                    <component :is="group.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive
-                      ? 'text-text-primary'
-                      : 'text-text-muted group-hover:text-text-primary'
-                      " />
+                    :class="isExactActive ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary' : ''">
+                    <component :is="group.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive ? 'text-text-primary' : 'text-text-muted group-hover:text-text-primary'" />
                     <span
                       class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 truncate">{{
                         group.name }}</span>
@@ -53,7 +42,7 @@
             </ul>
 
             <div v-if="group.type === 'group'">
-              <h3 class="text-xs uppercase text-text-muted font-semibold pl-3 mb-2">
+              <h3 class="text-xs text-text-muted font-semibold pl-3 mb-2">
                 <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6"
                   aria-hidden="true">•••</span>
                 <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">{{
@@ -75,14 +64,8 @@
                     <router-link v-else :to="item.path" custom v-slot="{ href, navigate, isExactActive }">
                       <a :href="href" @click="navigate"
                         class="flex items-center text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg px-3 py-2.5 transition-all duration-200 group"
-                        :class="isExactActive
-                          ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary'
-                          : ''
-                          ">
-                        <component :is="item.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive
-                          ? 'text-text-primary'
-                          : 'text-text-muted group-hover:text-text-primary'
-                          " />
+                        :class="isExactActive ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary' : ''">
+                        <component :is="item.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive ? 'text-text-primary' : 'text-text-muted group-hover:text-text-primary'" />
                         <span
                           class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 truncate">{{
                             item.name }}</span>
@@ -99,7 +82,7 @@
           <button @click.prevent="sidebarExpanded = !sidebarExpanded"
             class="p-2 text-text-muted hover:text-text-primary hover:bg-surface-hover rounded-lg transition-colors">
             <span class="sr-only">Expand / collapse sidebar</span>
-            <ChevronRightIcon class="w-5 h-5 transition-transform" :class="{ 'rotate-180': sidebarExpanded }" />
+            <IconChevronRight class="w-5 h-5 transition-transform" :class="{ 'rotate-180': sidebarExpanded }" />
           </button>
         </div>
       </div>
@@ -108,28 +91,12 @@
 </template>
 
 <script>
+import { IconAi, IconArchive, IconCalendar, IconChart, IconChat, IconChevronLeft, IconChevronRight, IconDocument, IconEdit, IconHome, IconImage, IconMoney, IconReceipt, IconSettings, IconUsers } from '@/ui/icons';
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { useAuthStore } from "../features/auth/presentation/stores/authStore";
 import SidebarLinkGroup from "./SidebarLinkGroup.vue";
 
 // Impor Ikon
-import {
-  HomeIcon,
-  ArchiveBoxIcon,
-  PhotoIcon,
-  CalendarDaysIcon,
-  Cog6ToothIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DocumentTextIcon,
-  PencilSquareIcon,
-  ChatBubbleBottomCenterTextIcon,
-  BanknotesIcon,
-  ReceiptRefundIcon,
-  SparklesIcon,
-  UsersIcon,
-  ChartBarIcon,
-} from "@heroicons/vue/24/outline";
 
 export default {
   name: "Sidebar",
@@ -152,7 +119,7 @@ export default {
         type: "link",
         name: "Dashboard",
         path: "/app/dashboard",
-        iconComponent: HomeIcon,
+        iconComponent: IconHome,
       },
       {
         type: "group",
@@ -161,31 +128,31 @@ export default {
           {
             name: "Catatan Bersama",
             path: "/app/notes",
-            iconComponent: PencilSquareIcon,
+            iconComponent: IconEdit,
             requiredPermission: "notes",
           },
           {
             name: "To-do List Berdua",
             path: "/app/todos",
-            iconComponent: DocumentTextIcon,
+            iconComponent: IconDocument,
             requiredPermission: "todos",
           },
           {
             name: "Galeri Kenangan",
             path: "/app/gallery",
-            iconComponent: PhotoIcon,
+            iconComponent: IconImage,
             requiredPermission: "gallery",
           },
           {
             name: "Kalender Cinta",
             path: "/app/calendar",
-            iconComponent: CalendarDaysIcon,
+            iconComponent: IconCalendar,
             requiredPermission: "calendar",
           },
           {
             name: "Vault Rahasia",
             path: "/app/vault",
-            iconComponent: ArchiveBoxIcon,
+            iconComponent: IconArchive,
             requiredPermission: "vault",
           },
         ],
@@ -197,25 +164,25 @@ export default {
           {
             name: "Kantong Keuangan",
             path: "/app/budgeting",
-            iconComponent: BanknotesIcon,
+            iconComponent: IconMoney,
             requiredPermission: "budgeting",
           },
           {
             name: "Riwayat Transaksi",
             path: "/app/transactions",
-            iconComponent: ReceiptRefundIcon,
+            iconComponent: IconReceipt,
             requiredPermission: "budgeting",
           },
           {
             name: "Rekap Bulanan",
             path: "/app/history",
-            iconComponent: ChartBarIcon,
+            iconComponent: IconChart,
             requiredPermission: "budgeting",
           },
           {
             name: "Split Bill AI",
             path: "/app/split",
-            iconComponent: SparklesIcon,
+            iconComponent: IconAi,
             requiredPermission: "budgeting",
           },
         ],
@@ -227,19 +194,19 @@ export default {
           {
             name: "WhatsApp Bot",
             path: "/app/wabot",
-            iconComponent: SparklesIcon,
+            iconComponent: IconAi,
             requiredPermission: "wabot",
           },
           {
             name: "WhatsApp Api",
             path: "/app/wabot-api",
-            iconComponent: ChatBubbleBottomCenterTextIcon,
+            iconComponent: IconChat,
             requiresAdmin: true,
           },
           {
             name: "Cadangkan WhatsApp",
             path: "/app/wabot-backup",
-            iconComponent: ArchiveBoxIcon,
+            iconComponent: IconArchive,
             requiredPermission: "wabot",
           },
         ],
@@ -251,13 +218,13 @@ export default {
           {
             name: "Manajemen User",
             path: "/app/admin/users",
-            iconComponent: UsersIcon,
+            iconComponent: IconUsers,
             requiresAdmin: true,
           },
           {
             name: "Pengaturan",
             path: "/app/settings",
-            iconComponent: Cog6ToothIcon,
+            iconComponent: IconSettings,
           },
         ],
       },

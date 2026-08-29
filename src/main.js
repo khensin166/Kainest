@@ -6,6 +6,8 @@ import router from "./router";
 import { useAuthStore } from "./features/auth/presentation/stores/authStore";
 
 // Impor CSS Tailwind Anda
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import './css/style.css'
 import 'vue3-toastify/dist/index.css';
 

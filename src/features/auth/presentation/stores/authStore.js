@@ -49,7 +49,6 @@ export const useAuthStore = defineStore("auth", () => {
    * Fungsi ini harus dipanggil di main.js SEBELUM app.mount().
    */
   async function initializeAuth() {
-    console.log("Memulai inisialisasi status autentikasi...");
     isLoading.value = true;
     isAuthReady.value = false;
 
@@ -73,10 +72,6 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = result.right; // Aman, bisa user atau null
         isAuthenticated.value = !!result.right; // true jika user, false jika null
         error.value = null; // Tidak ada error
-        console.log("Inisialisasi auth sukses.", {
-          user: user.value,
-          isAuthenticated: isAuthenticated.value,
-        });
       }
       // --- BATAS PERBAIKAN ---
       // if (result.right) {
@@ -98,7 +93,6 @@ export const useAuthStore = defineStore("auth", () => {
     } finally {
       isLoading.value = false;
       isAuthReady.value = true;
-      console.log("Inisialisasi auth selesai.");
     }
   }
 

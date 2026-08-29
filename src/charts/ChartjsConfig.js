@@ -6,7 +6,7 @@ import { adjustColorOpacity, getCssVariable } from '../utils/Utils'
 Chart.register(Tooltip)
 
 // Define Chart.js default settings
-Chart.defaults.font.family = '"Inter", sans-serif'
+Chart.defaults.font.family = '"Geist Variable", ui-sans-serif, system-ui, sans-serif'
 Chart.defaults.font.weight = 500
 Chart.defaults.plugins.tooltip.borderWidth = 1
 Chart.defaults.plugins.tooltip.displayColors = false

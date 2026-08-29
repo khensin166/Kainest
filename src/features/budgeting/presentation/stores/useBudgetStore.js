@@ -1,6 +1,7 @@
 // useBudgetStore.js
 
 import { defineStore } from "pinia";
+import { useCelebration } from "@/composables/useCelebration";
 import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 
@@ -63,7 +64,9 @@ export const useBudgetStore = defineStore("budget", () => {
   const expenseTrendData = ref([]); // Tren pengeluaran harian bulan ini
   const incomeTrendData = ref([]);  // Tren pemasukan harian bulan ini
   const isLoadingTrend = ref(false);
-  const transactionsList = ref([]); // Array TransactionEntity
+  const transactionsList = ref([]);      // Array TransactionEntity
+  const recentTransactions = ref([]);    // khusus widget Aktivitas Terbaru
+  const isLoadingRecent = ref(false);
   const transactionsMeta = ref(null); // Object pagination { currentPage, totalPages, ... }
   const isLoadingTransactions = ref(false);
   const isDeletingTransactionId = ref(null);
@@ -220,9 +223,6 @@ export const useBudgetStore = defineStore("budget", () => {
   // =========================================
 
   async function fetchDashboardSummary() {
-    console.log(
-      "⚡ [STORE ACTION] fetchDashboardSummary dipanggil (Support Failure Lama)!"
-    );
     isLoadingSummary.value = true;
     errorSummary.value = null;
 
@@ -231,7 +231,6 @@ export const useBudgetStore = defineStore("budget", () => {
     // (Cek properti 'right' karena failure.js lama)
     if (result.right) {
       summaryData.value = result.right;
-      console.log("✅ Data berhasil dimuat ke Store:", summaryData.value);
     } else {
       errorSummary.value =
         result.left?.message || "Terjadi kesalahan tidak diketahui.";
@@ -264,7 +263,6 @@ export const useBudgetStore = defineStore("budget", () => {
   async function fetchAllCategories() {
     if (categoriesList.value.length > 0) return;
 
-    console.log("⚡ [STORE ACTION] fetchAllCategories dipanggil!");
     isLoadingCategories.value = true;
 
     const result = await getCategoriesUseCaseInstance.execute();
@@ -291,7 +289,6 @@ export const useBudgetStore = defineStore("budget", () => {
   }
 
   async function fetchSpendingTrend() {
-    console.log("⚡ [STORE ACTION] fetchSpendingTrend dipanggil!");
     isLoadingTrend.value = true;
 
     const result = await getSpendingTrendUseCaseInstance.execute();
@@ -365,6 +362,24 @@ export const useBudgetStore = defineStore("budget", () => {
   /**
    * BARU: READ LIST - Mengambil daftar riwayat transaksi dengan filter
    */
+  /**
+   * Aktivitas Terbaru di Dashboard.
+   * Sengaja TIDAK memakai fetchTransactions(): aksi itu menyisipkan filter `type`
+   * ke query dan menulis ke transactionsList yang dipakai halaman Riwayat Transaksi.
+   * Di sini query-nya persis `?limit=<n>` — sama dengan panggilan lama widget.
+   */
+  async function fetchRecentActivity(limit = 6) {
+    isLoadingRecent.value = true;
+    const result = await getTransactionsListUseCaseInstance.execute({ limit });
+    if (result.right) {
+      recentTransactions.value = result.right.transactions;
+    } else {
+      console.warn("Gagal memuat aktivitas terbaru:", result.left?.message);
+      recentTransactions.value = [];
+    }
+    isLoadingRecent.value = false;
+  }
+
   async function fetchTransactions(params = {}, forceRefresh = false) {
     const finalParams = { page: 1, limit: 10, type: typeFilter.value, ...params };
 
@@ -381,11 +396,9 @@ export const useBudgetStore = defineStore("budget", () => {
       !forceRefresh && 
       isSamePage
     ) {
-      console.log("⚡ Menggunakan data cache di Store (Page sama & tidak force)");
       return;
     }
 
-    console.log("🌐 Mengambil data baru dari API...", finalParams);
 
     const result = await getTransactionsListUseCaseInstance.execute(finalParams);
 
@@ -500,12 +513,15 @@ export const useBudgetStore = defineStore("budget", () => {
   async function upsertPocket(data) {
     isLoadingPockets.value = true;
     errorPockets.value = null;
+    // Ditangkap SEBELUM simpan: sesudahnya daftar sudah terisi.
+    const kantongPertama = budgetCategories.value.length === 0;
     const result = await upsertPocketUseCaseInstance.execute(data);
     isLoadingPockets.value = false;
     
     if (result.right) {
       await fetchPockets();
       await fetchDashboardSummary(); // Refresh dashboard agar limit kategori terupdate
+      if (kantongPertama) useCelebration().celebrate("first-pocket");
       return true;
     } else {
       errorPockets.value = result.left?.message;
@@ -532,6 +548,7 @@ export const useBudgetStore = defineStore("budget", () => {
   async function bulkSetupPockets(data) {
     isLoadingPockets.value = true;
     errorPockets.value = null;
+    const kantongPertama = budgetCategories.value.length === 0;
     const result = await bulkSetupPocketsUseCaseInstance.execute(data);
     isLoadingPockets.value = false;
 
@@ -539,6 +556,7 @@ export const useBudgetStore = defineStore("budget", () => {
       await fetchPockets();
       // fetchDashboardSummary dipindahkan ke komponen parent (BudgetDashboardPage)
       // agar tidak terjadi race condition UI saat modal ditutup.
+      if (kantongPertama) useCelebration().celebrate("first-pocket");
       return true;
     } else {
       errorPockets.value = result.left?.message;
@@ -620,6 +638,9 @@ export const useBudgetStore = defineStore("budget", () => {
 
   // RETURN SEMUA STATE, GETTERS, DAN ACTIONS (SUDAH DIRAPIKAN)
   return {
+    recentTransactions,
+    isLoadingRecent,
+    fetchRecentActivity,
     // State
     summaryData,
     isLoadingSummary,

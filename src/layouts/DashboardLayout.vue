@@ -44,11 +44,7 @@
               class="bg-brand-light border border-brand-soft rounded-lg p-3 my-2 flex items-start gap-2.5">
               <div
                 class="w-6 h-6 rounded-full bg-brand-soft flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3.5 h-3.5 text-brand-primary" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <IconInfo class="w-3.5 h-3.5 text-brand-primary" aria-hidden="true" />
               </div>
               <p class="text-xs text-text-primary leading-relaxed">
                 <strong class="font-semibold block mb-0.5">Kenapa butuh nomor telepon?</strong>
@@ -65,7 +61,7 @@
 
           <div class="pt-4">
             <button type="submit" :disabled="profileStore.isUpdatingProfile"
-              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-none text-sm font-medium text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50">
+              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md text-sm font-medium text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50">
               {{ profileStore.isUpdatingProfile ? "Menyimpan..." : "Lanjutkan ke Aplikasi" }}
             </button>
           </div>
@@ -76,6 +72,7 @@
 </template>
 
 <script setup>
+import { IconInfo } from '@/ui/icons';
 import { ref, onMounted, computed, watch } from 'vue';
 import Sidebar from '../partials/Sidebar.vue';
 import Header from '../partials/Header.vue';

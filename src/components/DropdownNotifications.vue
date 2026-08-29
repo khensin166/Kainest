@@ -9,7 +9,7 @@
       :aria-expanded="dropdownOpen"
     >
       <span class="sr-only">Notifikasi</span>
-      <BellIcon class="w-5 h-5 text-text-muted" />
+      <IconBell class="w-5 h-5 text-text-muted" />
       <!-- Unread Badge -->
       <span v-if="unreadCount > 0"
         class="absolute top-0 right-0 w-2 h-2 bg-status-danger rounded-full border-2 border-surface-card">
@@ -32,9 +32,7 @@
       leave-to-class="transform opacity-0 scale-95"
     >
       <div v-show="dropdownOpen" ref="dropdown"
-        class="z-30 bg-surface-card border border-border-default py-2 rounded-2xl shadow-xl overflow-hidden w-80
-               sm:absolute sm:top-full sm:right-0 sm:mt-2 sm:origin-top-right
-               fixed left-1/2 -translate-x-1/2 top-16 sm:transform-none"
+        class="z-30 bg-surface-card border border-border-default py-2 rounded-lg shadow-xl overflow-hidden w-80 sm:absolute sm:top-full sm:right-0 sm:mt-2 sm:origin-top-right fixed left-1/2 -translate-x-1/2 top-16 sm:transform-none"
         @click.stop>
 
         <!-- Header -->
@@ -47,9 +45,7 @@
             </span>
             <!-- Close button (mobile) -->
             <button @click.stop="close" class="sm:hidden w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-hover text-text-muted">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <IconClose class="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -57,7 +53,7 @@
         <!-- Loading -->
         <div v-if="loading" class="p-4 space-y-3">
           <div v-for="i in 3" :key="i" class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-xl bg-surface-hover animate-pulse flex-shrink-0"></div>
+            <div class="w-8 h-8 rounded-md bg-surface-hover animate-pulse flex-shrink-0"></div>
             <div class="flex-1 space-y-1.5">
               <div class="h-3 bg-surface-hover rounded animate-pulse w-3/4"></div>
               <div class="h-2.5 bg-surface-hover rounded animate-pulse w-1/2"></div>
@@ -67,8 +63,8 @@
 
         <!-- Empty State -->
         <div v-else-if="notifications.length === 0" class="py-8 text-center">
-          <div class="w-10 h-10 rounded-2xl bg-surface-hover flex items-center justify-center mx-auto mb-2">
-            <BellSlashIcon class="w-5 h-5 text-text-muted" />
+          <div class="w-10 h-10 rounded-lg bg-surface-hover flex items-center justify-center mx-auto mb-2">
+            <IconBellOff class="w-5 h-5 text-text-muted" />
           </div>
           <p class="text-sm text-text-muted">Tidak ada notifikasi</p>
         </div>
@@ -80,7 +76,7 @@
             :class="{ 'bg-brand-surface/50': !notif.isRead }"
             @click="markRead(notif)">
             <!-- Icon by type -->
-            <div :class="['w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', iconBg(notif.type)]">
+            <div :class="['w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0', iconBg(notif.type)]">
               <component :is="iconByType(notif.type)" :class="['w-4 h-4', iconColor(notif.type)]" />
             </div>
             <div class="flex-1 min-w-0">
@@ -98,29 +94,24 @@
 </template>
 
 <script setup>
+import { IconAi, IconBell, IconBellOff, IconClose, IconInfo, IconWarning } from '@/ui/icons';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { BellIcon, BellSlashIcon, SparklesIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
-import axios from 'axios';
+import { useNotificationStore } from '@/features/notifications/presentation/stores/useNotificationStore';
+import { storeToRefs } from 'pinia';
 import { useHeaderDropdown } from '@/stores/headerDropdownStore';
 
 const { activeDropdown, toggle: _toggle, close: _close } = useHeaderDropdown('notifications');
 
 const trigger = ref(null);
 const dropdown = ref(null);
-const notifications = ref([]);
-const unreadCount = ref(0);
-const loading = ref(true);
+const notificationStore = useNotificationStore();
+const { notifications, unreadCount, isLoading: loading } = storeToRefs(notificationStore);
 
 // Computed open state from shared store
 const dropdownOpen = computed(() => activeDropdown.value === 'notifications');
 
 const toggle = () => _toggle();
 const close = () => _close();
-
-const apiHeaders = () => {
-  const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
 const formatRelative = (dateStr) => {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -134,53 +125,24 @@ const formatRelative = (dateStr) => {
 };
 
 const iconByType = (type) => {
-  if (type === 'ALERT') return ExclamationTriangleIcon;
-  if (type === 'AI_INSIGHT') return SparklesIcon;
-  return InformationCircleIcon;
+  if (type === 'ALERT') return IconWarning;
+  if (type === 'AI_INSIGHT') return IconAi;
+  return IconInfo;
 };
 
 const iconBg = (type) => {
-  if (type === 'ALERT') return 'bg-red-50 dark:bg-red-900/20';
-  if (type === 'AI_INSIGHT') return 'bg-violet-50 dark:bg-violet-900/20';
-  return 'bg-blue-50 dark:bg-blue-900/20';
+  if (type === 'ALERT') return 'bg-status-danger-bg';
+  if (type === 'AI_INSIGHT') return 'bg-ai-soft';
+  return 'bg-status-info-bg';
 };
 
 const iconColor = (type) => {
-  if (type === 'ALERT') return 'text-red-500';
-  if (type === 'AI_INSIGHT') return 'text-violet-500';
-  return 'text-blue-500';
+  if (type === 'ALERT') return 'text-status-danger';
+  if (type === 'AI_INSIGHT') return 'text-ai';
+  return 'text-status-info';
 };
 
-const fetchNotifications = async () => {
-  try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    const res = await axios.get(`${baseUrl}/notifications`, {
-      headers: apiHeaders(),
-      withCredentials: true,
-    });
-    notifications.value = res.data?.notifications || [];
-    unreadCount.value = res.data?.unreadCount ?? 0;
-  } catch (e) {
-    console.warn('[DropdownNotifications] Gagal fetch:', e.message);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const markRead = async (notif) => {
-  if (notif.isRead) return;
-  try {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    await axios.patch(`${baseUrl}/notifications/${notif.id}/read`, {}, {
-      headers: apiHeaders(),
-      withCredentials: true,
-    });
-    notif.isRead = true;
-    unreadCount.value = Math.max(0, unreadCount.value - 1);
-  } catch (e) {
-    console.warn('[DropdownNotifications] Gagal mark read:', e.message);
-  }
-};
+const markRead = (notif) => notificationStore.markAsRead(notif);
 
 // Close on outside click
 const clickHandler = ({ target }) => {
@@ -197,7 +159,7 @@ const keyHandler = ({ keyCode }) => {
 onMounted(() => {
   document.addEventListener('click', clickHandler);
   document.addEventListener('keydown', keyHandler);
-  fetchNotifications();
+  notificationStore.fetchNotifications();
 });
 
 onUnmounted(() => {

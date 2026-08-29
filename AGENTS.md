@@ -2,7 +2,7 @@
 
 ## Status Terkini (03 Juni 2026)
 - **Frontend (Kainest Vue 3):**
-  - Menggunakan UI/UX modern (vibrant colors, glassmorphism, blob animation).
+  - ~~Menggunakan UI/UX modern (vibrant colors, glassmorphism, blob animation).~~ **Sudah tidak berlaku sejak 30 Agustus 2026** — blob, glassmorphism, dan gradien dekoratif dibongkar; lihat Design System v4.0 di bawah.
   - Auth flow (Login, Register, Forgot Password, Reset Password) sudah terkoneksi dengan backend *Better Auth*.
   - Halaman Lupa Password (`/forgot-password`) & Reset Password (`/reset-password`) telah didesain ulang dengan gaya *split-screen* yang sama dengan halaman Login.
   - Terdapat komponen panduan (`<PageGuide>`) di seluruh halaman utama.
@@ -102,7 +102,12 @@
 3. Database *Supabase* (pooler port 6543) sesekali mungkin mengalami *timeout* saat inisialisasi awal di mode *development* lokal, cukup jalankan ulang jika terjadi *error*.
 4. **Perhatian Penting**: Di sisi Backend, saat ini chat pribadi melalui Linked Devices (`@lid`) memicu error 403 ("bot belum diaktifkan di grup") karena validasi backend menganggap domain JID `@lid` memerlukan aktivasi grup. Ke depannya, validasi ini harus disesuaikan agar mengenali chat pribadi secara tepat.
 5. **Peringatan/Future Repair (Disappearing Messages di WA)**: Meskipun parameter `ephemeralExpiration` sudah diekstrak dari pesan masuk dan diteruskan ke opsi pengiriman Baileys sehingga pesan bot kini dapat terbaca dengan baik, terkadang gelembung peringatan WhatsApp *"This message won't disappear. The sender may be on an old version of WhatsApp"* masih muncul secara paralel. Investigasi lebih lanjut diperlukan (misal: memeriksa apakah format ekstraksi regex dari `JSON.stringify(msg)` ada yang kurang presisi, atau status default chat-level ephemeral di sisi client perlu diatur). Hal ini didefer untuk perbaikan di masa mendatang.
-6. **Desain Sistem & Tema Warna Terpusat**: Seluruh token warna Tailwind v4 di aplikasi (terutama untuk `brand`, `surface`, `border`, `text`, dan `status`) wajib menggunakan variabel CSS yang didefinisikan di `src/css/theme-variables.css`. Jangan pernah melakukan *hardcode* warna heksadesimal (`#`) langsung di komponen Vue untuk memastikan kompatibilitas tema Light/Dark yang seamless. Jika butuh warna di Javascript (seperti Chart.js), gunakan fungsi `getCssVar()` untuk membaca variabel CSS aktif.
+6. **Desain Sistem & Tema Warna Terpusat**: Seluruh token warna Tailwind v4 wajib memakai variabel CSS di `src/css/theme-variables.css`, lalu dijembatani ke blok `@theme` di `src/css/style.css`. Jangan pernah *hardcode* warna heksadesimal (`#`) di komponen Vue. Jika butuh warna di JavaScript (seperti Chart.js), gunakan `getCssVar()`.
+   **Aplikasi punya EMPAT tema**: `Light` (tanpa kelas), `Dark` (`.dark`), `Factory` (`.dark.theme-factory`), dan `Spidey` (`.dark.theme-spidey`). Tema diterapkan lewat `src/composables/useTheme.js` yang dipanggil di `App.vue` — bukan lagi dari dalam `ThemeToggle`, karena dulu halaman tanpa komponen itu tidak mendapat tema tersimpan. Setiap token semantik wajib ada di ketiganya — token yang absen di satu tema membuat class-nya tidak menghasilkan CSS sama sekali di tema itu. Dijaga oleh aturan lint `no-theme-parity-gap`.
+7. **Struktur & aliran data**: dokumentasi lengkap ada di `KAINEST_ARCHITECTURE.md` — lapisan `data`/`domain`/`presentation`, model error `Either` + hierarki `Failure`, composition root `core/di/di.js`, dan klien HTTP `src/lib/apiClient.js`. **Komponen `.vue` dilarang mengimpor `axios`**; HTTP hanya boleh di `data/source/` dan selalu lewat `apiClient` agar interceptor 401/403 (auto-logout) tetap berjalan. Dijaga aturan lint `no-http-in-component`. Seluruh kebocoran sudah ditutup kecuali `SharedSplitPage.vue` (halaman publik tanpa auth, disengaja).
+8. **Pagar desain wajib hijau sebelum commit**: `npm run lint:design` (17 aturan, semuanya blocking). Termasuk `no-missing-import` — `vite build` TIDAK menangkap import ikon yang hilang/salah tempat di komponen Options API; build hijau tapi aplikasi layar putih. Aturan lengkap dan alasan tiap pengecualian ada di `KAINEST_DESIGN.md` dan `scripts/lint-design.mjs`.
+9. **Build hijau bukan bukti aplikasi hidup**: setelah perubahan UI berskala besar, buka aplikasinya (`/`, `/login`, `/dev/ui`, dan satu halaman di balik autentikasi). Kelalaian ini pernah meloloskan layar putih ke tangan pengguna.
+10. **Teks UI dibekukan**: pekerjaan desain mengubah warna, ikon, dan tata letak — **bukan kata-kata**. Termasuk kapitalisasi, tanda baca, dan emoji di dalam kalimat. Setelah pekerjaan desain, buktikan dengan mem-*diff* string UI sebelum vs sesudah.
 
 
 ---
@@ -212,3 +217,36 @@ Berikut adalah daftar fitur potensial yang dapat dikembangkan untuk Kainest ke d
   - Menambahkan dropdown **"Tanggal Gajian / Reset Siklus Bulanan"** dengan pilihan tanggal 1-30 serta `31/Akhir Bulan (Default)`.
   - Mengirim properti `payday` ke backend API `/budget/setup` bersama dengan nilai `salary`.
 
+## Update 30 Agustus 2026
+- **Frontend (Design System v4.0)** — dikerjakan di branch `chore/design-system-fase-0-1`:
+  - **Lapis primitif baru** `src/ui/` (13 komponen: Button, Badge, Card, Input, Select, Switch, Tabs, Modal, Skeleton, Spinner, PageShell, EmptyState, StatCard). Varian memakai `class-variance-authority` + `tailwind-merge`; perilaku & aksesibilitas dari **reka-ui**. Halaman demo dev-only di `/dev/ui`.
+  - **Dicabut**: daisyUI (dipakai setengah lalu ditimpa utility), HeadlessUI (diganti reka-ui), Heroicons dan lucide-vue-next (diganti Material Symbols). 25 berkas template Mosaic yang tidak terpakai dihapus.
+  - **Ikon → Material Symbols** lewat `unplugin-icons` (compile-time, tree-shaken, tanpa request jaringan). Semua ikon melewati satu peta `src/ui/icons.js` (76 ekspor bernama domain). 61 Heroicon + 82 inline SVG + 1 lucide dimigrasi; inline `<svg>` kini hanya untuk logo merek dan `<Spinner>`.
+  - **Font Inter → Geist** (self-hosted `@fontsource-variable/geist`, bukan Google Fonts).
+  - **Konsistensi warna**: satu peran = satu keluarga warna di ketiga tema. `chart-expense` berhenti memakai ungu (ungu = brand) dan mengikuti keluarga `danger`. Token `--color-ai` (violet) ditambahkan ke ketiga tema untuk seluruh fitur AI.
+  - **Pagar `npm run lint:design`** — 17 aturan blocking, termasuk `no-theme-parity-gap`, `no-undefined-token`, dan `no-missing-import`.
+- **Bug yang ditemukan & diperbaiki dalam proses**:
+  - `bg-brand-surface` dipakai di 10 tempat tetapi tokennya **tidak pernah didefinisikan** — elemen-elemen itu selama ini tanpa background.
+  - `bg-surface-canvas` di `SharedSplitPage` juga tidak pernah ada — halaman publik itu tanpa background.
+  - `max-w-9xl` dipakai 8 halaman tetapi tidak terdefinisi, sehingga halaman-halaman itu selebar layar sementara halaman lain dibatasi. Kini `--container-9xl: 96rem`.
+- **Bug yang lolos ke pengguna, lalu diperbaiki (pelajaran penting)**:
+  - Migrasi ikon otomatis mengandaikan semua komponen memakai `<script setup>`. Komponen **Options API** (`Sidebar.vue`, `Header.vue`, `Tooltip.vue`) tidak punya anchor itu, sehingga baris `import` hilang atau nyasar ke luar blok `<script>`. **`vite build` tetap hijau** — SFC compiler mengabaikan teks di luar blok — tetapi aplikasi menampilkan layar putih saat dibuka. Kini dijaga aturan lint `no-missing-import`.
+  - `GetStartedPage.vue` memakai `IconChecklist` sementara yang diimpor `IconCheckCircle` (sisa penggantian saat mengembalikan teks asli "Todo List").
+  - Primitif `Input.vue` berakar `<div>`, sehingga atribut `placeholder`/`type`/`autocomplete` menempel ke div dan **semua placeholder tidak muncul**. Diperbaiki dengan `inheritAttrs: false` + `v-bind="$attrs"` pada `<input>`.
+  - Ketiganya tidak terdeteksi `vite build` maupun `lint` versi saat itu. Verifikasi runtime di browser sekarang wajib — lihat catatan #8.
+- **Verifikasi yang sudah dilakukan**: `/`, `/login`, `/register`, `/forgot-password`, `/valentine`, `/dev/ui` (tema Light & Factory), serta pemeriksaan terukur 13 token semantik × 3 tema (nol yang kosong).
+- **Belum diverifikasi runtime**: seluruh halaman di balik autentikasi (Dashboard, Kantong Keuangan, Riwayat Transaksi, Rekap Bulanan, Split Bill, Settings, WaBot, Manajemen User).
+
+## Update 30 Agustus 2026 (lanjutan) — Tema Spidey
+- **Tema keempat `Spidey` — "Web Strike"** (`.dark.theme-spidey`): hitam hangat `#09090B` / kartu `#17161A`, **biru elektrik `#4DA3FF` memegang aksi** (teks gelap, 7.58:1), **merah Marvel `#E62429` dipakai MURNI** untuk bar, aksen, dan `chart-expense`. Melewati tiga iterasi: v1 navy nyaris-hitam terlalu desaturasi sehingga terasa dashboard generik; v2 medan biru jenuh membuat angka melelahkan dibaca **dan** menjatuhkan merah Marvel ke 2.76:1 sehingga harus diencerkan sampai berhenti terasa merah Marvel. Basis hitam justru memberi merah ruang (3.99:1 — cukup untuk grafis, ambang 3:1), sementara teks merah memakai `status-danger-text` `#FF6B6F`. Merah tetap **bukan** warna tombol: di aplikasi keuangan merah sudah berarti bahaya, dan menjadikannya warna aksi membuat tombol Simpan dan Hapus tampak sama.
+
+- **`ThemeToggle` jadi dropdown** (`DropdownMenuRadioGroup` reka-ui) — dengan empat tema, tombol siklus butuh sampai 4 klik untuk kembali. API komponen tidak berubah sehingga 7 halaman pemanggilnya tidak disentuh.
+- **Bug laten diperbaiki**: `useColorMode` dulu dipanggil di dalam `ThemeToggle`, sehingga tema tersimpan **tidak diterapkan** pada halaman yang tidak memuat komponen itu (`/dev/ui`, halaman berbagi publik). Kini diangkat ke `src/composables/useTheme.js` dan dipanggil di `App.vue`.
+- **Audit kontras WCAG** menemukan 4 masalah yang tidak terlihat dari melihat layar: `text-inverse` di tombol brand (4.23 gagal), `text-muted` (4.16 gagal), `text-faint` (2.35 gagal), dan `brand-text` Factory yang bernilai `#101010` — gelap di atas gelap, rasio 1.05, karena semantiknya melenceng jadi "teks di atas tombol". Semua diperbaiki; setiap tema baru wajib diaudit dengan cara yang sama.
+- **Keterbatasan yang diketahui**: 51 lokasi memakai `text-status-danger` (warna permukaan) sebagai warna teks, rasio ~3.9. Lolos untuk ikon dan angka besar, tidak untuk teks kecil. Bukan khas Spidey — tema Dark pun ~4.0. Perbaikannya per lokasi ke `text-status-danger-text`.
+
+## Update 30 Agustus 2026 (lanjutan) — Buku panduan & perbaikan sesi
+- **Bug "selalu keluar sendiri" diperbaiki**: interceptor `apiClient` dulu memperlakukan **403 sama dengan 401** dan memanggil `logout()`. Padahal 403 berarti *sudah login tapi tidak diizinkan* — misalnya membuka fitur yang butuh pasangan tertaut. Kini 403 memunculkan modal global dan sesi dipertahankan; hanya 401 yang mengakhiri sesi.
+- **Buku panduan lengkap**: `src/config/pageGuides.js` dari 7 → 13 kunci. Seluruh 13 halaman yang fiturnya sudah jadi punya tombol Buku Panduan. Panduan `wabot` ternyata sudah ditulis tapi tak pernah dipasang; kunci `dashboard` salah menempel di Kantong Keuangan (diganti jadi `budgeting`).
+- **Tiga menu stub** (`Galeri Kenangan`, `Kalender Cinta`, `Vault Rahasia`) dulu mengarah ke `Dashboard.vue` sehingga pengguna mengira aplikasi rusak. Kini memakai `ComingSoonPage.vue`.
+- **Catatan keamanan**: `PageGuide` merender `step.desc` dengan `v-html`. Isinya HANYA boleh dari `pageGuides.js` yang statis — jangan pernah mengalirkan teks dari API ke sana.

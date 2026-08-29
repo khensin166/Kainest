@@ -19,12 +19,7 @@
           class="truncate ml-2 text-sm font-medium text-text-primary group-hover:text-text-secondary"
           >{{ authStore.user?.displayName }}</span
         >
-        <svg
-          class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted"
-          viewBox="0 0 12 12"
-        >
-          <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
-        </svg>
+        <IconChevronDown class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted" aria-hidden="true" />
       </div>
     </button>
     <transition
@@ -37,7 +32,7 @@
     >
       <div
         v-show="dropdownOpen"
-        class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded-lg shadow-none overflow-hidden mt-1"
+        class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded-lg overflow-hidden mt-1"
         :class="align === 'right' ? 'right-0' : 'left-0'"
       >
         <div
@@ -46,7 +41,7 @@
           <div class="font-medium text-text-primary">
             {{ authStore.user?.displayName }}
           </div>
-          <div class="text-xs text-text-muted italic">
+          <div class="text-xs text-text-muted">
             Pengguna
           </div>
         </div>
@@ -92,11 +87,12 @@
 </template>
 
 <script setup>
+import { IconChevronDown } from '@/ui/icons';
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router"; // 1. Impor useRouter
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore"; // Pastikan path benar
 import BaseModal from "./modals/BaseModal.vue";
-import { DialogTitle } from "@headlessui/vue";
+import { DialogTitle } from "reka-ui";
 import UserAvatar from "../images/user-avatar-32.png";
 
 defineProps({

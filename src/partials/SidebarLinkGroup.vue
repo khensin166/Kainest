@@ -16,11 +16,9 @@ export default {
     },
   },
   setup(props) {
-    console.log("SidebarLinkGroup loaded"); // Debugging
     const expanded = ref(props.activeCondition);
 
     const handleClick = () => {
-      console.log("handleClick called, expanded:", expanded.value); // Debugging
       expanded.value = !expanded.value;
     };
 

@@ -88,13 +88,11 @@ export const useGowaStore = defineStore('gowa', () => {
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-      console.log(`[GOWA WS] Terhubung: ${deviceId}`);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(`[GOWA WS] Pesan dari ${deviceId}:`, data);
         
         if (data.status) {
           updateDeviceStatus(deviceId, data.status);
@@ -125,7 +123,6 @@ export const useGowaStore = defineStore('gowa', () => {
     };
 
     ws.onclose = () => {
-      console.log(`[GOWA WS] Terputus: ${deviceId}`);
       updateDeviceStatus(deviceId, 'DISCONNECTED');
       if (devices.value.find(d => d.id === deviceId)) {
         setTimeout(() => connectWebSocket(deviceId), 5000);

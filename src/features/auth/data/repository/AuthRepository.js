@@ -133,11 +133,9 @@ export class AuthRepository extends IAuthRepository {
           const sessionToken = await this.remoteSource.getSessionToken();
           if (sessionToken) {
             localStorage.setItem("authToken", sessionToken);
-            console.log("[Auth] Token berhasil diambil dari sesi cookie dan disimpan ke localStorage.");
           }
         } catch (sessionError) {
           // Tidak ada sesi aktif, lanjutkan tanpa token
-          console.log("[Auth] Tidak ada sesi cookie aktif.");
         }
       }
 

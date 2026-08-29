@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "url";
 import tailwindcss from "@tailwindcss/vite";
+import Icons from "unplugin-icons/vite";
 
 export default defineConfig({
   esbuild: {
@@ -11,7 +12,7 @@ export default defineConfig({
   define: {
     "process.env": process.env,
   },
-  plugins: [tailwindcss(), vue()],
+  plugins: [tailwindcss(), vue(), Icons({ compiler: "vue3", scale: 1 })],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -28,7 +29,6 @@ export default defineConfig({
             if (id.includes("vue")) return "vendor-vue";
             if (id.includes("pinia")) return "vendor-pinia";
             if (id.includes("axios")) return "vendor-axios";
-            if (id.includes("@heroicons") || id.includes("lucide")) return "vendor-icons";
             return "vendor-core"; // semua pustaka eksternal lainnya
           }
         },
