@@ -69,13 +69,13 @@ watch(() => props.modelValue, (newValue) => {
     <div class="relative">
         <flat-pickr class="form-input pl-9 font-medium w-full transition-colors duration-200" :class="[
             isFilterActive
-                ? 'bg-violet-50 text-violet-600 border-violet-300 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-700/50' // Style saat AKTIF
-                : 'bg-white dark:bg-gray-800 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 border-gray-200 dark:border-gray-700/60' // Style DEFAULT
+                ? 'bg-brand-soft text-brand-primary border-brand-primary' // Style saat AKTIF
+                : 'bg-surface-input text-text-secondary hover:text-text-primary border-border-default' // Style DEFAULT
         ]" :config="config" v-model="date" :placeholder="placeholder"></flat-pickr>
 
         <div class="absolute inset-0 right-auto flex items-center pointer-events-none pl-3">
             <svg class="fill-current transition-colors duration-200" :class="[
-                isFilterActive ? 'text-violet-500 dark:text-violet-400' : 'text-gray-400 dark:text-gray-500'
+                isFilterActive ? 'text-brand-primary' : 'text-text-muted'
             ]" width="16" height="16" viewBox="0 0 16 16">
                 <path d="M5 4a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2H5Z" />
                 <path

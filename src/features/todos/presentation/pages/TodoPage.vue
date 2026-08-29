@@ -2,28 +2,28 @@
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <div class="sm:flex sm:justify-between sm:items-center mb-8">
       <div class="mb-4 sm:mb-0 flex items-center gap-3">
-        <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">
+        <h1 class="text-2xl md:text-3xl text-text-primary font-bold">
           To-do List Berdua
         </h1>
         <PageGuide :steps="pageGuides.todos" />
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="bg-surface-card shadow-none rounded-xl border border-border-default p-6">
       <!-- Input Section -->
       <div class="mb-6">
         <form @submit.prevent="handleAddTodo" class="flex flex-col gap-3">
           <div class="flex gap-2">
             <div class="w-full space-y-2">
               <input v-model="newTodoTitle" type="text" placeholder="Apa yang ingin kita selesaikan hari ini?"
-                class="form-input w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500"
+                class="form-input w-full rounded-md border-border-default bg-surface-input text-text-primary focus:border-brand-primary focus:ring-brand-primary"
                 :disabled="todoStore.loading" />
               <input v-model="newTodoDescription" type="text" placeholder="Keterangan tambahan (opsional)"
-                class="form-input w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-violet-500 focus:ring-violet-500"
+                class="form-input w-full text-sm rounded-md border-border-default bg-surface-input text-text-primary focus:border-brand-primary focus:ring-brand-primary"
                 :disabled="todoStore.loading" />
             </div>
             <button type="submit"
-              class="btn bg-violet-500 hover:bg-violet-600 text-white whitespace-nowrap h-fit py-2.5"
+              class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse whitespace-nowrap h-fit py-2.5 border-none"
               :disabled="!newTodoTitle.trim() || todoStore.loading">
               <span v-if="todoStore.loading">Loading...</span>
               <span v-else>Tambah Tugas</span>
@@ -35,8 +35,8 @@
       <!-- Todo List -->
       <div v-if="todoStore.loading && todoStore.todos.length === 0" class="text-center py-8">
         <div class="inline-flex items-center justify-center">
-          <div class="w-4 h-4 border-2 border-violet-500 rounded-full animate-spin border-t-transparent"></div>
-          <span class="ml-2 text-gray-500 dark:text-gray-400">Memuat tugas...</span>
+          <div class="w-4 h-4 border-2 border-brand-primary rounded-full animate-spin border-t-transparent"></div>
+          <span class="ml-2 text-text-muted">Memuat tugas...</span>
         </div>
       </div>
 
@@ -51,29 +51,29 @@
       <div v-else class="space-y-6">
         <template v-for="(todos, date) in todoStore.groupedTodos" :key="date">
           <div>
-            <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 pl-1">
+            <h3 class="text-xs font-bold text-text-muted uppercase tracking-wider mb-3 pl-1">
               {{ date }}
             </h3>
             <ul class="space-y-3">
               <li v-for="todo in todos" :key="todo.id"
-                class="group flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-600">
+                class="group flex items-start justify-between p-4 bg-surface-subtle rounded-lg hover:bg-surface-hover transition-colors border border-transparent hover:border-border-strong">
                 <div class="flex items-start gap-3 flex-1 min-w-0">
                   <input type="checkbox" :checked="todo.isCompleted" @change="todoStore.toggleTodo(todo)"
-                    class="mt-1 w-5 h-5 rounded border-gray-300 text-violet-600 focus:ring-violet-500 cursor-pointer" />
+                    class="mt-1 w-5 h-5 rounded border-border-default text-brand-primary focus:ring-brand-primary cursor-pointer" />
                   <div class="flex flex-col cursor-pointer select-none" @click="todoStore.toggleTodo(todo)">
-                    <span class="text-gray-900 dark:text-gray-100 font-medium"
-                      :class="{ 'line-through text-gray-400 dark:text-gray-500': todo.isCompleted }">
+                    <span class="text-text-primary font-medium"
+                      :class="{ 'line-through text-text-muted': todo.isCompleted }">
                       {{ todo.title }}
                     </span>
-                    <span v-if="todo.description" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2"
-                      :class="{ 'line-through text-gray-400/70 dark:text-gray-600': todo.isCompleted }">
+                    <span v-if="todo.description" class="text-sm text-text-muted mt-0.5 line-clamp-2"
+                      :class="{ 'line-through text-text-muted/70': todo.isCompleted }">
                       {{ todo.description }}
                     </span>
                   </div>
                 </div>
 
                 <button @click="openDeleteModal(todo)"
-                  class="text-gray-400 hover:text-red-500 focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                  class="text-text-muted hover:text-status-danger focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity p-1"
                   title="Hapus tugas">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -16,8 +16,8 @@
     <BaseModal :isOpen="showOnboarding" size="md" :hideFooter="true" @close="preventClose">
       <template #header>
         <div class="text-center">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Selamat Datang di Kainest! 🎉</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400 font-normal">Selamat datang di aplikasi pembantu Anda.
+          <h2 class="text-xl font-bold text-text-primary mb-1">Selamat Datang di Kainest! 🎉</h2>
+          <p class="text-sm text-text-muted font-normal">Selamat datang di aplikasi pembantu Anda.
             Lengkapi profil Anda untuk mulai.</p>
         </div>
       </template>
@@ -25,32 +25,32 @@
       <template #body>
         <form @submit.prevent="submitOnboarding" class="mt-4 space-y-4">
           <div class="space-y-1">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="displayName">
-              Nama Panggilan <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-text-primary" for="displayName">
+              Nama Panggilan <span class="text-status-danger">*</span>
             </label>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Silakan isi nama panggilan agar kami mudah
+            <p class="text-xs text-text-muted mb-2">Silakan isi nama panggilan agar kami mudah
               memanggil Anda.</p>
             <input id="displayName" class="form-input w-full" type="text" v-model="onboardingData.displayName"
               placeholder="Cth: Kenan" required />
           </div>
 
           <div class="space-y-1">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="phone">
-              Nomor Telepon <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-text-primary" for="phone">
+              Nomor Telepon <span class="text-status-danger">*</span>
             </label>
 
             <!-- WhatsApp Bot Info Block -->
             <div
-              class="bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800 rounded-lg p-3 my-2 flex items-start gap-2.5">
+              class="bg-brand-light border border-brand-soft rounded-lg p-3 my-2 flex items-start gap-2.5">
               <div
-                class="w-6 h-6 rounded-full bg-violet-100 dark:bg-violet-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3.5 h-3.5 text-violet-600 dark:text-violet-300" fill="none" stroke="currentColor"
+                class="w-6 h-6 rounded-full bg-brand-soft flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5 text-brand-primary" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-xs text-violet-800 dark:text-violet-200 leading-relaxed">
+              <p class="text-xs text-text-primary leading-relaxed">
                 <strong class="font-semibold block mb-0.5">Kenapa butuh nomor telepon?</strong>
                 Nomor ini akan digunakan sebagai validasi agar Anda bisa terhubung dengan <strong>WhatsApp Bot
                   Kainest</strong>. Bot ini akan sangat membantu mempermudah kegiatan pencatatan harian Anda (seperti
@@ -60,12 +60,12 @@
 
             <input id="phone" class="form-input w-full" type="text" v-model="onboardingData.phoneNumber"
               placeholder="Cth: 628123456789" required />
-            <div v-if="phoneError" class="text-xs text-red-500 mt-1">{{ phoneError }}</div>
+            <div v-if="phoneError" class="text-xs text-status-danger mt-1">{{ phoneError }}</div>
           </div>
 
           <div class="pt-4">
             <button type="submit" :disabled="profileStore.isUpdatingProfile"
-              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-50">
+              class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-none text-sm font-medium text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50">
               {{ profileStore.isUpdatingProfile ? "Menyimpan..." : "Lanjutkan ke Aplikasi" }}
             </button>
           </div>

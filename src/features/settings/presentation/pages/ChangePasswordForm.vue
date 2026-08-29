@@ -1,7 +1,7 @@
 <!-- src\features\settings\presentation\pages\ChangePasswordForm.vue -->
 <template>
   <div>
-    <h2 class="text-xl text-gray-800 dark:text-gray-100 font-bold mb-6">Ubah Sandi</h2>
+    <h2 class="text-xl text-text-primary font-bold mb-6">Ubah Sandi</h2>
     <form @submit.prevent="handleChangePassword">
       <div class="space-y-4">
         <div>
@@ -21,7 +21,7 @@
       </div>
       <div class="flex justify-end mt-6">
         <button type="submit" :disabled="securityStore.isLoading || !isDirty"
-          class="px-4 py-2 text-sm font-medium text-white bg-[var(--color-violet-600)] hover:bg-[var(--color-violet-700)] rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          class="px-4 py-2 text-sm font-medium text-text-inverse bg-brand-primary hover:bg-brand-primary-hover rounded-md disabled:opacity-70 disabled:cursor-not-allowed transition-colors">
           {{ securityStore.isLoading ? 'Memproses...' : 'Simpan' }}
         </button>
       </div>

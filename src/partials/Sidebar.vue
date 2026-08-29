@@ -4,21 +4,21 @@
       :class="sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'" aria-hidden="true"></div>
 
     <div id="sidebar" ref="sidebar"
-      class="flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:w-64! shrink-0 bg-white dark:bg-gray-800 p-4 transition-all duration-200 ease-in-out"
+      class="flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:w-64! shrink-0 bg-surface-card p-4 transition-all duration-200 ease-in-out"
       :class="[
         variant === 'v2'
-          ? 'border-r border-gray-200 dark:border-gray-700/60'
-          : 'rounded-r-2xl shadow-xs',
+          ? 'border-r border-border-default'
+          : 'rounded-r-2xl shadow-none',
         sidebarOpen ? 'translate-x-0' : '-translate-x-64',
       ]">
       <div v-if="!authStore.user" class="flex justify-center items-center h-full">
-        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-violet-500"></div>
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-text-primary"></div>
       </div>
 
       <div v-else>
         <div class="flex justify-between mb-10 pr-3 sm:px-2">
           <button ref="trigger"
-            class="lg:hidden text-gray-500 hover:text-gray-400 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="lg:hidden text-text-secondary hover:text-text-primary p-2 rounded-lg hover:bg-surface-hover transition-colors"
             @click.stop="$emit('close-sidebar')" aria-controls="sidebar" :aria-expanded="sidebarOpen">
             <span class="sr-only">Close sidebar</span>
             <ChevronLeftIcon class="w-5 h-5" />
@@ -35,14 +35,14 @@
               <router-link :to="group.path" custom v-slot="{ href, navigate, isExactActive }">
                 <li>
                   <a :href="href" @click="navigate"
-                    class="flex items-center text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 py-2.5 transition-all duration-200 group"
+                    class="flex items-center text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg px-3 py-2.5 transition-all duration-200 group"
                     :class="isExactActive
-                      ? 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400'
+                      ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary'
                       : ''
                       ">
                     <component :is="group.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive
-                      ? 'text-violet-600 dark:text-violet-400'
-                      : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                      ? 'text-text-primary'
+                      : 'text-text-muted group-hover:text-text-primary'
                       " />
                     <span
                       class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 truncate">{{
@@ -53,7 +53,7 @@
             </ul>
 
             <div v-if="group.type === 'group'">
-              <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3 mb-2">
+              <h3 class="text-xs uppercase text-text-muted font-semibold pl-3 mb-2">
                 <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6"
                   aria-hidden="true">•••</span>
                 <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">{{
@@ -64,9 +64,9 @@
                 <template v-for="item in group.items" :key="item.path">
                   <li>
                     <a v-if="item.path === '/logout'" href="#" @click.prevent="handleLogout"
-                      class="flex items-center text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 py-2.5 transition-all duration-200 group">
+                      class="flex items-center text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg px-3 py-2.5 transition-all duration-200 group">
                       <component :is="item.iconComponent"
-                        class="shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                        class="shrink-0 w-5 h-5 text-text-muted group-hover:text-text-primary transition-colors" />
                       <span
                         class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 truncate">{{
                           item.name }}</span>
@@ -74,14 +74,14 @@
 
                     <router-link v-else :to="item.path" custom v-slot="{ href, navigate, isExactActive }">
                       <a :href="href" @click="navigate"
-                        class="flex items-center text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 py-2.5 transition-all duration-200 group"
+                        class="flex items-center text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-lg px-3 py-2.5 transition-all duration-200 group"
                         :class="isExactActive
-                          ? 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400'
+                          ? 'bg-surface-hover text-text-primary border-l-2 border-text-primary'
                           : ''
                           ">
                         <component :is="item.iconComponent" class="shrink-0 w-5 h-5 transition-colors" :class="isExactActive
-                          ? 'text-violet-600 dark:text-violet-400'
-                          : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                          ? 'text-text-primary'
+                          : 'text-text-muted group-hover:text-text-primary'
                           " />
                         <span
                           class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 truncate">{{
@@ -97,7 +97,7 @@
 
         <div class="pt-3 hidden lg:flex 2xl:hidden justify-end mt-auto">
           <button @click.prevent="sidebarExpanded = !sidebarExpanded"
-            class="p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+            class="p-2 text-text-muted hover:text-text-primary hover:bg-surface-hover rounded-lg transition-colors">
             <span class="sr-only">Expand / collapse sidebar</span>
             <ChevronRightIcon class="w-5 h-5 transition-transform" :class="{ 'rotate-180': sidebarExpanded }" />
           </button>

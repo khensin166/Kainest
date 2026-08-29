@@ -13,7 +13,7 @@
     >
       <slot name="trigger">
         <button class="block" @click.prevent>
-          <svg class="fill-current text-gray-400 dark:text-gray-500" width="16" height="16" viewBox="0 0 16 16">
+          <svg class="fill-current text-text-muted" width="16" height="16" viewBox="0 0 16 16">
             <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
           </svg>
         </button>
@@ -29,7 +29,7 @@
         leave-to-class="opacity-0"
       >
         <div
-          v-show="tooltipOpen" class="rounded-lg border overflow-hidden shadow-lg"
+          v-show="tooltipOpen" class="rounded-lg border overflow-hidden shadow-none"
           :class="[
             colorClasses(bg),
             sizeClasses(size),
@@ -82,11 +82,11 @@ export default {
     const colorClasses = (bg) => {
       switch (bg) {
         case 'light':
-          return 'bg-white text-gray-600 border-gray-200'
+          return 'bg-surface-card text-text-primary border-border-default'
         case 'dark':
-          return 'bg-gray-800 text-gray-100 border-gray-700/60'
+          return 'bg-surface-subtle text-text-primary border-border-default'
         default:
-          return 'text-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700/60'
+          return 'text-text-primary bg-surface-card border-border-default'
       }
     }      
 

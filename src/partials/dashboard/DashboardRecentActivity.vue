@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+  <div class="bg-surface-card rounded-2xl border border-border-default shadow-none overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-border-default">
         <div class="flex items-center gap-2">
-          <ClockIcon class="w-4 h-4 text-violet-500" />
-          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Aktivitas Terbaru</h2>
+          <ClockIcon class="w-4 h-4 text-brand-primary" />
+          <h2 class="text-sm font-semibold text-text-primary">Aktivitas Terbaru</h2>
         </div>
         <router-link v-if="hasBudgeting" to="/app/transactions"
-          class="text-xs text-violet-600 dark:text-violet-400 hover:underline font-medium">
+          class="text-xs text-brand-primary hover:underline font-medium">
           Lihat Semua
         </router-link>
       </div>
@@ -15,33 +15,33 @@
       <!-- Loading State -->
       <div v-if="loading" class="p-5 space-y-4">
         <div v-for="i in 4" :key="i" class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse flex-shrink-0"></div>
+          <div class="w-8 h-8 rounded-xl bg-surface-hover animate-pulse flex-shrink-0"></div>
           <div class="flex-1 space-y-1.5">
-            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
-            <div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+            <div class="h-3 bg-surface-hover rounded animate-pulse w-3/4"></div>
+            <div class="h-2.5 bg-surface-hover rounded animate-pulse w-1/2"></div>
           </div>
         </div>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="activities.length === 0" class="flex flex-col items-center justify-center py-10 px-5 text-center">
-        <div class="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center mb-3">
-          <InboxIcon class="w-6 h-6 text-violet-400" />
+        <div class="w-12 h-12 rounded-2xl bg-brand-surface flex items-center justify-center mb-3">
+          <InboxIcon class="w-6 h-6 text-brand-muted" />
         </div>
-        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Belum ada aktivitas</p>
-        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Mulai catat transaksi pertama kamu!</p>
+        <p class="text-sm font-medium text-text-primary">Belum ada aktivitas</p>
+        <p class="text-xs text-text-muted mt-1">Mulai catat transaksi pertama kamu!</p>
       </div>
 
       <!-- Activity List -->
-      <ul v-else class="divide-y divide-gray-50 dark:divide-gray-700/50">
+      <ul v-else class="divide-y divide-border-default">
         <li v-for="activity in activities" :key="activity.id"
-          class="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+          class="flex items-center gap-3 px-5 py-3.5 hover:bg-surface-hover transition-colors">
           <div :class="['w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', activity.iconBg]">
             <component :is="activity.icon" :class="['w-4 h-4', activity.iconColor]" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{{ activity.title }}</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">{{ activity.time }}</p>
+            <p class="text-sm font-medium text-text-primary truncate">{{ activity.title }}</p>
+            <p class="text-xs text-text-muted">{{ activity.time }}</p>
           </div>
           <span v-if="activity.amount" :class="['text-sm font-semibold flex-shrink-0', activity.amountColor]">
             {{ activity.amount }}
@@ -85,10 +85,10 @@ const activities = computed(() =>
     title: t.note || t.category?.name || 'Transaksi',
     time: formatRelative(t.createdAt),
     amount: (t.type === 'INCOME' ? '+ ' : '- ') + formatRupiah(t.amount),
-    amountColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-emerald-500',
+    amountColor: t.type === 'EXPENSE' ? 'text-status-danger' : 'text-status-success',
     icon: t.type === 'EXPENSE' ? ArrowDownIcon : ArrowUpIcon,
-    iconBg: t.type === 'EXPENSE' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20',
-    iconColor: t.type === 'EXPENSE' ? 'text-red-500' : 'text-emerald-500',
+    iconBg: t.type === 'EXPENSE' ? 'bg-status-danger/10' : 'bg-status-success/10',
+    iconColor: t.type === 'EXPENSE' ? 'text-status-danger' : 'text-status-success',
   }))
 );
 

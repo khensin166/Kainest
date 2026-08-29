@@ -16,11 +16,11 @@
       />
       <div class="flex items-center truncate">
         <span
-          class="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white"
+          class="truncate ml-2 text-sm font-medium text-text-primary group-hover:text-text-secondary"
           >{{ authStore.user?.displayName }}</span
         >
         <svg
-          class="w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500"
+          class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted"
           viewBox="0 0 12 12"
         >
           <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -37,16 +37,16 @@
     >
       <div
         v-show="dropdownOpen"
-        class="origin-top-right z-10 absolute top-full min-w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1"
+        class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded-lg shadow-none overflow-hidden mt-1"
         :class="align === 'right' ? 'right-0' : 'left-0'"
       >
         <div
-          class="pt-0.5 pb-2 px-3 mb-1 border-b border-gray-200 dark:border-gray-700/60"
+          class="pt-0.5 pb-2 px-3 mb-1 border-b border-border-default"
         >
-          <div class="font-medium text-gray-800 dark:text-gray-100">
+          <div class="font-medium text-text-primary">
             {{ authStore.user?.displayName }}
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 italic">
+          <div class="text-xs text-text-muted italic">
             Pengguna
           </div>
         </div>
@@ -58,7 +58,7 @@
           <li>
             <a
               href="#"
-              class="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3"
+              class="font-medium text-sm text-brand-primary hover:text-brand-primary-hover flex items-center py-1 px-3"
               @click.prevent="openLogoutModal"
             >
               Logout
@@ -77,13 +77,13 @@
       <template #header>
         <DialogTitle
           as="h3"
-          class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
+          class="text-lg font-medium leading-6 text-text-primary"
         >
           Konfirmasi Logout
         </DialogTitle>
       </template>
       <template #body>
-        <p class="text-sm mt-4 text-gray-600 dark:text-gray-300">
+        <p class="text-sm mt-4 text-text-muted">
           Apakah Anda yakin ingin keluar dari sesi ini?
         </p>
       </template>

@@ -30,6 +30,21 @@ export const formatRupiahNoSymbol = (value) => {
   }).format(num);
 };
 
+/**
+ * Mengubah string berformat Rupiah kembali menjadi angka murni.
+ * Mendukung: "Rp 1.500.000", "1.500.000", "1500000"
+ * @param {string|number} value
+ * @returns {number}
+ */
+export const parseRupiahToNumber = (value) => {
+  if (value === null || value === undefined || value === '') return 0;
+  if (typeof value === 'number') return value;
+  // Hapus semua karakter kecuali angka
+  const cleaned = String(value).replace(/[^0-9]/g, '');
+  const parsed = parseInt(cleaned, 10);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 export const getCssVariable = (variable) => {
   return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
 };

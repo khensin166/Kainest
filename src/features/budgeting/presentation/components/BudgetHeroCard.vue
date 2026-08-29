@@ -56,39 +56,41 @@ const isDetailsExpanded = ref(false);
 
 <template>
   <div
-    class="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-white dark:bg-gray-800 shadow-xs rounded-xl border border-gray-100 dark:border-gray-700/60 overflow-hidden relative">
+    class="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-surface-card shadow-xs rounded-xl border border-border-default overflow-hidden relative">
 
-    <!-- Glassmorphism sheen -->
+    <!-- Glassmorphism sheen — otomatis dinonaktifkan oleh .theme-factory override -->
     <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 dark:from-white/5 dark:to-white/0 pointer-events-none rounded-xl"></div>
 
     <div class="px-5 pt-5 pb-5 relative z-10 flex flex-col h-full">
       <header class="flex justify-between items-start mb-1">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Ringkasan Keuangan</h2>
+        <h2 class="text-lg font-semibold text-text-primary">Ringkasan Keuangan</h2>
       </header>
-      <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-4 tracking-wider">
+      <div class="text-xs font-semibold text-text-faint uppercase mb-4 tracking-wider">
         Periode: {{ monthName }}
       </div>
 
       <div class="flex flex-col gap-3 flex-1">
 
         <!-- [ROW 1] Sisa Gaji Pokok (Hero Number) -->
-        <div class="flex flex-col items-center justify-center px-4 py-5 bg-gray-50/80 dark:bg-gray-900/50 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-inner text-center">
-          <div class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
+        <div class="flex flex-col items-center justify-center px-4 py-5 bg-surface-subtle rounded-xl border border-border-default text-center">
+          <div class="text-xs font-bold text-text-muted uppercase tracking-widest mb-1">
             Sisa Gaji Pokok
           </div>
-          <div class="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight leading-none mb-3">
+          <div class="text-3xl font-black text-text-primary tracking-tight leading-none mb-3">
             {{ formatCurrency(totalRemaining) }}
           </div>
           <div class="flex flex-wrap items-center justify-center gap-2">
             <!-- MoM Remaining Badge -->
             <div v-if="momRemaining !== null"
-                 class="text-xs font-bold flex items-center px-2 py-1 rounded-md shadow-sm"
-                 :class="momRemaining >= 0 ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/40 border border-green-200 dark:border-green-800/50' : 'text-red-500 bg-red-100 dark:text-red-400 dark:bg-red-900/40 border border-red-200 dark:border-red-800/50'">
+                 class="text-xs font-bold flex items-center px-2 py-1 rounded-md border"
+                 :class="momRemaining >= 0
+                   ? 'text-status-success-text bg-status-success-bg border-status-success/30'
+                   : 'text-status-danger-text bg-status-danger-bg border-status-danger/30'">
               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="momRemaining >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
               {{ Math.abs(momRemaining) }}% vs bulan lalu
             </div>
             <!-- Unallocated Badge -->
-            <div v-if="unallocated > 0" class="text-xs font-bold flex items-center px-2 py-1 rounded-md text-amber-700 bg-amber-100 dark:text-amber-400 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-800/50 shadow-sm">
+            <div v-if="unallocated > 0" class="text-xs font-bold flex items-center px-2 py-1 rounded-md text-status-warning-text bg-status-warning-bg border border-status-warning/30">
               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
               {{ formatCurrency(unallocated) }} belum dialokasikan
             </div>
@@ -96,19 +98,21 @@ const isDetailsExpanded = ref(false);
         </div>
 
         <!-- [ROW 2] Pengeluaran — full width, always visible -->
-        <div class="flex items-center justify-between p-3.5 bg-gradient-to-r from-rose-50 to-red-50/30 dark:from-rose-900/25 dark:to-red-900/10 rounded-xl border border-red-100/60 dark:border-red-800/30 transition-all hover:shadow-sm">
+        <div class="flex items-center justify-between p-3.5 bg-status-danger-bg rounded-xl border border-status-danger/20 transition-all">
           <div class="flex items-center gap-2.5">
-            <div class="p-1.5 bg-red-100 dark:bg-red-800/60 rounded-lg text-red-600 dark:text-red-300">
+            <div class="p-1.5 bg-status-danger-bg rounded-lg text-status-danger">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
             </div>
             <div>
-              <div class="text-[10px] font-bold text-red-800/70 dark:text-red-400/80 uppercase tracking-widest">Pengeluaran Bulan Ini</div>
-              <div class="text-base font-bold text-gray-800 dark:text-gray-100 tracking-tight">{{ formatCurrency(totalSpent) }}</div>
+              <div class="text-[10px] font-bold text-status-danger-text uppercase tracking-widest">Pengeluaran Bulan Ini</div>
+              <div class="text-base font-bold text-text-primary tracking-tight">{{ formatCurrency(totalSpent) }}</div>
             </div>
           </div>
           <div v-if="momSpent !== null"
                class="text-xs font-bold flex items-center px-2 py-1 rounded-md"
-               :class="momSpent <= 0 ? 'text-green-600 bg-green-100/60 dark:text-green-400 dark:bg-green-900/30' : 'text-red-500 bg-red-100/60 dark:text-red-400 dark:bg-red-900/30'">
+               :class="momSpent <= 0
+                 ? 'text-status-success-text bg-status-success-bg'
+                 : 'text-status-danger-text bg-status-danger-bg'">
             <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSpent >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
             {{ Math.abs(momSpent) }}%
           </div>
@@ -120,30 +124,32 @@ const isDetailsExpanded = ref(false);
              :class="isDetailsExpanded ? 'block' : 'hidden sm:grid'">
 
           <!-- Gaji Utama -->
-          <div class="flex flex-col p-3 bg-gradient-to-br from-indigo-50/60 to-blue-50/30 dark:from-indigo-900/20 dark:to-blue-900/10 rounded-lg border border-indigo-100/60 dark:border-indigo-800/30 transition-all hover:shadow-sm min-w-0">
+          <div class="flex flex-col p-3 bg-surface-subtle rounded-lg border border-border-default transition-all min-w-0">
             <div class="flex items-center gap-1.5 mb-2">
-              <div class="p-1 bg-indigo-100 dark:bg-indigo-800/60 rounded text-indigo-600 dark:text-indigo-300 shrink-0">
+              <div class="p-1 bg-surface-hover rounded text-brand-primary shrink-0">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
-              <div class="text-[10px] font-bold text-indigo-800/70 dark:text-indigo-400/80 uppercase tracking-wide truncate">Gaji Utama</div>
+              <div class="text-[10px] font-bold text-text-muted uppercase tracking-wide truncate">Gaji Utama</div>
             </div>
-            <div class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1 truncate">{{ formatCurrency(totalSalary) }}</div>
-            <div v-if="momSalary !== null" class="text-[10px] font-bold flex items-center" :class="momSalary >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+            <div class="text-sm font-bold text-text-primary mb-1 truncate">{{ formatCurrency(totalSalary) }}</div>
+            <div v-if="momSalary !== null" class="text-[10px] font-bold flex items-center"
+                 :class="momSalary >= 0 ? 'text-status-success' : 'text-status-danger'">
               <svg class="w-3 h-3 mr-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSalary >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
               {{ Math.abs(momSalary) }}%
             </div>
           </div>
 
           <!-- Pemasukan Tambahan -->
-          <div class="flex flex-col p-3 bg-gradient-to-br from-violet-50/60 to-fuchsia-50/30 dark:from-violet-900/20 dark:to-fuchsia-900/10 rounded-lg border border-violet-100/60 dark:border-violet-800/30 transition-all hover:shadow-sm min-w-0">
+          <div class="flex flex-col p-3 bg-surface-subtle rounded-lg border border-border-default transition-all min-w-0">
             <div class="flex items-center gap-1.5 mb-2">
-              <div class="p-1 bg-violet-100 dark:bg-violet-800/60 rounded text-violet-600 dark:text-violet-300 shrink-0">
+              <div class="p-1 bg-surface-hover rounded text-brand-muted shrink-0">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
               </div>
-              <div class="text-[10px] font-bold text-violet-800/70 dark:text-violet-400/80 uppercase tracking-wide truncate">Tambahan</div>
+              <div class="text-[10px] font-bold text-text-muted uppercase tracking-wide truncate">Tambahan</div>
             </div>
-            <div class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1 truncate">{{ formatCurrency(totalIncome) }}</div>
-            <div v-if="momIncome !== null" class="text-[10px] font-bold flex items-center" :class="momIncome >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+            <div class="text-sm font-bold text-text-primary mb-1 truncate">{{ formatCurrency(totalIncome) }}</div>
+            <div v-if="momIncome !== null" class="text-[10px] font-bold flex items-center"
+                 :class="momIncome >= 0 ? 'text-status-success' : 'text-status-danger'">
               <svg class="w-3 h-3 mr-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momIncome >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
               {{ Math.abs(momIncome) }}%
             </div>
@@ -153,7 +159,7 @@ const isDetailsExpanded = ref(false);
         <!-- Mobile Expand/Collapse Toggle (hidden on desktop) -->
         <button
           @click="isDetailsExpanded = !isDetailsExpanded"
-          class="sm:hidden flex items-center justify-center gap-1.5 w-full py-1.5 text-[11px] font-semibold text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          class="sm:hidden flex items-center justify-center gap-1.5 w-full py-1.5 text-[11px] font-semibold text-text-faint hover:text-text-muted transition-colors">
           <span>{{ isDetailsExpanded ? 'Sembunyikan rincian' : 'Lihat rincian gaji' }}</span>
           <svg class="w-3.5 h-3.5 transition-transform duration-300" :class="isDetailsExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>

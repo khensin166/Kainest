@@ -1,10 +1,16 @@
 <template>
   <!-- Halaman loading sementara saat memproses token dari social login -->
-  <div class="auth-callback-page">
-    <div class="callback-card">
-      <div class="spinner"></div>
-      <h2>Memproses Login...</h2>
-      <p>Sedang memverifikasi sesi Anda, harap tunggu.</p>
+  <div class="min-h-[100dvh] flex items-center justify-center bg-surface-page relative">
+    
+    <!-- Theme Toggle -->
+    <div class="absolute top-6 right-6 z-50">
+      <ThemeToggle />
+    </div>
+
+    <div class="flex flex-col items-center gap-5 p-12 bg-surface-card border border-border-default rounded-3xl text-center max-w-[360px] w-[90%] shadow-none z-10">
+      <div class="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
+      <h2 class="text-2xl font-semibold text-text-primary m-0">Memproses Login...</h2>
+      <p class="text-sm text-text-muted m-0">Sedang memverifikasi sesi Anda, harap tunggu.</p>
     </div>
   </div>
 </template>
@@ -13,6 +19,7 @@
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -54,54 +61,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-.auth-callback-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-}
-
-.callback-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 3rem 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.5rem;
-  backdrop-filter: blur(16px);
-  text-align: center;
-  max-width: 360px;
-  width: 90%;
-}
-
-.callback-card h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #f1f5f9;
-  margin: 0;
-}
-
-.callback-card p {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid rgba(139, 92, 246, 0.2);
-  border-top-color: #8b5cf6;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>

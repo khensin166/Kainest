@@ -4,15 +4,15 @@
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Backup Chat Manager</h1>
-                <p class="text-sm text-gray-500 mt-1">Kelola daftar Chat/Grup yang auto-backup ke database Kainest.</p>
+                <h1 class="text-2xl font-bold text-text-primary">Backup Chat Manager</h1>
+                <p class="text-sm text-text-muted mt-1">Kelola daftar Chat/Grup yang auto-backup ke database Kainest.</p>
             </div>
 
             <div class="flex items-center gap-3">
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                    :class="waStore.apiKey ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                    :class="waStore.apiKey ? 'bg-status-success-bg text-status-success' : 'bg-status-danger-bg text-status-danger'">
                     <span class="w-2 h-2 rounded-full mr-2"
-                        :class="waStore.apiKey ? 'bg-green-600' : 'bg-red-600'"></span>
+                        :class="waStore.apiKey ? 'bg-status-success' : 'bg-status-danger'"></span>
                     {{ waStore.apiKey ? 'Terhubung' : 'Terputus dari Bot API' }}
                 </span>
             </div>
@@ -43,52 +43,52 @@
             <!-- FORM TAMBAH BACKUP -->
             <div class="lg:col-span-1">
                 <div
-                    class="sticky top-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Tambah Target Backup</h3>
+                    class="sticky top-6 bg-surface-card rounded-xl shadow-none border border-border-default p-6">
+                    <h3 class="text-lg font-bold text-text-primary mb-4">Tambah Target Backup</h3>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label class="block text-sm font-medium text-text-primary mb-1">
                                 Pilih dari Daftar Grup
                             </label>
                             <select v-model="formBackup.selectedGroup" @change="onSelectGroup"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm">
+                                class="w-full px-3 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent bg-surface-input text-text-primary text-sm">
                                 <option value="" disabled>-- Pilih Grup --</option>
                                 <option v-for="group in waStore.groups" :key="group.id" :value="group.id">{{ group.name
                                 }}</option>
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">Atau ketik ID secara manual di bawah:</p>
+                            <p class="text-xs text-text-muted mt-1">Atau ketik ID secara manual di bawah:</p>
                         </div>
 
-                        <hr class="border-gray-200 dark:border-gray-700 my-2" />
+                        <hr class="border-border-default my-2" />
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID Chat /
+                            <label class="block text-sm font-medium text-text-primary mb-1">ID Chat /
                                 Grup</label>
                             <input v-model="formBackup.chatId" type="text"
                                 placeholder="e.g. 12345@g.us atau 6281...@s.whatsapp.net"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm font-mono" />
+                                class="w-full px-3 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent bg-surface-input text-text-primary text-sm font-mono" />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama
+                            <label class="block text-sm font-medium text-text-primary mb-1">Nama
                                 Deskriptif</label>
                             <input v-model="formBackup.chatName" type="text" placeholder="e.g. Grup Keluarga"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm" />
+                                class="w-full px-3 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent bg-surface-input text-text-primary text-sm" />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Session
+                            <label class="block text-sm font-medium text-text-primary mb-1">Session
                                 Bot</label>
                             <select v-model="formBackup.sessionId"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm">
+                                class="w-full px-3 py-2 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent bg-surface-input text-text-primary text-sm">
                                 <option value="backup_1">Backup Bot 1 (backup_1)</option>
                                 <option value="primary">Primary Bot (primary)</option>
                             </select>
                         </div>
 
                         <button @click="handleAddTarget"
-                            class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                            class="w-full py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-lg font-medium transition-colors shadow-none disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 border-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,9 +103,9 @@
             <!-- DAFTAR TARGET -->
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Backup Targets</h3>
+                    <h3 class="text-lg font-bold text-text-primary">Daftar Backup Targets</h3>
                     <button @click="fetchData" :disabled="waStore.isLoading"
-                        class="px-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2">
+                        class="px-3 py-1.5 text-sm bg-surface-subtle border border-border-default rounded-lg hover:bg-surface-hover text-text-primary transition-colors flex items-center gap-2">
                         <svg v-if="waStore.isLoading" class="animate-spin h-3 w-3" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                             </circle>
@@ -118,23 +118,23 @@
                 </div>
 
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    class="bg-surface-card rounded-xl shadow-none border border-border-default overflow-hidden">
                     <div class="overflow-x-auto min-h-[400px]">
                         <table class="w-full text-left text-sm table-pin-rows">
                             <thead
-                                class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+                                class="bg-surface-subtle border-b border-border-default sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-6 py-4 font-semibold text-gray-900 dark:text-white">Deskripsi</th>
-                                    <th class="px-6 py-4 font-semibold text-gray-900 dark:text-white">Chat ID (Target)
+                                    <th class="px-6 py-4 font-semibold text-text-primary">Deskripsi</th>
+                                    <th class="px-6 py-4 font-semibold text-text-primary">Chat ID (Target)
                                     </th>
-                                    <th class="px-6 py-4 font-semibold text-gray-900 dark:text-white">Sesi Listener</th>
-                                    <th class="px-6 py-4 font-semibold text-gray-900 dark:text-white text-right">Aksi
+                                    <th class="px-6 py-4 font-semibold text-text-primary">Sesi Listener</th>
+                                    <th class="px-6 py-4 font-semibold text-text-primary text-right">Aksi
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody class="divide-y divide-border-default">
                                 <tr v-if="waStore.backupTargets.length === 0 && !waStore.isLoading"
-                                    class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                    class="hover:bg-surface-hover">
                                     <td colspan="4" class="p-0">
                                         <BaseEmptyState 
                                             icon="📋"
@@ -145,19 +145,19 @@
                                     </td>
                                 </tr>
                                 <tr v-for="target in waStore.backupTargets" :key="target.id"
-                                    class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ target.name
+                                    class="hover:bg-surface-hover transition-colors">
+                                    <td class="px-6 py-4 font-medium text-text-primary">{{ target.name
                                         || '-' }}</td>
-                                    <td class="px-6 py-4 font-mono text-xs text-gray-500">{{ target.chat_id }}</td>
+                                    <td class="px-6 py-4 font-mono text-xs text-text-muted">{{ target.chat_id }}</td>
                                     <td class="px-6 py-4">
                                         <span
-                                            class="px-2 py-1 rounded text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                            class="px-2 py-1 rounded text-xs font-semibold bg-surface-subtle text-text-primary">
                                             {{ target.session_id }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <button @click="handleRemoveTarget(target.id, target.name)"
-                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium text-xs px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+                                            class="text-status-danger font-medium text-xs px-3 py-1.5 rounded-lg hover:bg-status-danger-bg transition-colors">
                                             Hapus
                                         </button>
                                     </td>

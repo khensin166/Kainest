@@ -2,40 +2,40 @@
 <template>
     <div class="p-4 md:p-8 max-w-5xl mx-auto">
         <div v-if="noteStore.isLoadingNote" class="text-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
-            <p class="mt-4 text-gray-500 dark:text-gray-400">Memuat editor...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto"></div>
+            <p class="mt-4 text-text-muted">Memuat editor...</p>
         </div>
 
         <div v-else>
             <!-- Title Input: Plain Tailwind -->
             <input type="text" v-model="title" placeholder="Judul Catatan..."
-                class="w-full text-4xl font-bold bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-800 dark:text-gray-100 mb-6 p-0" />
+                class="w-full text-4xl font-bold bg-transparent border-none focus:ring-0 placeholder-text-muted text-text-primary mb-6 p-0" />
 
             <!-- Editor Container -->
             <div id="editorjs-container" class="min-h-[500px] w-full
-                       bg-gray-50 dark:bg-gray-900 
-                       rounded-xl border border-gray-200 dark:border-gray-700/60 
-                       pt-6 px-4 md:px-6 shadow-sm">
+                       bg-surface-page
+                       rounded-xl border border-border-default
+                       pt-6 px-4 md:px-6 shadow-none">
             </div>
 
             <!-- Action Buttons -->
             <div class="mt-8 flex justify-between items-end sticky bottom-6 z-10">
                 <div
-                    class="flex gap-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-2 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-                    <button @click="onSave" :disabled="noteStore.isLoadingNote" class="px-6 py-2.5 rounded-lg font-medium text-white transition-all
-                               bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="flex gap-3 bg-surface-card backdrop-blur-md p-2 rounded-xl shadow-none border border-border-default">
+                    <button @click="onSave" :disabled="noteStore.isLoadingNote" class="px-6 py-2.5 rounded-lg font-medium text-text-inverse transition-all
+                               bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
                         {{ noteStore.isLoadingNote ? 'Menyimpan...' : 'Simpan Note' }}
                     </button>
 
                     <button @click="openShareModal"
                         class="px-5 py-2.5 rounded-lg font-medium transition-colors
-                               text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
+                               text-text-primary bg-surface-subtle hover:bg-surface-hover">
                         Bagikan
                     </button>
                 </div>
 
                 <button v-if="isEditing" @click="onDelete"
-                    class="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
+                    class="px-4 py-2 text-sm font-medium text-status-danger transition-colors">
                     Hapus
                 </button>
             </div>
@@ -258,8 +258,7 @@ h3.ce-header {
 /* 4. Fix warna text untuk Dark Mode secara manual jika inherit gagal */
 .dark .ce-header,
 .dark .ce-paragraph {
-    color: #e5e7eb !important;
-    /* gray-200 */
+    color: var(--color-text-primary) !important;
 }
 
 /* 5. Block Tunes & Popover (Dark Mode Overrides) */
@@ -270,19 +269,16 @@ h3.ce-header {
 .dark .ce-conversion-toolbar,
 .dark .ce-settings,
 .dark .ce-toolbar__settings-btn {
-    background-color: #1f2937 !important;
-    /* bg-gray-800 */
-    border-color: #374151 !important;
-    /* border-gray-700 */
-    color: #e5e7eb !important;
-    /* text-gray-200 */
+    background-color: var(--color-surface-card) !important;
+    border-color: var(--color-border-default) !important;
+    color: var(--color-text-primary) !important;
 }
 
 /* Item di dalam popover (Text & Icon) */
 .dark .ce-popover-item,
 .dark .ce-conversion-tool,
 .dark .ce-inline-tool {
-    color: #e5e7eb !important;
+    color: var(--color-text-primary) !important;
 }
 
 /* Icon SVG fill */
@@ -291,7 +287,7 @@ h3.ce-header {
 .dark .ce-inline-tool__icon,
 .dark .ce-toolbar__plus,
 .dark .ce-toolbar__settings-btn {
-    color: #e5e7eb !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
@@ -302,27 +298,24 @@ h3.ce-header {
 .dark .ce-toolbar__settings-btn:hover,
 .dark .ce-toolbar__plus:hover,
 .dark .ce-settings__button:hover {
-    background-color: #374151 !important;
-    /* bg-gray-700 */
-    color: #ffffff !important;
+    background-color: var(--color-surface-hover) !important;
+    color: var(--color-text-primary) !important;
 }
 
 /* Active States */
 .dark .ce-popover-item--active,
 .dark .ce-inline-tool--active,
 .dark .ce-conversion-tool--active {
-    background-color: #4b5563 !important;
-    /* bg-gray-600 */
-    color: #ffffff !important;
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-text-inverse) !important;
 }
 
 /* Search Input di Toolbox */
 .dark .cdx-search-field,
 .dark .ce-popover__search {
-    background-color: #111827 !important;
-    /* bg-gray-900 */
-    color: #e5e7eb !important;
-    border-color: #374151 !important;
+    background-color: var(--color-surface-input) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border-default) !important;
 }
 
 /* Custom Text dalam Toolbox */
@@ -334,16 +327,15 @@ h3.ce-header {
 /* Menghilangkan shadow putih jika ada */
 .dark .ce-popover--opened,
 .dark .ce-inline-toolbar {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: none !important;
 }
 
 /* Plus button background fix */
 .dark .ce-toolbar__plus {
-    color: #9ca3af !important;
-    /* gray-400 */
+    color: var(--color-text-muted) !important;
 }
 
 .dark .ce-toolbar__plus:hover {
-    color: #e5e7eb !important;
+    color: var(--color-text-primary) !important;
 }
 </style>

@@ -5,8 +5,8 @@
     @click.self="closeModal" 
     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4"
   >
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
-      <h2 class="text-xl font-bold mb-4">Bagikan Catatan</h2>
+    <div class="bg-surface-card rounded-lg shadow-none border border-border-default w-full max-w-md p-6">
+      <h2 class="text-xl font-bold mb-4 text-text-primary">Bagikan Catatan</h2>
       
       <div class="form-control mb-4">
         <label class="label cursor-pointer justify-start space-x-3">
@@ -17,7 +17,7 @@
           />
           <span class="label-text font-semibold">Bagikan ke Publik (Web)</span>
         </label>
-        <p class="text-xs text-gray-500 mt-1 ml-1">
+        <p class="text-xs text-text-muted mt-1 ml-1">
           Siapa pun yang memiliki tautan dapat melihat note ini.
         </p>
         <div v-if="shareSettings.is_public" class="mt-2">
@@ -42,7 +42,7 @@
           />
           <span class="label-text font-semibold">Bagikan ke Pasangan</span>
         </label>
-        <p class="text-xs text-gray-500 mt-1 ml-1">
+        <p class="text-xs text-text-muted mt-1 ml-1">
           Pasangan Anda dapat mengakses note ini dari akun mereka.
         </p>
         
@@ -63,7 +63,7 @@
         <button 
           @click="saveSettings" 
           :disabled="noteStore.isLoadingNote"
-          class="btn btn-primary bg-violet-600 text-white"
+          class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse border-none"
         >
           {{ noteStore.isLoadingNote ? 'Menyimpan...' : 'Simpan' }}
         </button>

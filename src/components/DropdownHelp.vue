@@ -2,14 +2,13 @@
   <div class="relative inline-flex">
     <button
       ref="trigger"
-      class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full"
-      :class="{ 'bg-gray-200 dark:bg-gray-800': dropdownOpen }"
+      class="w-8 h-8 flex items-center justify-center hover:bg-surface-hover rounded-full"
       aria-haspopup="true"
-      @click.stop="toggle"
+      @click.prevent="dropdownOpen = !dropdownOpen"
       :aria-expanded="dropdownOpen"
     >
-      <span class="sr-only">Info</span>
-      <svg class="fill-current text-gray-500/80 dark:text-gray-400/80" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+      <span class="sr-only">Need help?</span>
+      <svg class="w-4 h-4 fill-current text-text-muted" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
         <path d="M9 7.5a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
         <path fill-rule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16Zm6-8A6 6 0 1 1 2 8a6 6 0 0 1 12 0Z" />
       </svg>
@@ -31,15 +30,13 @@
       leave-to-class="opacity-0"
     >
       <div v-show="dropdownOpen" ref="dropdown"
-        class="z-30 min-w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden
-               sm:absolute sm:top-full sm:mt-1
-               fixed left-1/2 -translate-x-1/2 top-16 sm:transform-none"
-        :class="align === 'right' ? 'sm:right-0' : 'sm:left-0'">
+        class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded-lg shadow-none overflow-hidden mt-1"
+        :class="align === 'right' ? 'right-0' : 'left-0'">
 
         <div class="flex items-center justify-between px-3 pt-1.5 pb-2">
-          <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase">Need help?</div>
+          <div class="text-xs font-semibold text-text-muted uppercase">Need help?</div>
           <!-- Close button (mobile) -->
-          <button @click.stop="close" class="sm:hidden w-5 h-5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
+          <button @click.stop="close" class="sm:hidden w-5 h-5 flex items-center justify-center rounded-full hover:bg-surface-hover text-text-muted">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
             </svg>
