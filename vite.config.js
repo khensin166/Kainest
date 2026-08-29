@@ -22,18 +22,16 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("vue")) return "vendor-vue";
-            if (id.includes("pinia")) return "vendor-pinia";
-            if (id.includes("axios")) return "vendor-axios";
-            return "vendor-core"; // semua pustaka eksternal lainnya
-          }
-        },
-      },
-    },
+    // manualChunks SENGAJA TIDAK DIPAKAI.
+    // Konfigurasi lama memakai `id.includes("vue")` yang menyapu 8 paket
+    // (@vue, @vueuse, vue-router, vue-chartjs, vue-flatpickr-component,
+    // vue3-toastify, qrcode.vue) ke chunk "vendor-vue", sementara reka-ui,
+    // chart.js, dan flatpickr masuk "vendor-core". Kedua chunk jadi saling
+    // bergantung, dan Rollup tidak bisa menjamin urutan inisialisasinya:
+    //   ReferenceError: Cannot access 'Bu' before initialization
+    // Error itu HANYA muncul di build produksi, tidak di dev server — sehingga
+    // lolos sampai ke Vercel dan membuat halaman kosong.
+    // Pemecahan chunk otomatis Rollup aman terhadap siklus; biarkan dia bekerja.
     // (Opsional) Jika masih ada chunk di atas 500kb, naikkan batas warning agar terminal tidak berisik
     chunkSizeWarningLimit: 600,
   },

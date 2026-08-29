@@ -1,6 +1,6 @@
 # Kainest Architecture
 
-**Versi:** 1.3 · **Last Updated:** 2026-08-30
+**Versi:** 1.4 · **Last Updated:** 2026-08-30
 
 > Dokumen ini mendeskripsikan struktur yang **benar-benar ada di kode**, termasuk
 > bagian yang belum konsisten. Pendampingnya adalah [KAINEST_DESIGN.md](KAINEST_DESIGN.md)
@@ -354,3 +354,26 @@ menampilkan Dashboard lagi tanpa penjelasan. Kini memakai `ComingSoonPage.vue`.
 mengabaikan komentar. Perluasan ini langsung menangkap tujuh berkas yang memakai
 `<PageGuide>` tanpa meng-*import*-nya — build tetap hijau, tapi halamannya mati saat
 dibuka.
+
+### 30 Agustus 2026 — Situs produksi tampil kosong
+
+Setelah deploy ke Vercel, seluruh halaman kosong meski semua aset termuat (12
+request, status 200/304). Penyebabnya **bukan** routing, env var, maupun CORS:
+
+```
+ReferenceError: Cannot access 'Bu' before initialization
+  at vendor-vue-*.js   <-dipanggil dari-   vendor-core-*.js
+```
+
+`manualChunks` di `vite.config.js` memakai `id.includes("vue")`, yang menyapu
+delapan paket (`@vue`, `@vueuse`, `vue-router`, `vue-chartjs`,
+`vue-flatpickr-component`, `vue3-toastify`, `qrcode.vue`) ke chunk `vendor-vue`,
+sementara `reka-ui`, `chart.js`, dan `flatpickr` masuk `vendor-core`. Kedua chunk
+saling mengimpor, dan Rollup tidak bisa menjamin urutan inisialisasinya.
+
+`manualChunks` dilepas; pemecahan otomatis Rollup aman terhadap siklus.
+
+**Pelajarannya lebih penting daripada perbaikannya:** kelas bug ini **tidak bisa
+muncul di dev server**, karena Vite memuat modul ES satu per satu tanpa
+menggabungkannya. Sejak sekarang, `npm run build && npm run preview` wajib
+dijalankan sebelum deploy.
