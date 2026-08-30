@@ -6,6 +6,7 @@ import {
   left,
   right,
   ServerFailure,
+  taggedServerFailure,
   GeneralFailure,
 } from "../../../../core/error/failure"; // Pastikan failure.js Anda memiliki GeneralFailure
 
@@ -29,7 +30,7 @@ export class ProfileRepository extends IProfileRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil profil."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -51,7 +52,7 @@ export class ProfileRepository extends IProfileRepository {
         return left(new ServerFailure(response.message || "Gagal update profil."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -79,7 +80,7 @@ export class ProfileRepository extends IProfileRepository {
         return left(new GeneralFailure("Gagal upload ke Cloudinary."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.message || "Proses upload gagal."));
+      return left(taggedServerFailure(error, error.message || "Proses upload gagal."));
     }
   }
 }

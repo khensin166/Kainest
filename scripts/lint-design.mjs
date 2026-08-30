@@ -13,6 +13,7 @@ import { globSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const RULES = [
+
   { id:'no-shadow-none',  level:'error', ext:['.vue'],
     re:/(?<![-:\w])shadow-none(?![-\w])/g,
     msg:'`shadow-none` adalah default — fosil find-and-replace. Hapus class-nya.' },
@@ -91,6 +92,15 @@ const EXEMPT = [
 const exempt = (ruleId, file, line) =>
   EXEMPT.some(e => e.rule === ruleId && (e.file ? e.file.test(file) : true) && (e.line ? e.line.test(line) : true))
 
+/**
+ * Komponen Options API (tanpa `<script setup>`) WAJIB mendaftarkan komponen di
+ * blok `components: {}`. Tanpa itu, Vue merender tag literal seperti
+ * `<iconmenu>` — elemen HTML tak dikenal berukuran 0x0. Tidak ada error di
+ * console, build tetap hijau, tombolnya sekadar hilang dari layar.
+ * Ini pernah membuat hamburger sidebar tak terlihat di mobile.
+ */
+const komponenTakTerdaftar = []
+
 const files = execSync('git ls-files "src/**/*.vue" "src/**/*.js"', { encoding:'utf8' })
   .split('\n').filter(Boolean)
 
@@ -119,6 +129,18 @@ for (const f of files) {
   const ext = f.slice(f.lastIndexOf('.'))
   const src = readFileSync(f, 'utf8')
   const lines = src.split('\n')
+  if (ext === '.vue' && !src.includes('<script setup>') && /<script/.test(src)) {
+    const tpl = src.match(/<template>([\s\S]*)<\/template>/)
+    if (tpl) {
+      const dipakai = new Set([...tpl[1].matchAll(/<(Icon[A-Z][A-Za-z]*|Spinner|PageGuide)\b/g)].map(m => m[1]))
+      const blok = src.match(/components:\s*\{([^}]*)\}/)
+      const terdaftar = new Set(blok ? blok[1].split(',').map(x => x.trim().split(':')[0]) : [])
+      for (const nama of dipakai) {
+        if (!terdaftar.has(nama)) komponenTakTerdaftar.push(`${f}  ->  <${nama}/>`)
+      }
+    }
+  }
+
   if (ext === '.vue') {
     lines.forEach((line, i) => {
       for (const m of line.matchAll(TOKEN_PREFIX)) {
@@ -224,6 +246,10 @@ for (const tok of [...allTokens].sort()) {
 console.log(`  [${parityGaps.length === 0 ? ' OK  ' : 'GAGAL'}] ${pad('no-theme-parity-gap', 20)} ${pad(parityGaps.length, 5)}  Token semantik tidak ada di semua tema — class jadi kosong di tema itu.`)
 for (const g of parityGaps) console.log(`            ${g}`)
 errors += parityGaps.length
+
+console.log(`  [${komponenTakTerdaftar.length === 0 ? ' OK  ' : 'GAGAL'}] ${pad('no-unregistered-comp', 20)} ${pad(komponenTakTerdaftar.length, 5)}  Komponen dipakai di Options API tanpa didaftarkan di components:{} — dirender jadi tag kosong 0x0.`)
+for (const x of komponenTakTerdaftar) console.log(`            ${x}`)
+errors += komponenTakTerdaftar.length
 
 const nUndef = [...undefinedTokens.values()].reduce((a, b) => a + b.length, 0)
 console.log(`  [${nUndef === 0 ? ' OK  ' : 'GAGAL'}] ${pad('no-undefined-token', 20)} ${pad(nUndef, 5)}  Token dipakai tapi tidak ada di @theme — class tidak menghasilkan CSS.`)

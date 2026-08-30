@@ -874,9 +874,15 @@
 
 /* --- Animasi dialog (dipakai BaseModal & ui/Modal) --- */
 @keyframes kainest-fade-in { from { opacity: 0 } to { opacity: 1 } }
+/* PENTING: jangan menganimasikan `transform` di sini.
+   Tailwind v4 memakai properti `translate` (bukan `transform`) untuk utility
+   -translate-x-1/2 / -translate-y-1/2 yang memusatkan modal. Keduanya berlaku
+   bersamaan, sehingga `transform: translate(-50%,-48%)` menambah pergeseran
+   menjadi total -100%,-98% — modal tampak melompat dari pojok kiri-atas ke
+   tengah. Cukup animasikan `scale` dan `opacity`; keduanya tidak bertabrakan. */
 @keyframes kainest-pop-in  {
-  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96) }
-  to   { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+  from { opacity: 0; scale: 0.96 }
+  to   { opacity: 1; scale: 1 }
 }
 .kainest-fade-in[data-state="open"] { animation: kainest-fade-in 180ms ease-out }
 .kainest-pop-in[data-state="open"]  { animation: kainest-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1) }

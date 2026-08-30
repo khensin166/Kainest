@@ -58,6 +58,8 @@ api.interceptors.response.use(
           "Fitur ini baru bisa dipakai setelah kamu menautkan pasangan. Buka Pengaturan → Pasangan untuk menautkannya.",
         newStatus: "warning",
       });
+      // Ditandai agar notify.error() tidak memunculkan toast di atas modal ini.
+      error.__handled = true;
     }
 
     // Tetap teruskan error

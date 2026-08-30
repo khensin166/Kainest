@@ -1,7 +1,7 @@
 import { IDashboardRepository } from "../../domain/repository/IDashboardRepository";
 import { DashboardRemoteSource } from "../source/DashboardRemoteSource";
 import { DashboardMapper } from "../mappers/DashboardMapper";
-import { left, right, ServerFailure } from "@/core/error/failure";
+import { left, right, ServerFailure, taggedServerFailure } from "@/core/error/failure";
 
 export class DashboardRepository extends IDashboardRepository {
   constructor() {
@@ -14,7 +14,7 @@ export class DashboardRepository extends IDashboardRepository {
       const data = await this.remoteSource.getSystemUpdates();
       return right(DashboardMapper.mapSystemUpdateList(data?.updates));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -23,7 +23,7 @@ export class DashboardRepository extends IDashboardRepository {
       const data = await this.remoteSource.syncSystemUpdates();
       return right({ newlyAdded: data?.newlyAdded ?? 0, blasted: data?.blasted ?? 0 });
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -32,7 +32,7 @@ export class DashboardRepository extends IDashboardRepository {
       const data = await this.remoteSource.getFeedbacks();
       return right(DashboardMapper.mapFeedbackList(data?.feedbacks));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -41,7 +41,7 @@ export class DashboardRepository extends IDashboardRepository {
       await this.remoteSource.submitFeedback(payload);
       return right(true);
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -50,7 +50,7 @@ export class DashboardRepository extends IDashboardRepository {
       await this.remoteSource.hideFeedback(id);
       return right(true);
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 }

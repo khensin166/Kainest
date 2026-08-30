@@ -1,5 +1,6 @@
 // src/features/couple/presentation/stores/useCoupleStore.js
 import { defineStore } from "pinia";
+import { notify } from "@/lib/notify";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 import { 
@@ -29,11 +30,7 @@ export const useCoupleStore = defineStore("couple", () => {
     if (result.right) {
       connectionStatus.value = result.right; // Simpan CoupleEntity
     } else {
-      modalStore.openModal({
-        newTitle: "Error",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
     }
   }
 
@@ -48,6 +45,7 @@ export const useCoupleStore = defineStore("couple", () => {
     if (result.right) {
       // Sukses! 'result.right' adalah CoupleEntity baru dari getCoupleStatus
       connectionStatus.value = result.right;
+      // lint-ok: momen sekali seumur akun, diikuti pindah halaman
       modalStore.openModal({
         newTitle: "Berhasil!",
         newMessage: "Anda sekarang terhubung dengan pasangan Anda.",
@@ -55,11 +53,7 @@ export const useCoupleStore = defineStore("couple", () => {
       });
     } else {
       // Gagal
-      modalStore.openModal({
-        newTitle: "Gagal Terhubung",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left));
     }
   }

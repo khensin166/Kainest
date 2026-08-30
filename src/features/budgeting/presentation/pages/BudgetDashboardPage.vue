@@ -164,10 +164,14 @@ onActivated(async () => {
           Alokasikan dan pantau keuangan Anda ke berbagai kantong agar pengeluaran terkendali.
         </p>
       </div>
-      <!-- Action Buttons: icon-only for Atur Gaji on mobile, flex-1 for others -->
-      <div class="flex flex-row w-full sm:w-auto justify-start sm:justify-end gap-2">
+      <!-- Aksi: di layar sempit dua tombol sekunder jadi ikon sebaris, dan aksi
+           utama turun ke bawah selebar layar. Sebelumnya ketiganya sebaris dengan
+           dua di antaranya berlabel penuh, sehingga terpotong di layar ~412px. -->
+      <div class="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:items-center sm:justify-end">
 
-        <!-- Atur Gaji: icon-only on mobile, icon+text on desktop -->
+        <!-- Sekunder: ikon saja di mobile -->
+        <div class="flex gap-2">
+
         <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
             <Button variant="secondary" @click="isSetupModalOpen = true" class="shrink-0">
@@ -178,20 +182,21 @@ onActivated(async () => {
           <div class="text-sm">Tetapkan total gajimu bulan ini untuk dibagi ke dalam kantong.</div>
         </Tooltip>
 
-        <!-- Kelola Kantong: flex-1 on mobile -->
-        <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
+        <Tooltip bg="dark" size="md" position="bottom">
           <template #trigger>
-            <Button variant="secondary" block @click="openPocketModal" :class="budgetStore.salary> 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-brand-primary hover:bg-brand-primary-hover text-text-inverse ring-4 ring-brand-primary/20 animate-pulse border-transparent' : 'bg-surface-card hover:border-border-strong text-brand-primary'">
+            <Button variant="secondary" class="shrink-0" @click="openPocketModal" :class="budgetStore.salary> 0 && (!budgetStore.budgetCategories || budgetStore.budgetCategories.length === 0) ? 'bg-brand-primary hover:bg-brand-primary-hover text-text-inverse ring-4 ring-brand-primary/20 animate-pulse border-transparent' : 'bg-surface-card hover:border-border-strong text-brand-primary'">
               <!-- Wallet Icon -->
-              <IconCard class="w-4 h-4 shrink-0 mr-2" aria-hidden="true" />
-              <span>Kelola Kantong</span>
+              <IconCard class="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span class="hidden sm:inline ml-2">Kelola Kantong</span>
             </Button>
           </template>
           <div class="text-sm">Buat, edit, atau hapus kategori kantong persentase/nominal.</div>
         </Tooltip>
 
-        <!-- Catat Transaksi: flex-1 on mobile -->
-        <Tooltip bg="dark" size="md" position="bottom" class="flex-1 sm:flex-none">
+        </div>
+
+        <!-- Aksi utama: selebar layar di mobile -->
+        <Tooltip bg="dark" size="md" position="bottom" class="w-full sm:w-auto">
           <template #trigger>
             <Button variant="primary" block @click="openTransactionModal">
               <IconAdd class="w-4 h-4 fill-current opacity-75 shrink-0" aria-hidden="true" />

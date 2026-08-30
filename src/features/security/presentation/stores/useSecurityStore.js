@@ -1,5 +1,6 @@
 // src/features/security/presentation/stores/useSecurityStore.js
 import { defineStore } from "pinia";
+import { notify } from "@/lib/notify";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 import { changePasswordUseCase } from "../../../../core/di/di";
@@ -30,19 +31,11 @@ export const useSecurityStore = defineStore("security", () => {
           ? failure.message
           : mapFailureToMessage(failure);
 
-      modalStore.openModal({
-        newTitle: "Gagal Mengubah Password",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
       throw new Error(message);
     } else {
       // Sukses
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Password Anda telah berhasil diperbarui.",
-        newStatus: "success",
-      });
+      notify.success("Password Anda telah berhasil diperbarui.");
     }
   }
 

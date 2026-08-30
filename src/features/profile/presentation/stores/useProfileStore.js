@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { notify } from "@/lib/notify";
 import { ref } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 import { useAuthStore } from "../../../auth/presentation/stores/authStore";
@@ -39,11 +40,7 @@ export const useProfileStore = defineStore("profile", () => {
     } else {
       // Gagal
       const message = mapFailureToMessage(result.left);
-      modalStore.openModal({
-        newTitle: "Gagal Memuat Profil",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
     }
   }
 
@@ -60,21 +57,13 @@ export const useProfileStore = defineStore("profile", () => {
 
     if (result.left) {
       const message = mapFailureToMessage(result.left);
-      modalStore.openModal({
-        newTitle: "Gagal Update Profil",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
       throw new Error(message);
     } else {
       // BERHASIL! Update data user di authStore
       // Gabungkan data agar permissions & role dari session sebelumnya tidak hilang
       authStore.setUser({ ...authStore.user, ...result.right }); 
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Profil Anda telah diperbarui.",
-        newStatus: "success",
-      });
+      notify.success("Profil Anda telah diperbarui.");
     }
   }
 
@@ -90,21 +79,13 @@ export const useProfileStore = defineStore("profile", () => {
 
     if (result.left) {
       const message = mapFailureToMessage(result.left);
-      modalStore.openModal({
-        newTitle: "Gagal Upload Foto",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
       throw new Error(message);
     } else {
       // BERHASIL! Update data user di authStore
       // Gabungkan data agar permissions & role dari session sebelumnya tidak hilang
       authStore.setUser({ ...authStore.user, ...result.right }); 
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Foto profil telah diperbarui.",
-        newStatus: "success",
-      });
+      notify.success("Foto profil telah diperbarui.");
     }
   }
 

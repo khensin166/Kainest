@@ -57,6 +57,7 @@ export default {
     Help: DropdownHelp,
     UserMenu: DropdownProfile,
     ThemeToggle,
+    IconMenu,
   }
 }
 </script>

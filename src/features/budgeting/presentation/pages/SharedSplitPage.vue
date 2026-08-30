@@ -144,7 +144,7 @@
 <script setup>
 import { IconAi, IconCancel, IconClose, IconExternal, IconForum, IconPaste, IconRefresh, IconSend, IconUsers } from '@/ui/icons';
 import { Button } from '@/ui';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
@@ -205,7 +205,7 @@ const formattedSummaryText = computed(() => {
 const copyToClipboard = () => {
   if (formattedSummaryText.value) {
     navigator.clipboard.writeText(formattedSummaryText.value);
-    toast.success("Teks ringkasan tagihan & link Kainest berhasil disalin! Silakan paste di WhatsApp.");
+    notify.success("Teks ringkasan tagihan & link Kainest berhasil disalin! Silakan paste di WhatsApp.");
   }
 };
 
@@ -226,11 +226,11 @@ const blastWhatsApp = async () => {
       }
     });
     
-    toast.success("Berhasil! Pesan tagihan & link promo Kainest telah diblast via GOWA.");
+    notify.success("Berhasil! Pesan tagihan & link promo Kainest telah diblast via GOWA.");
     showBlastModal.value = false;
   } catch (err) {
     console.error("Gagal blast:", err);
-    toast.error("Gagal mengirim WhatsApp. Pastikan Anda sudah login dan bot GOWA aktif.");
+    notify.error("Gagal mengirim WhatsApp. Pastikan Anda sudah login dan bot GOWA aktif.");
   } finally {
     isBlasting.value = false;
   }

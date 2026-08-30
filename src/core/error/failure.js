@@ -34,6 +34,20 @@ export class RateLimitFailure extends Failure {
 
 export class GeneralFailure extends Failure {}
 
+/**
+ * Membuat ServerFailure sambil MEWARISKAN tanda `__handled` dari error asal.
+ *
+ * apiClient menandai error 403 yang sudah ia tampilkan lewat modal global.
+ * Tanpa pewarisan ini tanda tersebut hilang di lapisan repository (setiap
+ * `catch` membuat Failure baru dari pesannya saja), sehingga satu galat
+ * memunculkan dua notifikasi: modal DAN toast.
+ */
+export const taggedServerFailure = (sumber, message, code) => {
+  const failure = new ServerFailure(message, code);
+  failure.__handled = Boolean(sumber && sumber.__handled);
+  return failure;
+};
+
 // Fungsi helper untuk Either
 // Fungsi helper untuk Either
 export const left = (failure) => ({

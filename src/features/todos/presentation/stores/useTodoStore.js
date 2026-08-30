@@ -1,7 +1,7 @@
 // src/features/todos/presentation/stores/useTodoStore.js
 import { defineStore } from "pinia";
 import { TodoRepository } from "../../data/repository/TodoRepository";
-import { toast } from "vue3-toastify";
+import { notify } from "@/lib/notify";
 import moment from "moment";
 import "moment/locale/id"; // Gunakan locale Indonesia
 
@@ -55,7 +55,7 @@ export const useTodoStore = defineStore("todo", {
       result.fold(
         (err) => {
           this.error = err.message;
-          toast.error(err.message);
+          notify.error(err.message, err);
         },
         (data) => {
           this.todos = data;
@@ -70,11 +70,11 @@ export const useTodoStore = defineStore("todo", {
       
       result.fold(
         (err) => {
-          toast.error(err.message);
+          notify.error(err.message, err);
         },
         (newTodo) => {
           this.todos.unshift(newTodo);
-          toast.success("Tugas berhasil ditambahkan");
+          notify.success("Tugas berhasil ditambahkan");
         }
       );
       this.loading = false;
@@ -93,7 +93,7 @@ export const useTodoStore = defineStore("todo", {
         (err) => {
           // Revert jika gagal
           todo.isCompleted = originalStatus;
-          toast.error(err.message);
+          notify.error(err.message, err);
         },
         (updatedTodo) => {
            // Update data dari server untuk memastikan sinkron
@@ -113,11 +113,11 @@ export const useTodoStore = defineStore("todo", {
 
       result.fold(
         (err) => {
-          toast.error(err.message);
+          notify.error(err.message, err);
         },
         () => {
           this.todos = this.todos.filter(t => t.id !== todoId);
-          toast.success("Tugas dihapus");
+          notify.success("Tugas dihapus");
         }
       );
       this.loading = false;

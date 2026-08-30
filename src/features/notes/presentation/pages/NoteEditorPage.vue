@@ -47,7 +47,7 @@
 <script setup>
 import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNoteStore } from '../stores/useNoteStore';
@@ -74,7 +74,7 @@ const isShareModalOpen = ref(false);
 const openShareModal = () => {
     // Pastikan note sudah disimpan sebelum dibagikan
     if (!noteStore.currentNote) {
-        toast.warning("Silakan simpan note terlebih dahulu sebelum membagikan.");
+        notify.warning("Silakan simpan note terlebih dahulu sebelum membagikan.");
         return;
     }
     isShareModalOpen.value = true;

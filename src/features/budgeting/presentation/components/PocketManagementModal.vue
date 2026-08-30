@@ -304,7 +304,7 @@ import { Spinner } from '@/ui';
 import { IconAdd, IconArrowRight, IconBolt, IconCheck, IconChevronDown, IconClose, IconDelete, IconTag, IconWarning, IconWave } from '@/ui/icons';
 import { ref, computed, onMounted, defineEmits, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
 import CurrencyInput from '@/components/forms/CurrencyInput.vue';
@@ -517,7 +517,7 @@ const applyBlueprint = (type) => {
       const catId = findCategoryByName(item.names);
       if (catId) pocketsData.value.push(buildPocket(catId, item.percent));
     });
-    toast.success('Blueprint 50-30-20 diterapkan!');
+    notify.success('Blueprint 50-30-20 diterapkan!');
   } else if (type === 'hemat') {
     const plan = [
       { names: ['makan', 'food'], percent: 40 },
@@ -529,7 +529,7 @@ const applyBlueprint = (type) => {
       const catId = findCategoryByName(item.names);
       if (catId) pocketsData.value.push(buildPocket(catId, item.percent));
     });
-    toast.success('Blueprint Mahasiswa Hemat diterapkan!');
+    notify.success('Blueprint Mahasiswa Hemat diterapkan!');
   }
 
   if (pocketsData.value.length === 0) addPocket();
@@ -560,7 +560,7 @@ const submitNewCategory = async () => {
   isCreatingCategory.value = false;
 
   if (result.success) {
-    toast.success("Kategori berhasil ditambahkan!");
+    notify.success("Kategori berhasil ditambahkan!");
     showNewCategoryForm.value = false;
     newCategoryName.value = '';
     newCategoryIcon.value = '';
@@ -573,7 +573,7 @@ const submitNewCategory = async () => {
       keywordsInput: ''
     });
   } else {
-    toast.error(result.message || "Gagal membuat kategori.");
+    notify.error(result.message || "Gagal membuat kategori.");
   }
 };
 
@@ -597,7 +597,7 @@ const totalPercentage = computed(() => {
 
 const handleSubmit = async () => {
   if (totalPercentage.value > 100) {
-    toast.error("Total persentase tidak boleh melebihi 100%.");
+    notify.error("Total persentase tidak boleh melebihi 100%.");
     return;
   }
 
@@ -609,7 +609,7 @@ const handleSubmit = async () => {
   }));
 
   if (payload.length === 0) {
-    toast.error("Minimal harus ada satu kantong yang diisi.");
+    notify.error("Minimal harus ada satu kantong yang diisi.");
     return;
   }
 
@@ -625,12 +625,12 @@ const handleSubmit = async () => {
         budgetStore.updateKeywords(item.categoryId, keywordArray);
       }
     }
-    toast.success("Kantong berhasil disimpan!");
+    notify.success("Kantong berhasil disimpan!");
     isSubmitting.value = false;
     emit('close', { refresh: true });
   } else {
     isSubmitting.value = false;
-    toast.error("Gagal menyimpan kantong. Silakan coba lagi.");
+    notify.error("Gagal menyimpan kantong. Silakan coba lagi.");
   }
 };
 </script>

@@ -6,6 +6,7 @@ import {
   left,
   right,
   ServerFailure,
+  taggedServerFailure,
 } from "../../../../core/error/failure";
 
 export class TodoRepository extends ITodoRepository {
@@ -24,7 +25,7 @@ export class TodoRepository extends ITodoRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil todos."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -38,7 +39,7 @@ export class TodoRepository extends ITodoRepository {
         return left(new ServerFailure(response.message || "Gagal membuat todo."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -52,7 +53,7 @@ export class TodoRepository extends ITodoRepository {
         return left(new ServerFailure(response.message || "Gagal update todo."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -65,7 +66,7 @@ export class TodoRepository extends ITodoRepository {
         return left(new ServerFailure(response.message || "Gagal menghapus todo."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 }
