@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { IconAi, IconArchive, IconCalendar, IconChart, IconChat, IconChevronLeft, IconChevronRight, IconDocument, IconEdit, IconHome, IconImage, IconMoney, IconReceipt, IconSettings, IconUsers, IconSavings } from '@/ui/icons';
+import { IconAi, IconArchive, IconCalendar, IconChart, IconChat, IconChevronLeft, IconChevronRight, IconDocument, IconEdit, IconHome, IconImage, IconMoney, IconReceipt, IconSettings, IconUsers, IconSavings, IconShield } from '@/ui/icons';
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { useAuthStore } from "../features/auth/presentation/stores/authStore";
 import SidebarLinkGroup from "./SidebarLinkGroup.vue";
@@ -172,25 +172,25 @@ export default {
             name: "Rencana Keuangan",
             path: "/app/plans",
             iconComponent: IconSavings,
-            requiredPermission: "budgeting",
+            requiredPermission: "plan",
           },
           {
             name: "Riwayat Transaksi",
             path: "/app/transactions",
             iconComponent: IconReceipt,
-            requiredPermission: "budgeting",
+            requiredPermission: "history",
           },
           {
             name: "Rekap Bulanan",
             path: "/app/history",
             iconComponent: IconChart,
-            requiredPermission: "budgeting",
+            requiredPermission: "history",
           },
           {
             name: "Split Bill AI",
             path: "/app/split",
             iconComponent: IconAi,
-            requiredPermission: "budgeting",
+            requiredPermission: "split",
           },
         ],
       },
@@ -226,6 +226,12 @@ export default {
             name: "Manajemen User",
             path: "/app/admin/users",
             iconComponent: IconUsers,
+            requiresAdmin: true,
+          },
+          {
+            name: "Grup Akses (IAM)",
+            path: "/app/admin/groups",
+            iconComponent: IconShield,
             requiresAdmin: true,
           },
           {

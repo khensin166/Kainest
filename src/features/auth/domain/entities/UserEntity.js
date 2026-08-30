@@ -18,7 +18,8 @@ export class UserEntity {
     // RBAC
     role,
     permissions,
-  }) {
+    userGroup,
+  } = {}) {
     this.id = id;
     this.email = email;
     this.name = name;
@@ -28,7 +29,7 @@ export class UserEntity {
 
     // Data profil yang sudah di-flatten
     this.profileId = profileId;
-    this.displayName = displayName;
+    this.displayName = displayName || name || email?.split('@')[0];
     this.avatarUrl = avatarUrl;
     this.invitationCode = invitationCode;
     this.whatsappJid = whatsappJid;
@@ -36,6 +37,7 @@ export class UserEntity {
     // RBAC
     this.role = role || "user";
     this.permissions = permissions || [];
+    this.userGroup = userGroup || null;
   }
 
   // Opsional: Helper getter agar lebih mudah di UI

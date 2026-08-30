@@ -5,7 +5,7 @@ import { ref } from "vue";
 import apiClient from "@/lib/apiClient";
 import { 
   registerBotUseCase, 
-  getGroupsUseCase, 
+  getGroupsUseCaseWa, 
   sendMessageUseCase, 
   waBotRepository 
 } from "../../../../core/di/di";
@@ -25,7 +25,7 @@ export const useWaBotStore = defineStore("wabot", () => {
   // --- DEPENDENCIES (Injected) ---
   const repositoryInstance = waBotRepository;
   const registerUseCaseInstance = registerBotUseCase;
-  const getGroupsUseCaseInstance = getGroupsUseCase;
+  const getGroupsUseCaseInstance = getGroupsUseCaseWa;
   const sendMessageUseCaseInstance = sendMessageUseCase;
 
   // --- ACTIONS ---

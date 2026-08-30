@@ -71,6 +71,11 @@ import { GetNotificationsUseCase } from "../../features/notifications/domain/use
 import { MarkNotificationReadUseCase } from "../../features/notifications/domain/use-cases/MarkNotificationReadUseCase";
 import { GetUsersUseCase } from "../../features/admin/domain/use-cases/GetUsersUseCase";
 import { UpdateUserAccessUseCase } from "../../features/admin/domain/use-cases/UpdateUserAccessUseCase";
+import { GetGroupsUseCase as AdminGetGroupsUseCase } from "../../features/admin/domain/use-cases/GetGroupsUseCase";
+import { CreateGroupUseCase } from "../../features/admin/domain/use-cases/CreateGroupUseCase";
+import { UpdateGroupUseCase } from "../../features/admin/domain/use-cases/UpdateGroupUseCase";
+import { DeleteGroupUseCase } from "../../features/admin/domain/use-cases/DeleteGroupUseCase";
+import { AssignUserToGroupUseCase } from "../../features/admin/domain/use-cases/AssignUserToGroupUseCase";
 
 // --- Singleton Instances ---
 
@@ -129,7 +134,13 @@ export const getCoupleStatusUseCase = new GetCoupleStatusUseCase(coupleRepositor
 export const connectCoupleUseCase = new ConnectCoupleUseCase(coupleRepository);
 
 export const registerBotUseCase = new RegisterBotUseCase(waBotRepository);
-export const getGroupsUseCase = new GetGroupsUseCase(waBotRepository);
+export const getGroupsUseCaseWa = new GetGroupsUseCase(waBotRepository);
+
+export const getAdminGroupsUseCase = new AdminGetGroupsUseCase(adminRepository);
+export const createGroupUseCase = new CreateGroupUseCase(adminRepository);
+export const updateGroupUseCase = new UpdateGroupUseCase(adminRepository);
+export const deleteGroupUseCase = new DeleteGroupUseCase(adminRepository);
+export const assignUserToGroupUseCase = new AssignUserToGroupUseCase(adminRepository);
 export const sendMessageUseCase = new SendMessageUseCase(waBotRepository);
 
 export const changePasswordUseCase = new ChangePasswordUseCase(securityRepository);

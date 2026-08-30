@@ -156,19 +156,19 @@ const routes = [
         path: "history",
         name: "FinancialHistory",
         component: () => import('./features/budgeting/presentation/pages/FinancialHistoryPage.vue'),
-        meta: { requiredPermission: "budgeting" },
+        meta: { requiredPermission: "history" },
       },
       {
         path: "plans",
         name: "Plans",
         component: () => import('./features/plans/presentation/pages/PlansPage.vue'),
-        meta: { requiredPermission: "budgeting" },
+        meta: { requiredPermission: "plan" },
       },
       {
         path: "split",
         name: "SplitBill",
         component: () => import('./features/budgeting/presentation/pages/SplitBillPage.vue'),
-        meta: { requiredPermission: "budgeting" },
+        meta: { requiredPermission: "split" },
       },
       {
         path: "wabot",
@@ -192,6 +192,12 @@ const routes = [
         name: "UserManagement",
         component: () => import('./features/admin/presentation/pages/UserManagementPage.vue'),
         meta: { requiresAdmin: true } // Hanya admin
+      },
+      {
+        path: "admin/groups",
+        name: "UserGroupManagement",
+        component: () => import('./features/admin/presentation/pages/UserGroupPage.vue'),
+        meta: { requiresAdmin: true }
       },
     ],
   },

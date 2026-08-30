@@ -158,27 +158,26 @@
           </div>
         </div>
 
-        <!-- Hak akses modul -->
+        <!-- Hak Akses IAM (Group) -->
         <div class="px-5 py-4 border-t border-border-default bg-surface-subtle">
           <div class="flex items-baseline justify-between gap-3 mb-3">
-            <p class="text-sm font-medium text-text-primary">Hak Akses Modul</p>
-            <span class="text-xs text-text-muted tabular-nums">
-              {{ user.permissions.length }} dari {{ availableModules.length }} aktif
-            </span>
+            <p class="text-sm font-medium text-text-primary">Grup Akses (IAM)</p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-            <label
-              v-for="mod in availableModules"
-              :key="mod.id"
-              class="flex items-center justify-between gap-3 cursor-pointer select-none"
+          <div class="w-full sm:w-1/2">
+            <select
+              v-model="user.userGroupId"
+              @change="ubahGroup(user)"
+              class="w-full px-3 py-2 border border-border-default rounded-md bg-surface text-sm text-text-primary focus:ring-2 focus:ring-brand-primary"
             >
-              <span class="text-sm text-text-secondary">{{ mod.label }}</span>
-              <Switch
-                :model-value="user.permissions.includes(mod.id)"
-                @update:model-value="ubahIzin(user, mod.id, $event)"
-              />
-            </label>
+              <option :value="null">Pilih Grup...</option>
+              <option v-for="group in groups" :key="group.id" :value="group.id">
+                {{ group.name }} ({{ group.permissions.length }} modul)
+              </option>
+            </select>
+            <p class="text-xs text-text-muted mt-2">
+              Hak akses modul secara otomatis diturunkan dari grup yang dipilih.
+            </p>
           </div>
         </div>
       </Card>
@@ -191,7 +190,7 @@ import { ref, computed, onMounted } from 'vue';
 import { notify } from "@/lib/notify";
 import { Button, Card, Badge, Input, Switch, Spinner, EmptyState } from '@/ui';
 import { IconRefresh, IconSearch, IconShield, IconUser, IconUsers, IconWarning } from '@/ui/icons';
-import { getUsersUseCase, updateUserAccessUseCase } from '@/core/di/di';
+import { getUsersUseCase, updateUserAccessUseCase, getAdminGroupsUseCase, assignUserToGroupUseCase } from '@/core/di/di';
 import { useModalStore } from '@/stores/modalStore';
 import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
@@ -204,14 +203,14 @@ const error = ref(null);
 const pencarian = ref('');
 const peranTerpilih = ref('all');
 
-const availableModules = [
-  { id: 'todos', label: 'To-do' },
-  { id: 'notes', label: 'Notes' },
-  { id: 'gallery', label: 'Gallery' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'budgeting', label: 'Kantong Keuangan' },
-  { id: 'wabot', label: 'WaBot' },
-];
+const groups = ref([]);
+
+const fetchGroups = async () => {
+  const result = await getAdminGroupsUseCase.execute();
+  if (result.isRight()) {
+    groups.value = result.value;
+  }
+};
 
 const DAFTAR_PERAN = [
   {
@@ -271,7 +270,9 @@ const fetchUsers = async () => {
       ...u,
       role: u.role || 'user',
       permissions: u.permissions || [],
+      userGroupId: u.userGroupId || null,
       _changed: false,
+      _groupChanged: false,
       _saving: false,
     }));
   }
@@ -284,32 +285,40 @@ const ubahPeran = (user, peran) => {
   user._changed = true;
 };
 
-const ubahIzin = (user, modulId, aktif) => {
-  const idx = user.permissions.indexOf(modulId);
-  if (aktif && idx < 0) user.permissions.push(modulId);
-  else if (!aktif && idx >= 0) user.permissions.splice(idx, 1);
+const ubahGroup = (user) => {
   user._changed = true;
+  user._groupChanged = true;
 };
 
 const saveChanges = async (user) => {
   user._saving = true;
 
-  const result = await updateUserAccessUseCase.execute(user.id, {
+  // 1. Update Role
+  const roleResult = await updateUserAccessUseCase.execute(user.id, {
     role: user.role,
-    permissions: user.permissions,
   });
+
+  // 2. Update Group jika berubah
+  if (user._groupChanged) {
+    const groupResult = await assignUserToGroupUseCase.execute(user.id, user.userGroupId);
+    if (groupResult.isLeft()) {
+      notify.error(groupResult.error.message || "Gagal mengupdate grup");
+    }
+  }
 
   user._saving = false;
 
-  if (result.left) {
-    notify.error(result.left.message, result.left);
+  if (roleResult.left) {
+    notify.error(roleResult.left.message, roleResult.left);
   } else {
     user._changed = false;
+    user._groupChanged = false;
     notify.success(`Akses untuk ${user.email} berhasil diperbarui.`);
   }
 };
 
 onMounted(() => {
+  fetchGroups();
   fetchUsers();
 });
 </script>

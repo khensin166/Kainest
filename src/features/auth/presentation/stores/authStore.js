@@ -30,6 +30,13 @@ export const useAuthStore = defineStore("auth", () => {
 
   const hasPermission = (permission) => {
     if (isAdmin.value) return true; // Admin has all permissions
+    
+    // IAM Style: Prioritaskan permissions dari UserGroup
+    if (user.value?.userGroup?.permissions) {
+      return user.value.userGroup.permissions.includes(permission);
+    }
+    
+    // Fallback: baca dari legacy permissions array
     return user.value?.permissions?.includes(permission) || false;
   };
 
