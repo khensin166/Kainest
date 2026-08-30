@@ -168,10 +168,10 @@
             <select
               v-model="user.userGroupId"
               @change="ubahGroup(user)"
-              class="w-full px-3 py-2 border border-border-default rounded-md bg-transparent text-sm text-text-primary focus:ring-2 focus:ring-brand-primary [&>option]:bg-surface"
+              class="w-full px-3 py-2 border border-border-default rounded-md bg-transparent text-sm text-text-primary focus:ring-2 focus:ring-brand-primary"
             >
-              <option :value="null">Pilih Grup...</option>
-              <option v-for="group in groups" :key="group.id" :value="group.id">
+              <option :value="null" class="bg-surface-subtle text-text-primary">Pilih Grup...</option>
+              <option v-for="group in groups" :key="group.id" :value="group.id" class="bg-surface-subtle text-text-primary">
                 {{ group.name }} ({{ group.permissions.length }} modul)
               </option>
             </select>
