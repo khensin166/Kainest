@@ -186,8 +186,8 @@ const getModuleName = (id) => {
 const fetchGroups = async () => {
   isLoading.value = true;
   const result = await getAdminGroupsUseCase.execute();
-  if (result.isRight()) {
-    groups.value = result.value;
+  if (!result.left) {
+    groups.value = result.right;
   } else {
     notify.error("Gagal memuat grup akses");
   }
@@ -232,12 +232,12 @@ const saveGroup = async () => {
     result = await createGroupUseCase.execute(payload);
   }
 
-  if (result.isRight()) {
+  if (!result.left) {
     notify.success(editingGroup.value ? "Grup berhasil diperbarui" : "Grup baru berhasil dibuat");
     isModalOpen.value = false;
     await fetchGroups();
   } else {
-    notify.error(result.error?.message || "Terjadi kesalahan saat menyimpan grup");
+    notify.error(result.left?.message || "Terjadi kesalahan saat menyimpan grup");
   }
   isSaving.value = false;
 };
@@ -249,11 +249,11 @@ const confirmDelete = (group) => {
     newStatus: "warning",
     onConfirm: async () => {
       const result = await deleteGroupUseCase.execute(group.id);
-      if (result.isRight()) {
+      if (!result.left) {
         notify.success("Grup berhasil dihapus");
         await fetchGroups();
       } else {
-        notify.error(result.error?.message || "Gagal menghapus grup");
+        notify.error(result.left?.message || "Gagal menghapus grup");
       }
     }
   });

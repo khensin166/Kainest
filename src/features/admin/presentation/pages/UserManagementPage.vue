@@ -207,8 +207,8 @@ const groups = ref([]);
 
 const fetchGroups = async () => {
   const result = await getAdminGroupsUseCase.execute();
-  if (result.isRight()) {
-    groups.value = result.value;
+  if (!result.left) {
+    groups.value = result.right;
   }
 };
 
@@ -301,8 +301,8 @@ const saveChanges = async (user) => {
   // 2. Update Group jika berubah
   if (user._groupChanged) {
     const groupResult = await assignUserToGroupUseCase.execute(user.id, user.userGroupId);
-    if (groupResult.isLeft()) {
-      notify.error(groupResult.error.message || "Gagal mengupdate grup");
+    if (groupResult.left) {
+      notify.error(groupResult.left.message || "Gagal mengupdate grup");
     }
   }
 
