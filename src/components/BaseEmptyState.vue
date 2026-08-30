@@ -1,31 +1,21 @@
+<!-- BaseEmptyState.vue — pembungkus tipis di atas primitif ui/EmptyState.
+     API lama (title/message/heightClass) dipertahankan; `icon` kini komponen, bukan emoji. -->
 <template>
-  <div class="flex flex-col items-center justify-center text-center w-full" :class="heightClass">
-    <div class="text-5xl mb-4">{{ icon }}</div>
-    <h3 class="text-lg font-semibold text-text-primary">{{ title }}</h3>
-    <p class="text-sm text-text-muted mt-1 max-w-sm">
-      {{ message }}
-    </p>
-    <slot></slot>
+  <div class="flex items-center justify-center w-full" :class="heightClass">
+    <EmptyState :icon="icon" :title="title" :description="message">
+      <slot />
+    </EmptyState>
   </div>
 </template>
 
 <script setup>
+import { IconInbox } from '@/ui/icons';
+import { EmptyState } from '@/ui';
+
 defineProps({
-  icon: {
-    type: String,
-    default: "📭"
-  },
-  title: {
-    type: String,
-    default: "Belum ada data"
-  },
-  message: {
-    type: String,
-    default: "Data belum tersedia untuk saat ini."
-  },
-  heightClass: {
-    type: String,
-    default: "h-64"
-  }
+  icon:        { type: [Object, Function], default: () => IconInbox },
+  title:       { type: String, default: 'Belum ada data' },
+  message:     { type: String, default: 'Data belum tersedia untuk saat ini.' },
+  heightClass: { type: String, default: 'h-64' },
 });
 </script>

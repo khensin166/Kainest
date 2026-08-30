@@ -41,25 +41,23 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <button v-if="!forced" type="button"
-                    class="btn-sm border-border-default hover:border-border-strong text-text-secondary"
-                    @click="$emit('close')" :disabled="isSubmitting">
+                <Button variant="secondary" size="sm" v-if="!forced" type="button" @click="$emit('close')" :disabled="isSubmitting">
                     Batal
-                </button>
-                <button type="submit" class="btn-sm bg-brand-primary hover:bg-brand-primary-hover text-text-inverse"
-                    :disabled="isSubmitting">
+                </Button>
+                <Button variant="primary" size="sm" type="submit" :disabled="isSubmitting">
                     <span v-if="isSubmitting">Menyimpan...</span>
                     <span v-else>Simpan Perubahan</span>
-                </button>
+                </Button>
             </div>
         </form>
     </div>
 </template>
 
 <script setup>
+import { Button } from '@/ui';
 import { ref, computed, defineEmits, defineProps, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import CurrencyInput from '@/components/forms/CurrencyInput.vue';
 
 const props = defineProps({
@@ -106,7 +104,7 @@ watch(() => budgetStore.payday, (newVal) => {
 const handleSubmit = async () => {
     // Validasi sederhana
     if (!salary.value) {
-        toast.warning('Mohon isi pemasukan / gaji bulanan Anda.');
+        notify.warning('Mohon isi pemasukan / gaji bulanan Anda.');
         return;
     }
 
@@ -121,10 +119,10 @@ const handleSubmit = async () => {
     isSubmitting.value = false;
 
     if (result.success) {
-        toast.success('Konfigurasi budget berhasil disimpan!');
+        notify.success('Konfigurasi budget berhasil disimpan!');
         emit('close', { refresh: true });
     } else {
-        toast.error(result.message || 'Gagal menyimpan konfigurasi.');
+        notify.error(result.message || 'Gagal menyimpan konfigurasi.');
     }
 };
 </script>

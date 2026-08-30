@@ -1,9 +1,15 @@
 <!-- BudgetHeroCard.vue -->
 <script setup>
-import { ref } from 'vue';
+import { IconChevronDown, IconTrendDown, IconTrendUp, IconWarning } from '@/ui/icons';
+import { ref, computed } from 'vue';
 import { formatRupiah as formatCurrency } from '@/utils/Utils';
 
 const props = defineProps({
+  /** Ringkasan solvabilitas; null bila belum termuat. */
+  health: {
+    type: Object,
+    default: null,
+  },
   totalRemaining: {
     type: Number,
     required: true,
@@ -50,123 +56,110 @@ const props = defineProps({
   }
 });
 
+import { Card, Badge } from '@/ui';
+
+/** Delta 0 bukan informasi — badge disembunyikan, bukan menampilkan "0% vs bulan lalu". */
+const showDelta = (v) => v !== null && v !== undefined && v !== 0;
+
+const teksZona = computed(() => {
+  const h = props.health;
+  if (!h) return '';
+  if (h.zone === 'DANGER') {
+    return `Kurang ${formatCurrency(h.shortfall)} untuk menutup komitmen bulan ini`;
+  }
+  return `Sisa aman ${formatCurrency(h.sisaAman)} setelah komitmen`;
+});
+
+const kelasZona = computed(() => {
+  const zona = props.health?.zone;
+  if (zona === 'DANGER') return 'text-status-danger-text';
+  if (zona === 'WARNING') return 'text-status-warning-text';
+  return 'text-text-muted';
+});
+
 // Mobile expand/collapse state for secondary stats
 const isDetailsExpanded = ref(false);
 </script>
 
 <template>
-  <div
-    class="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-surface-card shadow-xs rounded-xl border border-border-default overflow-hidden relative">
+  <Card :padded="false" class="flex flex-col col-span-full sm:col-span-6 xl:col-span-4">
+    <div class="p-5 flex flex-col h-full">
 
-    <!-- Glassmorphism sheen — otomatis dinonaktifkan oleh .theme-factory override -->
-    <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 dark:from-white/5 dark:to-white/0 pointer-events-none rounded-xl"></div>
-
-    <div class="px-5 pt-5 pb-5 relative z-10 flex flex-col h-full">
-      <header class="flex justify-between items-start mb-1">
-        <h2 class="text-lg font-semibold text-text-primary">Ringkasan Keuangan</h2>
+      <header class="flex items-baseline justify-between gap-3 mb-6">
+        <h2 class="text-sm font-semibold text-text-primary">Ringkasan Keuangan</h2>
+        <span class="text-xs font-mono text-text-muted">Periode: {{ monthName }}</span>
       </header>
-      <div class="text-xs font-semibold text-text-faint uppercase mb-4 tracking-wider">
-        Periode: {{ monthName }}
+
+      <!-- Angka utama. Satu tingkat, tanpa kotak di dalam kotak. -->
+      <p class="text-xs text-text-muted mb-1.5">Sisa Gaji Pokok</p>
+      <p class="text-4xl font-bold text-text-primary tabular-nums tracking-tight leading-none">
+        {{ formatCurrency(totalRemaining) }}
+      </p>
+
+      <!-- Zona solvabilitas ditempel di sini, bukan jadi elemen sendiri: angka di
+           atas berubah MAKNA begitu ada komitmen, jadi keterangannya harus terbaca
+           di napas yang sama. -->
+      <p v-if="health" class="mt-2 text-sm" :class="kelasZona">
+        {{ teksZona }}
+      </p>
+
+      <div v-if="showDelta(momRemaining) || unallocated > 0" class="flex flex-wrap items-center gap-2 mt-3">
+        <Badge v-if="showDelta(momRemaining)" :tone="momRemaining >= 0 ? 'success' : 'danger'">
+          <component :is="momRemaining >= 0 ? IconTrendUp : IconTrendDown" class="w-3 h-3" aria-hidden="true" />
+          {{ Math.abs(momRemaining) }}% vs bulan lalu
+        </Badge>
+        <Badge v-if="unallocated > 0" tone="warning">
+          <IconWarning class="w-3 h-3" aria-hidden="true" />
+          {{ formatCurrency(unallocated) }} belum dialokasikan
+        </Badge>
       </div>
 
-      <div class="flex flex-col gap-3 flex-1">
+      <!-- Rincian. Dipisah garis, bukan ditumpuk sebagai kartu bersarang. -->
+      <div class="mt-6 pt-5 border-t border-border-default space-y-4">
 
-        <!-- [ROW 1] Sisa Gaji Pokok (Hero Number) -->
-        <div class="flex flex-col items-center justify-center px-4 py-5 bg-surface-subtle rounded-xl border border-border-default text-center">
-          <div class="text-xs font-bold text-text-muted uppercase tracking-widest mb-1">
-            Sisa Gaji Pokok
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-xs text-text-muted">Pengeluaran Bulan Ini</span>
+          <span class="flex items-baseline gap-2">
+            <span class="text-sm font-semibold text-text-primary tabular-nums">{{ formatCurrency(totalSpent) }}</span>
+            <Badge v-if="showDelta(momSpent)" :tone="momSpent <= 0 ? 'success' : 'danger'">
+              {{ momSpent > 0 ? '+' : '' }}{{ momSpent }}%
+            </Badge>
+          </span>
+        </div>
+
+        <div :class="isDetailsExpanded ? 'block space-y-4' : 'hidden sm:block sm:space-y-4'">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="text-xs text-text-muted">Gaji Utama</span>
+            <span class="flex items-baseline gap-2">
+              <span class="text-sm font-semibold text-text-primary tabular-nums">{{ formatCurrency(totalSalary) }}</span>
+              <Badge v-if="showDelta(momSalary)" :tone="momSalary >= 0 ? 'success' : 'danger'">
+                {{ momSalary > 0 ? '+' : '' }}{{ momSalary }}%
+              </Badge>
+            </span>
           </div>
-          <div class="text-3xl font-black text-text-primary tracking-tight leading-none mb-3">
-            {{ formatCurrency(totalRemaining) }}
-          </div>
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            <!-- MoM Remaining Badge -->
-            <div v-if="momRemaining !== null"
-                 class="text-xs font-bold flex items-center px-2 py-1 rounded-md border"
-                 :class="momRemaining >= 0
-                   ? 'text-status-success-text bg-status-success-bg border-status-success/30'
-                   : 'text-status-danger-text bg-status-danger-bg border-status-danger/30'">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="momRemaining >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-              {{ Math.abs(momRemaining) }}% vs bulan lalu
-            </div>
-            <!-- Unallocated Badge -->
-            <div v-if="unallocated > 0" class="text-xs font-bold flex items-center px-2 py-1 rounded-md text-status-warning-text bg-status-warning-bg border border-status-warning/30">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-              {{ formatCurrency(unallocated) }} belum dialokasikan
-            </div>
+
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="text-xs text-text-muted">Tambahan</span>
+            <span class="flex items-baseline gap-2">
+              <span class="text-sm font-semibold text-text-primary tabular-nums">{{ formatCurrency(totalIncome) }}</span>
+              <Badge v-if="showDelta(momIncome)" :tone="momIncome >= 0 ? 'success' : 'danger'">
+                {{ momIncome > 0 ? '+' : '' }}{{ momIncome }}%
+              </Badge>
+            </span>
           </div>
         </div>
 
-        <!-- [ROW 2] Pengeluaran — full width, always visible -->
-        <div class="flex items-center justify-between p-3.5 bg-status-danger-bg rounded-xl border border-status-danger/20 transition-all">
-          <div class="flex items-center gap-2.5">
-            <div class="p-1.5 bg-status-danger-bg rounded-lg text-status-danger">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-            </div>
-            <div>
-              <div class="text-[10px] font-bold text-status-danger-text uppercase tracking-widest">Pengeluaran Bulan Ini</div>
-              <div class="text-base font-bold text-text-primary tracking-tight">{{ formatCurrency(totalSpent) }}</div>
-            </div>
-          </div>
-          <div v-if="momSpent !== null"
-               class="text-xs font-bold flex items-center px-2 py-1 rounded-md"
-               :class="momSpent <= 0
-                 ? 'text-status-success-text bg-status-success-bg'
-                 : 'text-status-danger-text bg-status-danger-bg'">
-            <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSpent >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-            {{ Math.abs(momSpent) }}%
-          </div>
-        </div>
-
-        <!-- [ROW 3] Gaji Utama + Pemasukan Tambahan (Grid 2 cols) -->
-        <!-- On desktop: always visible. On mobile: hidden unless expanded. -->
-        <div class="grid grid-cols-2 gap-3 transition-all duration-300"
-             :class="isDetailsExpanded ? 'block' : 'hidden sm:grid'">
-
-          <!-- Gaji Utama -->
-          <div class="flex flex-col p-3 bg-surface-subtle rounded-lg border border-border-default transition-all min-w-0">
-            <div class="flex items-center gap-1.5 mb-2">
-              <div class="p-1 bg-surface-hover rounded text-brand-primary shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              </div>
-              <div class="text-[10px] font-bold text-text-muted uppercase tracking-wide truncate">Gaji Utama</div>
-            </div>
-            <div class="text-sm font-bold text-text-primary mb-1 truncate">{{ formatCurrency(totalSalary) }}</div>
-            <div v-if="momSalary !== null" class="text-[10px] font-bold flex items-center"
-                 :class="momSalary >= 0 ? 'text-status-success' : 'text-status-danger'">
-              <svg class="w-3 h-3 mr-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momSalary >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-              {{ Math.abs(momSalary) }}%
-            </div>
-          </div>
-
-          <!-- Pemasukan Tambahan -->
-          <div class="flex flex-col p-3 bg-surface-subtle rounded-lg border border-border-default transition-all min-w-0">
-            <div class="flex items-center gap-1.5 mb-2">
-              <div class="p-1 bg-surface-hover rounded text-brand-muted shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-              </div>
-              <div class="text-[10px] font-bold text-text-muted uppercase tracking-wide truncate">Tambahan</div>
-            </div>
-            <div class="text-sm font-bold text-text-primary mb-1 truncate">{{ formatCurrency(totalIncome) }}</div>
-            <div v-if="momIncome !== null" class="text-[10px] font-bold flex items-center"
-                 :class="momIncome >= 0 ? 'text-status-success' : 'text-status-danger'">
-              <svg class="w-3 h-3 mr-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="momIncome >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'"></path></svg>
-              {{ Math.abs(momIncome) }}%
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile Expand/Collapse Toggle (hidden on desktop) -->
+        <!-- Perilaku mobile tidak berubah: rincian gaji disembunyikan sampai dibuka. -->
         <button
+          type="button"
           @click="isDetailsExpanded = !isDetailsExpanded"
-          class="sm:hidden flex items-center justify-center gap-1.5 w-full py-1.5 text-[11px] font-semibold text-text-faint hover:text-text-muted transition-colors">
-          <span>{{ isDetailsExpanded ? 'Sembunyikan rincian' : 'Lihat rincian gaji' }}</span>
-          <svg class="w-3.5 h-3.5 transition-transform duration-300" :class="isDetailsExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-          </svg>
+          class="sm:hidden flex items-center justify-center gap-1.5 w-full pt-1 text-xs font-medium text-text-muted hover:text-text-primary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded-sm"
+        >
+          {{ isDetailsExpanded ? 'Sembunyikan rincian' : 'Lihat rincian gaji' }}
+          <IconChevronDown class="w-3.5 h-3.5 transition-transform" :class="isDetailsExpanded ? 'rotate-180' : ''" aria-hidden="true" />
         </button>
-
       </div>
+
     </div>
-  </div>
+  </Card>
 </template>

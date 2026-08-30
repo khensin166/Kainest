@@ -1,127 +1,211 @@
+<!-- UserManagementPage.vue — kendali peran & hak akses (RBAC).
+     Peran dan izin modul BERDIRI SENDIRI di backend: mengubah peran tidak
+     otomatis mengubah izin. UI ini sengaja tidak menampilkan izin "terwarisi"
+     agar tidak membohongi cara kerja sistem yang sebenarnya. -->
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
+    <header class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
       <div>
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl md:text-3xl text-text-primary font-bold">Manajemen Pengguna</h1>
+          <h1 class="text-2xl font-bold text-text-primary tracking-tight">Manajemen Pengguna</h1>
           <PageGuide :steps="pageGuides.users" />
         </div>
-        <p class="text-sm text-text-muted mt-1">Pusat kendali admin — atur hak akses, pantau, dan kelola aktivitas seluruh pengguna aplikasi.</p>
+        <p class="text-sm text-text-muted mt-1">
+          Pusat kendali admin — atur hak akses, pantau, dan kelola aktivitas seluruh pengguna aplikasi.
+        </p>
       </div>
-      <button @click="fetchUsers"
-        class="p-2 text-text-muted hover:text-brand-primary transition-colors rounded-md hover:bg-surface-hover"
-        title="Refresh Data">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      </button>
-    </div>
+      <Button variant="secondary" class="shrink-0" :loading="isLoading" @click="fetchUsers">
+        <IconRefresh v-if="!isLoading" class="h-4 w-4" aria-hidden="true" />
+        <span class="hidden sm:inline">Muat Ulang</span>
+      </Button>
+    </header>
 
-    <!-- Main Container -->
-    <div class="bg-surface-card shadow-none rounded-sm border border-border-default p-6">
-
-      <!-- Loading State -->
-      <div v-if="isLoading" class="flex justify-center items-center py-16">
-        <div class="animate-spin rounded-full h-8 w-8 border-2 border-brand-primary border-t-transparent"></div>
+    <!-- Ringkasan sekaligus filter peran -->
+    <Card :padded="false" class="mb-4">
+      <div class="grid grid-cols-3 divide-x divide-border-default border-b border-border-default">
+        <button
+          v-for="f in filterPeran"
+          :key="f.value"
+          type="button"
+          class="px-4 py-3 text-center transition-colors cursor-pointer
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
+          :class="peranTerpilih === f.value ? 'bg-surface-hover' : 'hover:bg-surface-hover/60'"
+          :aria-pressed="peranTerpilih === f.value"
+          @click="peranTerpilih = f.value"
+        >
+          <p class="text-xl font-bold tabular-nums" :class="peranTerpilih === f.value ? 'text-text-primary' : 'text-text-secondary'">
+            {{ f.jumlah }}
+          </p>
+          <p class="text-xs mt-0.5" :class="peranTerpilih === f.value ? 'text-text-secondary' : 'text-text-muted'">
+            {{ f.label }}
+          </p>
+        </button>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error"
-        class="p-4 bg-status-danger-bg text-status-danger rounded-lg text-sm flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <p>{{ error }}</p>
+      <div class="p-4">
+        <Input v-model="pencarian" placeholder="Cari nama atau email...">
+          <template #prefix><IconSearch class="h-4 w-4" aria-hidden="true" /></template>
+        </Input>
       </div>
+    </Card>
 
-      <!-- User Cards -->
-      <div v-else class="space-y-4">
-        <BaseEmptyState v-if="users.length === 0" icon="👥" title="Tidak Ada Pengguna"
-          message="Belum ada user yang terdaftar." heightClass="py-12" />
+    <!-- Memuat -->
+    <Card v-if="isLoading">
+      <div class="flex flex-col items-center justify-center py-16 gap-3">
+        <Spinner class="h-6 w-6 text-brand-primary" />
+        <p class="text-sm text-text-muted">Memuat data pengguna...</p>
+      </div>
+    </Card>
 
-        <div v-for="user in users" :key="user.id"
-          class="border border-border-default rounded-lg p-5 transition-all bg-surface-subtle"
-          :class="{ 'ring-1 ring-brand-primary/50 border-brand-primary': user._changed }">
-          <!-- Top Row: User Info + Role + Save -->
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <!-- Avatar & Name -->
-            <div class="flex items-center gap-4 flex-1 min-w-0">
-              <img class="h-10 w-10 rounded-full object-cover flex-shrink-0 shadow-sm"
-                :src="user.profile?.avatarUrl || user.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name || user.email) + '&size=40&background=6366f1&color=fff'"
-                alt="" referrerpolicy="no-referrer" />
-              <div class="min-w-0">
-                <div class="text-sm font-semibold text-text-primary truncate">
-                  {{ user.profile?.displayName || user.name || "No Name" }}
-                </div>
-                <div class="text-sm text-text-muted truncate">
-                  {{ user.email }}
-                </div>
-              </div>
+    <!-- Gagal -->
+    <Card v-else-if="error" :padded="false">
+      <div class="flex items-start gap-3 p-4">
+        <IconWarning class="h-5 w-5 shrink-0 mt-0.5 text-status-danger" aria-hidden="true" />
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-text-primary">Gagal memuat pengguna</p>
+          <p class="text-sm text-text-muted mt-0.5">{{ error }}</p>
+        </div>
+        <Button variant="secondary" size="sm" class="shrink-0" @click="fetchUsers">Coba Lagi</Button>
+      </div>
+    </Card>
+
+    <!-- Daftar pengguna -->
+    <div v-else class="space-y-4">
+      <Card v-if="penggunaTersaring.length === 0" :padded="false">
+        <EmptyState
+          :icon="IconUsers"
+          :title="users.length === 0 ? 'Tidak Ada Pengguna' : 'Tidak ada yang cocok'"
+          :description="users.length === 0
+            ? 'Belum ada user yang terdaftar.'
+            : 'Coba ubah kata pencarian atau filter perannya.'"
+        />
+      </Card>
+
+      <Card
+        v-for="user in penggunaTersaring"
+        :key="user.id"
+        :padded="false"
+        :class="user._changed ? 'ring-1 ring-brand-primary border-brand-primary' : ''"
+      >
+        <!-- Identitas + peran aktif -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-5">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <!-- Avatar: inisial lokal bila tidak ada foto, tanpa layanan eksternal -->
+            <div class="h-10 w-10 rounded-full shrink-0 overflow-hidden bg-brand-surface flex items-center justify-center">
+              <img
+                v-if="user.profile?.avatarUrl || user.image"
+                class="h-full w-full object-cover"
+                :src="user.profile?.avatarUrl || user.image"
+                alt=""
+                referrerpolicy="no-referrer"
+              />
+              <span v-else class="text-sm font-bold text-brand-primary">{{ inisial(user) }}</span>
             </div>
-
-            <!-- Actions (Role & Save) -->
-            <div class="flex items-center gap-3 self-end sm:self-auto">
-              <!-- Role Select -->
-              <div class="relative">
-                <select v-model="user.role" @change="markAsChanged(user)"
-                  class="appearance-none text-sm font-medium border border-border-default rounded-md pl-3 pr-8 py-1.5 bg-surface-input text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary cursor-pointer hover:bg-surface-hover transition-colors">
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <!-- Custom Chevron -->
-                <div
-                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-muted">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Save Button -->
-              <button v-if="user._changed" @click="saveChanges(user)" :disabled="user._saving"
-                class="inline-flex items-center px-4 py-1.5 text-sm font-medium rounded-md text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50 transition-colors shadow-none border-none">
-                <svg v-if="user._saving" class="animate-spin -ml-1 mr-2 h-4 w-4 text-text-inverse"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                  </path>
-                </svg>
-                Simpan
-              </button>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-text-primary truncate">
+                {{ user.profile?.displayName || user.name || "No Name" }}
+              </p>
+              <p class="text-sm text-text-muted truncate">{{ user.email }}</p>
             </div>
           </div>
 
-          <!-- Bottom Row: Permissions -->
-          <div class="mt-4 pt-4 border-t border-border-default">
-            <p class="text-sm font-medium text-text-primary mb-2">Hak Akses Modul:</p>
-            <div class="flex flex-wrap gap-x-6 gap-y-2">
-              <label v-for="mod in availableModules" :key="mod.id"
-                class="inline-flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" :value="mod.id" v-model="user.permissions" @change="markAsChanged(user)"
-                  class="h-4 w-4 rounded border-border-default text-brand-primary focus:ring-brand-primary focus:ring-2 bg-surface-input cursor-pointer">
-                <span
-                  class="text-sm text-text-primary group-hover:text-brand-primary transition-colors select-none">
-                  {{ mod.label }}
+          <div class="flex items-center gap-3 shrink-0">
+            <Badge :tone="user.role === 'admin' ? 'brand' : 'neutral'">
+              {{ user.role === 'admin' ? 'Admin' : 'User' }}
+            </Badge>
+            <Button
+              v-if="user._changed"
+              size="sm"
+              :loading="user._saving"
+              @click="saveChanges(user)"
+            >
+              Simpan
+            </Button>
+          </div>
+        </div>
+
+        <!-- Peran: dua pilihan dengan penjelasan, bukan dropdown telanjang -->
+        <div class="px-5 pb-5">
+          <p class="text-xs font-medium text-text-muted mb-2">Peran</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              v-for="peran in DAFTAR_PERAN"
+              :key="peran.value"
+              type="button"
+              class="text-left rounded-md border p-3 transition-colors cursor-pointer
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              :class="user.role === peran.value
+                ? 'border-brand-primary bg-brand-surface'
+                : 'border-border-default hover:border-border-strong hover:bg-surface-hover'"
+              :aria-pressed="user.role === peran.value"
+              @click="ubahPeran(user, peran.value)"
+            >
+              <span class="flex items-center gap-2">
+                <component
+                  :is="peran.icon"
+                  class="w-4 h-4 shrink-0"
+                  :class="user.role === peran.value ? 'text-brand-primary' : 'text-text-muted'"
+                  aria-hidden="true"
+                />
+                <span class="text-sm font-semibold" :class="user.role === peran.value ? 'text-text-primary' : 'text-text-secondary'">
+                  {{ peran.label }}
                 </span>
-              </label>
+              </span>
+              <span class="block text-xs text-text-muted mt-1 leading-relaxed">{{ peran.desc }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hak Akses IAM (Group) -->
+        <div class="px-5 py-4 border-t border-border-default bg-surface-subtle">
+          <div class="flex items-baseline justify-between gap-3 mb-3">
+            <p class="text-sm font-medium text-text-primary">Grup Akses (IAM)</p>
+          </div>
+
+          <div class="w-full sm:w-1/2">
+            <select
+              v-model="user.userGroupId"
+              @change="ubahGroup(user)"
+              class="w-full px-3 py-2 border border-border-default rounded-md bg-transparent text-sm text-text-primary focus:ring-2 focus:ring-brand-primary"
+            >
+              <option :value="null" class="bg-surface-subtle text-text-primary">Pilih Grup...</option>
+              <option v-for="group in groups" :key="group.id" :value="group.id" class="bg-surface-subtle text-text-primary">
+                {{ group.name }} ({{ group.permissions.length }} modul)
+              </option>
+            </select>
+            <p class="text-xs text-text-muted mt-2">
+              Hak akses modul secara otomatis diturunkan dari grup yang dipilih.
+            </p>
+            
+            <div v-if="user.userGroupId" class="mt-3">
+              <p class="text-xs font-semibold text-text-secondary mb-1">Modul yang Diaktifkan:</p>
+              <div class="flex flex-wrap gap-1.5">
+                <Badge 
+                  v-for="perm in groups.find(g => g.id === user.userGroupId)?.permissions || []" 
+                  :key="perm"
+                  tone="success"
+                  size="sm"
+                >
+                  {{ perm }}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getUsersUseCase, updateUserAccessUseCase } from '@/core/di/di';
+import { ref, computed, onMounted } from 'vue';
+import { notify } from "@/lib/notify";
+import { Button, Card, Badge, Input, Switch, Spinner, EmptyState } from '@/ui';
+import { IconRefresh, IconSearch, IconShield, IconUser, IconUsers, IconWarning } from '@/ui/icons';
+import { getUsersUseCase, updateUserAccessUseCase, getAdminGroupsUseCase, assignUserToGroupUseCase } from '@/core/di/di';
 import { useModalStore } from '@/stores/modalStore';
-import BaseEmptyState from '@/components/BaseEmptyState.vue';
 import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
 
@@ -130,15 +214,62 @@ const modalStore = useModalStore();
 const users = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+const pencarian = ref('');
+const peranTerpilih = ref('all');
 
-const availableModules = [
-  { id: 'todos', label: 'To-do' },
-  { id: 'notes', label: 'Notes' },
-  { id: 'gallery', label: 'Gallery' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'budgeting', label: 'Kantong Keuangan' },
-  { id: 'wabot', label: 'WaBot' },
+const groups = ref([]);
+
+const fetchGroups = async () => {
+  const result = await getAdminGroupsUseCase.execute();
+  if (!result.left) {
+    groups.value = result.right;
+  }
+};
+
+const DAFTAR_PERAN = [
+  {
+    value: 'user',
+    label: 'User',
+    icon: IconUser,
+    desc: 'Akses terbatas pada modul yang diaktifkan di bawah.',
+  },
+  {
+    value: 'admin',
+    label: 'Admin',
+    icon: IconShield,
+    desc: 'Akses penuh ke seluruh aplikasi, termasuk halaman ini.',
+  },
 ];
+
+const jumlahAdmin = computed(() => users.value.filter((u) => u.role === 'admin').length);
+
+const filterPeran = computed(() => [
+  { value: 'all', label: 'Total Pengguna', jumlah: users.value.length },
+  { value: 'admin', label: 'Admin', jumlah: jumlahAdmin.value },
+  { value: 'user', label: 'User', jumlah: users.value.length - jumlahAdmin.value },
+]);
+
+const penggunaTersaring = computed(() => {
+  let daftar = users.value;
+
+  if (peranTerpilih.value !== 'all') {
+    daftar = daftar.filter((u) => u.role === peranTerpilih.value);
+  }
+
+  const q = pencarian.value.trim().toLowerCase();
+  if (q) {
+    daftar = daftar.filter(
+      (u) =>
+        (u.profile?.displayName || '').toLowerCase().includes(q) ||
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+    );
+  }
+  return daftar;
+});
+
+const inisial = (user) =>
+  (user.profile?.displayName || user.name || user.email || '?').charAt(0).toUpperCase();
 
 const fetchUsers = async () => {
   isLoading.value = true;
@@ -149,49 +280,59 @@ const fetchUsers = async () => {
   if (result.left) {
     error.value = result.left.message;
   } else {
-    // Tambahkan field state internal
-    users.value = result.right.map(u => ({
+    users.value = result.right.map((u) => ({
       ...u,
       role: u.role || 'user',
       permissions: u.permissions || [],
+      userGroupId: u.userGroupId || null,
       _changed: false,
-      _saving: false
+      _groupChanged: false,
+      _saving: false,
     }));
   }
   isLoading.value = false;
 };
 
-const markAsChanged = (user) => {
+const ubahPeran = (user, peran) => {
+  if (user.role === peran) return;
+  user.role = peran;
   user._changed = true;
+};
+
+const ubahGroup = (user) => {
+  user._changed = true;
+  user._groupChanged = true;
 };
 
 const saveChanges = async (user) => {
   user._saving = true;
 
-  const result = await updateUserAccessUseCase.execute(user.id, {
+  // 1. Update Role
+  const roleResult = await updateUserAccessUseCase.execute(user.id, {
     role: user.role,
-    permissions: user.permissions
   });
+
+  // 2. Update Group jika berubah
+  if (user._groupChanged) {
+    const groupResult = await assignUserToGroupUseCase.execute(user.id, user.userGroupId);
+    if (groupResult.left) {
+      notify.error(groupResult.left.message || "Gagal mengupdate grup");
+    }
+  }
 
   user._saving = false;
 
-  if (result.left) {
-    modalStore.openModal({
-      newTitle: "Gagal Menyimpan",
-      newMessage: result.left.message,
-      newStatus: "error"
-    });
+  if (roleResult.left) {
+    notify.error(roleResult.left.message, roleResult.left);
   } else {
     user._changed = false;
-    modalStore.openModal({
-      newTitle: "Tersimpan",
-      newMessage: `Akses untuk ${user.email} berhasil diperbarui.`,
-      newStatus: "success"
-    });
+    user._groupChanged = false;
+    notify.success(`Akses untuk ${user.email} berhasil diperbarui.`);
   }
 };
 
 onMounted(() => {
+  fetchGroups();
   fetchUsers();
 });
 </script>

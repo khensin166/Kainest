@@ -23,5 +23,6 @@ export function mapUserFromApi(apiUser) {
     whatsappJid: apiUser.whatsappJid,
     role: apiUser.role,
     permissions: apiUser.permissions,
+    userGroup: apiUser.userGroup,
   });
 }

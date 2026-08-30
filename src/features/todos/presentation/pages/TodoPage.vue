@@ -1,15 +1,15 @@
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-    <div class="sm:flex sm:justify-between sm:items-center mb-8">
+    <div class="sm:flex sm:justify-between sm:items-center mb-6">
       <div class="mb-4 sm:mb-0 flex items-center gap-3">
-        <h1 class="text-2xl md:text-3xl text-text-primary font-bold">
+        <h1 class="text-2xl font-bold text-text-primary tracking-tight">
           To-do List Berdua
         </h1>
         <PageGuide :steps="pageGuides.todos" />
       </div>
     </div>
 
-    <div class="bg-surface-card shadow-none rounded-xl border border-border-default p-6">
+    <div class="bg-surface-card rounded-md border border-border-default p-6">
       <!-- Input Section -->
       <div class="mb-6">
         <form @submit.prevent="handleAddTodo" class="flex flex-col gap-3">
@@ -22,12 +22,10 @@
                 class="form-input w-full text-sm rounded-md border-border-default bg-surface-input text-text-primary focus:border-brand-primary focus:ring-brand-primary"
                 :disabled="todoStore.loading" />
             </div>
-            <button type="submit"
-              class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse whitespace-nowrap h-fit py-2.5 border-none"
-              :disabled="!newTodoTitle.trim() || todoStore.loading">
+            <Button variant="primary" type="submit" class="whitespace-nowrap" :disabled="!newTodoTitle.trim() || todoStore.loading">
               <span v-if="todoStore.loading">Loading...</span>
               <span v-else>Tambah Tugas</span>
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -42,7 +40,7 @@
 
       <BaseEmptyState 
         v-else-if="Object.keys(todoStore.groupedTodos).length === 0"
-        icon="📝"
+        :icon="IconChecklist"
         title="Belum ada tugas"
         message="Yuk, mulai catat hal-hal yang perlu dilakukan bersama!"
         heightClass="py-12"
@@ -51,7 +49,7 @@
       <div v-else class="space-y-6">
         <template v-for="(todos, date) in todoStore.groupedTodos" :key="date">
           <div>
-            <h3 class="text-xs font-bold text-text-muted uppercase tracking-wider mb-3 pl-1">
+            <h3 class="text-xs font-bold text-text-muted mb-3 pl-1">
               {{ date }}
             </h3>
             <ul class="space-y-3">
@@ -75,10 +73,7 @@
                 <button @click="openDeleteModal(todo)"
                   class="text-text-muted hover:text-status-danger focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity p-1"
                   title="Hapus tugas">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <IconDelete class="w-5 h-5" aria-hidden="true" />
                 </button>
               </li>
             </ul>
@@ -90,6 +85,8 @@
 </template>
 
 <script setup>
+import { IconChecklist, IconDelete } from '@/ui/icons';
+import { Button } from '@/ui';
 import { ref, onMounted } from 'vue';
 import { useTodoStore } from '../stores/useTodoStore';
 import { useModalStore } from '../../../../stores/modalStore';

@@ -6,6 +6,9 @@ export default {
 }
 </script>
 <script setup>
+import { IconDelete, IconFilter, IconMoney, IconSearch } from '@/ui/icons';
+import { notify } from "@/lib/notify";
+import { Button, Spinner } from '@/ui';
 import { onMounted, ref, watch, computed, provide, onActivated } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
 import Datepicker from '@/components/forms/Datepicker.vue';
@@ -16,7 +19,7 @@ import { pageGuides } from '@/config/pageGuides';
 import TransactionItem from '../components/TransactionItem.vue';
 import { debounce } from '../../../../utils/debounce';
 import { useModalStore } from '../../../../stores/modalStore';
-import { DialogTitle } from '@headlessui/vue';
+import { DialogTitle } from 'reka-ui';
 import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
 
@@ -122,7 +125,6 @@ const prevPage = () => { if (budgetStore.hasPreviousPage) loadTransactions(budge
 // ✨ Handler saat tombol EDIT diklik di TransactionItem
 // Menerima seluruh objek data transaksi
 const handleEditClick = (transactionData) => {
-  console.log("📝 Membuka modal EDIT untuk:", transactionData.categoryName);
   // Isi state dengan data yang diterima dari child component
   selectedTransactionToEdit.value = transactionData;
   // Buka modal
@@ -131,7 +133,6 @@ const handleEditClick = (transactionData) => {
 
 // ✨ Fungsi untuk menutup modal edit dan mereset state
 const closeEditModal = () => {
-  console.log("🔒 Menutup modal edit.");
   isEditModalOpen.value = false;
   // Tunggu sebentar sebelum reset data agar transisi modal mulus
   setTimeout(() => {
@@ -144,7 +145,6 @@ provide('closeModalFunc', closeEditModal);
 
 // Handler saat tombol tong sampah di item diklik
 const handleDeleteClick = (id) => {
-  console.log("🗑️ Membuka Global Delete Modal untuk ID:", id);
 
   // Panggil store untuk membuka modal global
   modalStore.openDeleteModal({
@@ -152,24 +152,15 @@ const handleDeleteClick = (id) => {
     message: 'Apakah Anda yakin ingin menghapus transaksi ini dari riwayat Anda?', // Pesan kustom (opsional)
     // INI BAGIAN PENTING: Fungsi yang akan dijalankan jika user klik "Ya, Hapus"
     onConfirm: async () => {
-      console.log("🔥 Eksekusi hapus dari Global Modal untuk ID:", id);
       const result = await budgetStore.deleteTransaction(id);
 
       if (result.success) {
         // Tampilkan notifikasi sukses global
-        modalStore.openModal({
-          newTitle: 'Berhasil Dihapus',
-          newMessage: 'Transaksi telah berhasil dihapus.',
-          newStatus: 'success',
-        });
+        notify.success('Transaksi telah berhasil dihapus.');
         // Data list otomatis refresh
       } else {
         // Tampilkan notifikasi error global
-        modalStore.openModal({
-          newTitle: 'Gagal Menghapus',
-          newMessage: result.message || 'Terjadi kesalahan.',
-          newStatus: 'error',
-        });
+        notify.error(result.message || 'Terjadi kesalahan.', result);
         throw new Error(result.message);
       }
     }
@@ -177,12 +168,10 @@ const handleDeleteClick = (id) => {
 };
 
 onMounted(() => {
-  console.log("🔴 MOUNTED (Halaman dibuat baru - Cache GAGAL)");
   loadTransactions(1, false);
 });
 
 onActivated(() => {
-  console.log("🟢 ACTIVATED (Halaman dari cache - Cache SUKSES)");
   loadTransactions(budgetStore.currentPage, false);
 });
 </script>
@@ -191,10 +180,10 @@ onActivated(() => {
   <div>
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
-      <div class="sm:flex sm:justify-between sm:items-start mb-8">
+      <div class="sm:flex sm:justify-between sm:items-start mb-6">
         <div class="mb-4 sm:mb-0">
           <div class="flex items-center gap-3">
-            <h1 class="text-2xl md:text-3xl text-text-primary font-bold">
+            <h1 class="text-2xl font-bold text-text-primary tracking-tight">
               Riwayat Transaksi
             </h1>
             <PageGuide :steps="pageGuides.transactions" />
@@ -205,20 +194,12 @@ onActivated(() => {
         </div>
 
         <div class="flex items-center gap-2">
-          <button @click="isFilterExpanded = !isFilterExpanded"
-            class="btn border transition-all duration-200 flex items-center px-4 py-2 rounded-md font-medium text-sm relative"
-            :class="[
-              isFilterActive 
-                ? 'bg-brand-soft text-brand-text border-brand-primary hover:bg-surface-hover'
-                : 'bg-surface-card border-border-default hover:border-border-strong text-text-muted'
-            ]">
-            <svg class="w-4 h-4 fill-current shrink-0 mr-2" viewBox="0 0 16 16">
-              <path d="M15 2h-3v1h3v11H1V3h3V2H1c-.6 0-1 .4-1 1v11c0 .6.4 1 1 1h14c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zm-6 9h2v-2h-2v2zm-4 0h2v-2H5v2zm0-4h2V5H5v2zm4 0h2V5h-2v2z" />
-            </svg>
+          <Button variant="secondary" @click="isFilterExpanded = !isFilterExpanded" class="relative" :class="[ isFilterActive ? 'bg-brand-soft text-brand-text border-brand-primary hover:bg-surface-hover' : 'bg-surface-card border-border-default hover:border-border-strong text-text-muted' ]">
+            <IconFilter class="w-4 h-4 fill-current shrink-0 mr-2" aria-hidden="true" />
             Filter & Pencarian
             <!-- Active filter badge dot -->
             <span v-if="isFilterActive" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-primary rounded-full ring-2 ring-surface-card animate-pulse"></span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -230,7 +211,7 @@ onActivated(() => {
         leave-active-class="transition ease-in duration-150 transform" 
         leave-from-class="opacity-100 translate-y-0" 
         leave-to-class="opacity-0 -translate-y-2">
-        <div v-show="isFilterExpanded" class="mb-8 p-5 bg-surface-subtle rounded-xl border border-border-default shadow-xs">
+        <div v-show="isFilterExpanded" class="mb-8 p-5 bg-surface-subtle rounded-md border border-border-default shadow-xs">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             
             <!-- Cari Transaksi -->
@@ -238,9 +219,7 @@ onActivated(() => {
               <label class="block text-sm font-medium mb-1.5 text-text-secondary">Cari Transaksi</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg class="h-5 w-5 text-text-faint" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a1 1 0 11-1.414 1.414l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-                  </svg>
+                  <IconSearch class="h-5 w-5 text-text-faint" aria-hidden="true" />
                 </div>
                 <input v-model="searchQuery" type="text" class="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-text-primary ring-1 ring-inset ring-border-default placeholder:text-text-faint focus:ring-2 focus:ring-inset focus:ring-brand-primary bg-surface-input sm:text-sm sm:leading-6 transition-colors duration-200 ease-in-out" placeholder="Ketikan kata kunci..." />
               </div>
@@ -280,18 +259,16 @@ onActivated(() => {
             <span class="text-xs text-text-muted">
               Filter aktif sedang diterapkan.
             </span>
-            <button @click="clearFilters" class="btn bg-brand-soft text-brand-primary border-border-default hover:bg-surface-hover hover:border-brand-primary transition-colors duration-200 flex items-center px-4 py-2 rounded-md font-medium text-sm">
-              <svg class="w-4 h-4 fill-current shrink-0 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M19 7a1 1 0 0 0-1 1v11.191A1.92 1.92 0 0 1 15.99 21H8.01A1.92 1.92 0 0 1 6 19.191V8a1 1 0 0 0-2 0v11.191A3.918 3.918 0 0 0 8.01 23h7.98A3.918 3.918 0 0 0 20 19.191V8a1 1 0 0 0-1-1Zm1-3h-4V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2ZM10 4V3h4v1Z" />
-              </svg>
+            <Button variant="secondary" @click="clearFilters">
+              <IconDelete class="w-4 h-4 fill-current shrink-0 mr-2" aria-hidden="true" />
               Hapus Semua Filter
-            </button>
+            </Button>
           </div>
         </div>
       </Transition>
 
       <div
-        class="col-span-full bg-surface-card shadow-xs rounded-xl border border-border-default relative">
+        class="col-span-full bg-surface-card shadow-xs rounded-md border border-border-default relative">
         <header class="px-5 py-4 border-b border-border-default">
           <h2 class="font-semibold text-text-primary">Aktivitas Terakhir</h2>
         </header>
@@ -304,7 +281,7 @@ onActivated(() => {
 
           <BaseEmptyState 
             v-else-if="budgetStore.transactionsList.length === 0"
-            icon="💸"
+            :icon="IconMoney"
             title="Belum ada transaksi"
             message="Tidak ada transaksi yang ditemukan untuk filter ini."
             heightClass="h-32"
@@ -314,7 +291,7 @@ onActivated(() => {
             <div v-for="(transactions, groupName) in budgetStore.groupedTransactions" :key="groupName" class="mb-4">
 
               <header
-                class="text-xs uppercase text-text-muted bg-surface-subtle rounded-xl font-semibold p-2 mb-1 sticky top-0 z-10">
+                class="text-xs text-text-muted bg-surface-subtle rounded-md font-semibold p-2 mb-1 sticky top-0 z-10">
                 {{ groupName }}
               </header>
 
@@ -323,7 +300,7 @@ onActivated(() => {
                   <TransactionItem :transaction="transaction"
                     :isDeleting="budgetStore.isDeletingTransactionId === transaction.id" @edit="handleEditClick"
                     @delete="handleDeleteClick"
-                    class="!shadow-none !border-b !border-border-default hover:!bg-surface-hover rounded-none p-2" />
+                    class="!border-b !border-border-default hover:!bg-surface-hover rounded-none p-2" />
                 </li>
               </ul>
             </div>
@@ -339,18 +316,12 @@ onActivated(() => {
           <div class="flex space-x-2">
             <button @click="prevPage" :disabled="!budgetStore.hasPreviousPage || budgetStore.isLoadingTransactions"
               class="flex items-center px-4 py-2 text-sm font-medium text-text-secondary bg-surface-card border border-border-default rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg v-if="budgetStore.isLoadingTransactions" class="animate-spin -ml-1 mr-2 h-4 w-4 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <Spinner class="-ml-1 mr-2 h-4 w-4 text-brand-primary" />
               Sebelumnya
             </button>
             <button @click="nextPage" :disabled="!budgetStore.hasNextPage || budgetStore.isLoadingTransactions"
               class="flex items-center px-4 py-2 text-sm font-medium text-text-secondary bg-surface-card border border-border-default rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg v-if="budgetStore.isLoadingTransactions" class="animate-spin -ml-1 mr-2 h-4 w-4 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <Spinner class="-ml-1 mr-2 h-4 w-4 text-brand-primary" />
               Selanjutnya
             </button>
           </div>

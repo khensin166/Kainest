@@ -1,4 +1,5 @@
 <script setup>
+import { IconCalendar, IconChevronLeft, IconChevronRight } from '@/ui/icons';
 import { computed, ref } from 'vue';
 import flatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
@@ -31,8 +32,8 @@ const config = ref({
   dateFormat: 'Y-m-d', // Gunakan format yang ramah API (ISO format)
   altInput: true,      // Tampilkan format yang ramah user di input
   altFormat: 'M j, Y', // Format tampilan user (seperti 'Nov 28, 2025')
-  prevArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
-  nextArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
+  prevArrow: '<IconChevronLeft class="fill-current" aria-hidden="true" />',
+  nextArrow: '<IconChevronRight class="fill-current" aria-hidden="true" />',
   onReady: (selectedDates, dateStr, instance) => {
     // Hapus manipulasi DOM manual yang tidak perlu
     const customClass = (props.align) ? props.align : '';
@@ -65,11 +66,7 @@ const dateValue = computed({
       class="form-input pl-9 bg-surface-card text-text-primary hover:text-text-secondary font-medium w-[15.5rem]"
       :config="config" v-model="dateValue" :placeholder="placeholder"></flat-pickr>
     <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
-      <svg class="fill-current text-text-muted ml-3" width="16" height="16" viewBox="0 0 16 16">
-        <path d="M5 4a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2H5Z" />
-        <path
-          d="M4 0a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V4a4 4 0 0 0-4-4H4ZM2 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Z" />
-      </svg>
+      <IconCalendar class="fill-current text-text-muted ml-3" aria-hidden="true" />
     </div>
   </div>
 </template>

@@ -23,7 +23,7 @@
         </div>
 
         <div v-else>
-            <div class="mb-8">
+            <div class="mb-6">
                 <h3 class="text-lg font-semibold text-text-primary mb-2">Kode Undangan Anda</h3>
                 <p class="text-sm text-text-muted mb-3">
                     Berikan kode ini kepada pasangan Anda agar dia bisa terhubung dengan Anda.
@@ -33,13 +33,13 @@
                     class="w-full bg-surface-subtle p-4 rounded-lg text-center relative group cursor-pointer hover:bg-surface-hover transition-colors duration-150"
                     :disabled="myInvitationCode === 'MEMUAT...'">
                     <p
-                        class="text-3xl font-bold tracking-widest text-brand-primary transition-colors">
+                        class="text-3xl font-bold text-brand-primary transition-colors">
                         {{ myInvitationCode }}
                     </p>
 
                     <div class="absolute top-0 right-0 p-2">
-                        <CheckIcon v-if="isCopied" class="w-5 h-5 text-status-success" />
-                        <ClipboardIcon v-else
+                        <IconCheck v-if="isCopied" class="w-5 h-5 text-status-success" />
+                        <IconCopy v-else
                             class="w-5 h-5 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                 </button>
@@ -82,11 +82,11 @@
 </template>
 
 <script setup>
+import { IconCheck, IconCopy } from '@/ui/icons';
 import { ref, computed } from 'vue';
 import { useAuthStore } from '../../../auth/presentation/stores/authStore';
 import { useCoupleStore } from '../../presentation/stores/useCoupleStore';
 import UserAvatar from "@/images/user-avatar-32.png";
-import { ClipboardIcon, CheckIcon } from "@heroicons/vue/24/outline";
 
 const authStore = useAuthStore();
 const coupleStore = useCoupleStore();

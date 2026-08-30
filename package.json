@@ -5,15 +5,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:design": "node scripts/lint-design.mjs"
   },
   "dependencies": {
     "@editorjs/editorjs": "^2.31.0",
     "@editorjs/header": "^2.8.8",
     "@editorjs/image": "^2.10.3",
     "@editorjs/list": "^2.0.9",
-    "@headlessui/vue": "^1.7.23",
-    "@heroicons/vue": "^2.2.0",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "@supabase/supabase-js": "^2.52.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/vite": "^4.1.17",
@@ -23,14 +24,16 @@
     "canvas-confetti": "^1.9.4",
     "chart.js": "^4.4.1",
     "chartjs-adapter-moment": "^1.0.1",
-    "daisyui": "^5.5.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "editorjs-html": "^4.0.5",
     "flatpickr": "^4.6.13",
-    "lucide-vue-next": "^0.525.0",
     "moment": "^2.29.4",
     "pinia": "^3.0.3",
     "qrcode.vue": "^3.6.0",
+    "reka-ui": "^2.10.4",
     "socket.io-client": "^4.8.1",
+    "tailwind-merge": "^3.6.0",
     "vue": "^3.2.20",
     "vue-chartjs": "^5.3.3",
     "vue-flatpickr-component": "^11.0.3",
@@ -38,11 +41,13 @@
     "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
+    "@iconify-json/material-symbols": "^1.2.90",
     "@tailwindcss/postcss": "^4.0.0",
-    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue": "^6.0.8",
     "@vue/compiler-sfc": "^3.2.20",
     "postcss": "^8.4.32",
     "tailwindcss": "^4.0.0",
+    "unplugin-icons": "^23.0.1",
     "vite": "^7.0.5"
   }
 }

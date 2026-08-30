@@ -45,9 +45,7 @@
             <!-- Status: Sudah Terverifikasi -->
             <div v-if="user.whatsappJid"
               class="text-xs font-semibold text-status-success bg-status-success-bg px-2 py-1 rounded flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
+              <IconCheck class="w-3 h-3" aria-hidden="true" />
               Terverifikasi (Bot Connected)
             </div>
             <!-- Status: Belum Terverifikasi - Tombol Buka Panduan -->
@@ -101,7 +99,7 @@
         <div class="space-y-4 pt-2 pb-2">
           <!-- Langkah 1: Salin kode !link -->
           <div
-            class="flex gap-3 p-3 bg-brand-primary/10 rounded-xl border border-brand-primary/30 text-left">
+            class="flex gap-3 p-3 bg-brand-primary/10 rounded-md border border-brand-primary/30 text-left">
             <div
               class="w-7 h-7 rounded-full bg-brand-primary text-text-inverse font-bold text-sm flex-shrink-0 flex items-center justify-center">
               1</div>
@@ -112,13 +110,8 @@
                 <code class="text-status-success text-xs font-mono flex-1">!link {{ user.invitationCode }}</code>
                 <button @click="copyLinkCode" type="button"
                   class="text-text-muted hover:text-text-primary transition-colors flex-shrink-0">
-                  <svg v-if="!copiedCode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <svg v-else class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <IconCopy class="w-4 h-4" aria-hidden="true" />
+                  <IconCheck class="w-4 h-4 text-status-success" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -135,10 +128,7 @@
               <div v-if="botPhoneNumber" class="flex flex-wrap gap-2">
                 <button @click="copyBotNumber" type="button"
                   class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-subtle hover:bg-surface-hover text-text-primary text-xs rounded-lg font-medium transition-colors border border-border-default">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
+                  <IconCopy class="w-3.5 h-3.5" aria-hidden="true" />
                   {{ copiedBotNum ? 'Tersalin! ✓' : 'Salin Nomor Bot' }}
                 </button>
               </div>
@@ -148,7 +138,7 @@
 
           <!-- Langkah 3: Tempel kode di dalam Grup → Aktif Sekaligus! -->
           <div
-            class="flex gap-3 p-3 bg-status-success-bg rounded-xl border border-status-success/30 text-left">
+            class="flex gap-3 p-3 bg-status-success-bg rounded-md border border-status-success/30 text-left">
             <div
               class="w-7 h-7 rounded-full bg-status-success text-text-inverse font-bold text-sm flex-shrink-0 flex items-center justify-center">
               3</div>
@@ -156,9 +146,7 @@
               <p class="text-sm font-semibold text-text-primary">Kirim kode tautan <span class="text-status-success">di dalam grup</span></p>
               <p class="text-xs text-text-muted mb-1.5">Paste kode yang sudah kamu salin tadi langsung ke percakapan grup. Akun dan grup akan <strong>langsung aktif sekaligus</strong> — tidak perlu langkah tambahan!</p>
               <div class="flex items-center gap-1.5 text-xs text-status-success bg-status-success/20 rounded-lg px-3 py-2">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <IconCheck class="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>Setelah kode terkirim, kamu langsung bisa mencatat pengeluaran di grup tersebut! 🎉</span>
               </div>
             </div>
@@ -175,6 +163,7 @@
 </template>
 
 <script setup>
+import { IconCheck, IconCopy } from '@/ui/icons';
 import { ref, watch, computed, onMounted } from "vue";
 import { useProfileStore } from "../../../profile/presentation/stores/useProfileStore";
 import BaseModal from "../../../../components/modals/BaseModal.vue";

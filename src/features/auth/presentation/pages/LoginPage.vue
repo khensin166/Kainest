@@ -8,16 +8,11 @@
     </div>
 
     <!-- Bagian Kiri (Desktop) & Atas (Mobile): Ilustrasi / Branding -->
-    <div class="w-full lg:w-1/2 bg-slate-900 relative flex flex-col justify-center px-6 pt-6 pb-8 lg:px-16 lg:py-0 h-[30dvh] lg:h-screen z-0">
-      <!-- Ambient Background -->
-      <div class="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-        <div class="absolute top-1/4 -left-20 w-72 h-72 bg-violet-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob"></div>
-        <div class="absolute bottom-1/4 right-0 w-72 h-72 bg-fuchsia-400 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
-      </div>
+    <div class="w-full lg:w-1/2 bg-surface-brand relative flex flex-col justify-center px-6 pt-6 pb-8 lg:px-16 lg:py-0 h-[30dvh] lg:h-screen z-0">
 
       <!-- Mobile Back Button (Absolute) -->
       <button @click="$router.push('/')" class="lg:hidden absolute top-6 left-6 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md z-20">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <IconArrowLeft class="w-4 h-4" aria-hidden="true" />
       </button>
 
       <div class="relative z-10 flex flex-col justify-center h-full">
@@ -29,49 +24,42 @@
 
         <!-- Mobile Header (Arrow removed) -->
         <div class="lg:hidden flex flex-col gap-3 w-full mt-6">
-            <h1 class="text-2xl font-bold text-white mb-1 leading-tight">
-              Siap mengatur hari Anda?
-            </h1>
-            <p class="text-gray-300 text-xs font-light leading-relaxed pr-2">
-              Masuk untuk menikmati pengalaman manajemen terbaik, dari keuangan hingga produktivitas.
-            </p>
-          </div>
+          <h1 class="text-2xl font-bold text-white mb-1 leading-tight">
+            Siap mengatur hari Anda?
+          </h1>
+          <p class="text-white/70 text-xs leading-relaxed pr-2">
+            Masuk untuk menikmati pengalaman manajemen terbaik, dari keuangan hingga produktivitas.
+          </p>
+        </div>
 
         <!-- Desktop Typography -->
         <div class="hidden lg:block">
-          <h1 class="text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
+          <h1 class="text-5xl font-bold text-white mb-6 leading-tight tracking-tight">
             Satu Aplikasi.<br />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-400">Beragam Kemudahan.</span>
+            <span class="text-brand-muted">Beragam Kemudahan.</span>
           </h1>
-          <p class="text-gray-300 text-lg max-w-md font-light leading-relaxed">
+          <p class="text-white/70 text-lg max-w-md leading-relaxed">
             Mulai dari manajemen keuangan, berbagi tagihan, hingga merekam aktivitas bersama pasangan—semua terpusat dan terintegrasi mulus dengan WhatsApp AI.
           </p>
         </div>
       </div>
-      
-      <!-- Abstract Graphic Desktop -->
-      <div class="hidden lg:block absolute -bottom-32 -right-32 opacity-20 pointer-events-none text-violet-500">
-        <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path fill="currentColor" d="M45.7,-76.4C58.9,-69.3,69.1,-55.4,75.8,-40.5C82.5,-25.6,85.7,-9.6,83.4,5.4C81.1,20.4,73.3,34.4,63.1,45.4C52.9,56.4,40.3,64.4,26.4,70.5C12.5,76.6,-2.7,80.8,-17.5,78.2C-32.3,75.6,-46.7,66.2,-57.4,53.8C-68.1,41.4,-75.1,26,-78.3,10.2C-81.5,-5.6,-80.9,-21.8,-74.1,-34.7C-67.3,-47.6,-54.3,-57.2,-40.6,-63.9C-26.9,-70.6,-13.5,-74.4,1.4,-76.3C16.3,-78.2,32.5,-78.2,45.7,-76.4Z" transform="translate(100 100)" />
-        </svg>
-      </div>
     </div>
 
     <!-- Bagian Kanan (Desktop) & Bawah (Mobile): Form Login -->
-    <div class="w-full lg:w-1/2 flex-1 flex flex-col justify-start lg:justify-center items-center relative z-10 lg:z-auto bg-surface-page lg:bg-transparent rounded-t-[2rem] lg:rounded-none px-6 py-6 lg:p-12 mt-[-1.5rem] lg:mt-0 shadow-none overflow-y-auto">
+    <div class="w-full lg:w-1/2 flex-1 flex flex-col justify-start lg:justify-center items-center relative z-10 lg:z-auto bg-surface-page lg:bg-transparent rounded-t-lg lg:rounded-none px-6 py-6 lg:p-12 mt-[-1.5rem] lg:mt-0 overflow-y-auto">
       
       <div class="w-full max-w-md space-y-6">
         <!-- Desktop Header Title -->
-        <div class="hidden lg:block text-left mb-8">
-          <h2 class="text-3xl font-extrabold text-text-primary tracking-tight">Selamat Datang kembali</h2>
+        <div class="hidden lg:block text-left mb-6">
+          <h2 class="text-2xl font-bold text-text-primary tracking-tight tracking-tight">Selamat Datang kembali</h2>
           <p class="mt-2 text-sm text-text-secondary">
             Masuk ke akun Anda untuk melanjutkan aktivitas hari ini.
           </p>
         </div>
 
         <!-- Tab Toggle (Masuk / Daftar) -->
-        <div class="flex p-1.5 bg-surface-subtle rounded-2xl w-full border border-border-default">
-          <button class="flex-1 py-2.5 text-sm font-bold bg-surface-card text-text-primary rounded-xl shadow-none transition-all">
+        <div class="flex p-1.5 bg-surface-subtle rounded-md w-full border border-border-default">
+          <button class="flex-1 py-2.5 text-sm font-bold bg-surface-card text-text-primary rounded-md transition-all">
             Login
           </button>
           <button @click="$router.push('/register')" class="flex-1 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary transition-all">
@@ -85,10 +73,10 @@
             <div class="relative">
               <label for="email-address" class="sr-only">Alamat Email</label>
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <EnvelopeIcon class="h-5 w-5 text-text-muted" />
+                <IconMail class="h-5 w-5 text-text-muted" />
               </div>
               <input id="email-address" v-model="email" name="email" type="email" autocomplete="email" required
-                class="block w-full pl-11 pr-4 py-3 bg-surface-input border border-border-default rounded-2xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all shadow-none"
+                class="block w-full pl-11 pr-4 py-3 bg-surface-input border border-border-default rounded-md text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all"
                 placeholder="Email Address" />
             </div>
 
@@ -96,16 +84,16 @@
             <div class="relative">
               <label for="password" class="sr-only">Sandi</label>
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <LockClosedIcon class="h-5 w-5 text-text-muted" />
+                <IconLock class="h-5 w-5 text-text-muted" />
               </div>
               <input id="password" v-model="password" name="password" :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password" required
-                class="block w-full pl-11 pr-12 py-3 bg-surface-input border border-border-default rounded-2xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all shadow-none"
+                class="block w-full pl-11 pr-12 py-3 bg-surface-input border border-border-default rounded-md text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all"
                 placeholder="Password" />
               <button type="button" @click="showPassword = !showPassword" v-show="password.length > 0"
                 class="absolute inset-y-0 right-0 pr-4 flex items-center text-text-muted hover:text-text-primary focus:outline-none">
-                <EyeIcon v-if="!showPassword" class="h-5 w-5" />
-                <EyeSlashIcon v-else class="h-5 w-5" />
+                <IconEye v-if="!showPassword" class="h-5 w-5" />
+                <IconEyeOff v-else class="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -128,12 +116,12 @@
 
           <!-- Tombol Submit -->
           <button type="submit" :disabled="auth.isLoading"
-            class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-2xl shadow-none text-sm font-bold text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-70 disabled:cursor-not-allowed transition-all mt-4">
+            class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-md text-sm font-bold text-text-inverse bg-brand-primary hover:bg-brand-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-70 disabled:cursor-not-allowed transition-all mt-4">
             {{ auth.isLoading ? "Memproses..." : "Login" }}
           </button>
 
           <!-- Separator -->
-          <div class="relative mt-8 mb-8">
+          <div class="relative mt-8 mb-6">
             <div class="absolute inset-0 flex items-center">
               <div class="w-full border-t border-border-default"></div>
             </div>
@@ -145,7 +133,7 @@
           <!-- Tombol Social Login -->
           <div class="grid grid-cols-2 gap-4">
             <button type="button" @click="handleSocialLogin('google')"
-              class="flex w-full items-center justify-center gap-2 px-4 py-3.5 bg-surface-card border border-border-default rounded-full shadow-none text-sm font-bold text-text-primary hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border-strong">
+              class="flex w-full items-center justify-center gap-2 px-4 py-3.5 bg-surface-card border border-border-default rounded-md text-sm font-bold text-text-primary hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border-strong">
               <svg class="h-5 w-5" viewBox="0 0 24 24">
                 <path fill="#EA4335"
                   d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 15.01 1 12 1 7.24 1 3.2 3.74 1.25 7.75l3.85 2.99C6.01 7.27 8.78 5.04 12 5.04z" />
@@ -159,7 +147,7 @@
               Google
             </button>
             <button type="button" @click="handleSocialLogin('github')"
-              class="flex w-full items-center justify-center gap-2 px-4 py-3.5 bg-surface-card border border-border-default rounded-full shadow-none text-sm font-bold text-text-primary hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border-strong">
+              class="flex w-full items-center justify-center gap-2 px-4 py-3.5 bg-surface-card border border-border-default rounded-md text-sm font-bold text-text-primary hover:bg-surface-hover transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border-strong">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd" clip-rule="evenodd"
                   d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
@@ -170,7 +158,7 @@
 
           <!-- Pesan Error -->
           <div v-if="auth.error"
-            class="mt-4 p-3 bg-status-danger-bg border border-status-danger/30 rounded-xl text-sm text-status-danger text-center">
+            class="mt-4 p-3 bg-status-danger-bg border border-status-danger/30 rounded-md text-sm text-status-danger text-center">
             {{ auth.error }}
           </div>
 
@@ -188,8 +176,8 @@
 </template>
 
 <script setup>
+import { IconArrowLeft, IconEye, IconEyeOff, IconLock, IconMail } from '@/ui/icons';
 import { ref } from "vue";
-import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
 import { useAuthStore } from "@/features/auth/presentation/stores/authStore";
 import { useRouter } from "vue-router";
 import ThemeToggle from "@/components/ThemeToggle.vue";

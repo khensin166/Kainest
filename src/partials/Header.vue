@@ -1,11 +1,7 @@
 <template>
   <header
     class="sticky top-0 before:absolute before:inset-0 before:backdrop-blur-md max-lg:before:bg-surface-card/90 before:-z-10 z-30"
-    :class="[
-      variant === 'v2' || variant === 'v3' ? 'before:bg-surface-card after:absolute after:h-px after:inset-x-0 after:top-full after:bg-border-default after:-z-10' : 'max-lg:shadow-none lg:before:bg-surface-page/90',
-      variant === 'v2' ? 'before:bg-surface-card' : '',
-      variant === 'v3' ? 'before:bg-surface-page' : '',
-    ]"
+    :class="[ variant === 'v2' || variant === 'v3' ? 'before:bg-surface-card after:absolute after:h-px after:inset-x-0 after:top-full after:bg-border-default after:-z-10' : 'max-lg:shadow-none lg:before:bg-surface-page/90', variant === 'v2' ? 'before:bg-surface-card' : '', variant === 'v3' ? 'before:bg-surface-page' : '', ]"
   >
     <div class="px-4 sm:px-6 lg:px-8">
       <div
@@ -19,11 +15,7 @@
           <!-- Hamburger button -->
           <button class="text-text-secondary hover:text-text-primary lg:hidden" @click.stop="$emit('toggle-sidebar')" aria-controls="sidebar" :aria-expanded="sidebarOpen">
             <span class="sr-only">Open sidebar</span>
-            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="5" width="16" height="2" />
-              <rect x="4" y="11" width="16" height="2" />
-              <rect x="4" y="17" width="16" height="2" />
-            </svg>
+            <IconMenu class="w-6 h-6 fill-current" aria-hidden="true" />
           </button>
 
         </div>
@@ -47,6 +39,7 @@
 </template>
 
 <script>
+import { IconMenu } from '@/ui/icons'
 import { ref } from 'vue'
 import DropdownNotifications from '../components/DropdownNotifications.vue'
 import DropdownHelp from '../components/DropdownHelp.vue'
@@ -64,6 +57,7 @@ export default {
     Help: DropdownHelp,
     UserMenu: DropdownProfile,
     ThemeToggle,
+    IconMenu,
   }
 }
 </script>

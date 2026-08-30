@@ -32,7 +32,7 @@
 <script setup>
 import { useModalStore } from "../../stores/modalStore";
 import BaseModal from "./BaseModal.vue";
-import { DialogTitle } from "@headlessui/vue";
+import { DialogTitle } from "reka-ui";
 
 const modalStore = useModalStore();
 </script>

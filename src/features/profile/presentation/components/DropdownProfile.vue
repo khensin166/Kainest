@@ -1,8 +1,8 @@
 <script setup>
+import { IconAccount, IconChevronDown } from '@/ui/icons';
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../auth/presentation/stores/authStore'
-import { UserCircleIcon } from '@heroicons/vue/24/outline'
 import defaultAvatar from '@/images/user-avatar-32.png'
 import { useHeaderDropdown } from '@/stores/headerDropdownStore'
 
@@ -64,9 +64,7 @@ const handleLogout = async () => {
         <span class="truncate ml-2 text-sm font-medium text-text-primary group-hover:text-text-primary">
             {{ authStore.user?.displayName || 'User' }}
         </span>
-        <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted" viewBox="0 0 12 12">
-          <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
-        </svg>
+        <IconChevronDown class="w-3 h-3 shrink-0 ml-1 fill-current text-text-muted" aria-hidden="true" />
       </div>
     </button>
     <transition
@@ -77,10 +75,10 @@ const handleLogout = async () => {
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded shadow-none overflow-hidden mt-1 right-0">
+      <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-surface-card border border-border-default py-1.5 rounded overflow-hidden mt-1 right-0">
         <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-border-default">
           <div class="font-medium text-text-primary">{{ authStore.user?.displayName }}</div>
-          <div class="text-xs text-text-muted italic capitalize">{{ authStore.user?.role === 'admin' ? 'Administrator' : authStore.user?.role || 'User' }}</div>
+          <div class="text-xs text-text-muted capitalize">{{ authStore.user?.role === 'admin' ? 'Administrator' : authStore.user?.role || 'User' }}</div>
         </div>
         <ul
           ref="dropdown"

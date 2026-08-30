@@ -1,35 +1,34 @@
 <!-- NoteEditorPage.vue -->
 <template>
-    <div class="p-4 md:p-8 max-w-5xl mx-auto">
+    <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-3xl mx-auto">
         <div v-if="noteStore.isLoadingNote" class="text-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto"></div>
             <p class="mt-4 text-text-muted">Memuat editor...</p>
         </div>
 
         <div v-else>
+            <div class="flex justify-end mb-2">
+                <PageGuide :steps="pageGuides.noteEditor" />
+            </div>
+
             <!-- Title Input: Plain Tailwind -->
             <input type="text" v-model="title" placeholder="Judul Catatan..."
                 class="w-full text-4xl font-bold bg-transparent border-none focus:ring-0 placeholder-text-muted text-text-primary mb-6 p-0" />
 
             <!-- Editor Container -->
-            <div id="editorjs-container" class="min-h-[500px] w-full
-                       bg-surface-page
-                       rounded-xl border border-border-default
-                       pt-6 px-4 md:px-6 shadow-none">
+            <div id="editorjs-container" class="min-h-[500px] w-full bg-surface-page rounded-md border border-border-default pt-6 px-4 md:px-6">
             </div>
 
             <!-- Action Buttons -->
             <div class="mt-8 flex justify-between items-end sticky bottom-6 z-10">
                 <div
-                    class="flex gap-3 bg-surface-card backdrop-blur-md p-2 rounded-xl shadow-none border border-border-default">
-                    <button @click="onSave" :disabled="noteStore.isLoadingNote" class="px-6 py-2.5 rounded-lg font-medium text-text-inverse transition-all
-                               bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="flex gap-3 bg-surface-card backdrop-blur-md p-2 rounded-md border border-border-default">
+                    <button @click="onSave" :disabled="noteStore.isLoadingNote" class="px-6 py-2.5 rounded-lg font-medium text-text-inverse transition-all bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
                         {{ noteStore.isLoadingNote ? 'Menyimpan...' : 'Simpan Note' }}
                     </button>
 
                     <button @click="openShareModal"
-                        class="px-5 py-2.5 rounded-lg font-medium transition-colors
-                               text-text-primary bg-surface-subtle hover:bg-surface-hover">
+                        class="px-5 py-2.5 rounded-lg font-medium transition-colors text-text-primary bg-surface-subtle hover:bg-surface-hover">
                         Bagikan
                     </button>
                 </div>
@@ -46,6 +45,9 @@
 </template>
 
 <script setup>
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
+import { notify } from "@/lib/notify";
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNoteStore } from '../stores/useNoteStore';
@@ -72,7 +74,7 @@ const isShareModalOpen = ref(false);
 const openShareModal = () => {
     // Pastikan note sudah disimpan sebelum dibagikan
     if (!noteStore.currentNote) {
-        alert("Silakan simpan note terlebih dahulu sebelum membagikan.");
+        notify.warning("Silakan simpan note terlebih dahulu sebelum membagikan.");
         return;
     }
     isShareModalOpen.value = true;

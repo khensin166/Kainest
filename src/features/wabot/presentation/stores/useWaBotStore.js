@@ -1,10 +1,11 @@
+import { notify } from "@/lib/notify";
 // src/features/wabot/presentation/stores/useWaBotStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import apiClient from "@/lib/apiClient";
 import { 
   registerBotUseCase, 
-  getGroupsUseCase, 
+  getGroupsUseCaseWa, 
   sendMessageUseCase, 
   waBotRepository 
 } from "../../../../core/di/di";
@@ -24,7 +25,7 @@ export const useWaBotStore = defineStore("wabot", () => {
   // --- DEPENDENCIES (Injected) ---
   const repositoryInstance = waBotRepository;
   const registerUseCaseInstance = registerBotUseCase;
-  const getGroupsUseCaseInstance = getGroupsUseCase;
+  const getGroupsUseCaseInstance = getGroupsUseCaseWa;
   const sendMessageUseCaseInstance = sendMessageUseCase;
 
   // --- ACTIONS ---
@@ -112,8 +113,6 @@ export const useWaBotStore = defineStore("wabot", () => {
     if (!apiKey.value || !baseUrl.value) return;
 
     // --- TAMBAHKAN LOG INI ---
-    console.log("Mencoba fetch group ke:", baseUrl.value);
-    console.log("Menggunakan API Key:", apiKey.value);
     // -------------------------
 
     isLoading.value = true;
@@ -152,7 +151,7 @@ export const useWaBotStore = defineStore("wabot", () => {
   // 6. PERBAIKAN ACTION: Fetch All Keys (Pakai Repository)
   async function fetchApiKeysList() {
     if (!baseUrl.value || !adminSecret.value) {
-      alert("Base URL dan Admin Secret harus diisi dulu!");
+      notify.warning("Base URL dan Admin Secret harus diisi dulu!");
       return;
     }
 
@@ -167,7 +166,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       apiKeysList.value = keys; // Repository sudah mengembalikan array data
     } catch (error) {
       console.error("Gagal ambil list key:", error);
-      alert("Gagal mengambil list API Key. Pastikan Admin Secret benar.");
+      notify.error("Gagal mengambil list API Key. Pastikan Admin Secret benar.");
     } finally {
       isLoading.value = false;
     }
@@ -232,7 +231,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       await fetchBackupTargets(); // refresh list
       return true;
     } catch (error) {
-      alert("Gagal menambah backup: " + error.message);
+      notify.error("Gagal menambah backup: " + error.message);
       return false;
     }
   }
@@ -253,7 +252,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       await fetchBackupTargets(); // refresh list
       return true;
     } catch (error) {
-      alert("Gagal menghapus backup: " + error.message);
+      notify.error("Gagal menghapus backup: " + error.message);
       return false;
     }
   }

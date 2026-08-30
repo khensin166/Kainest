@@ -10,6 +10,7 @@
 
       <!-- Right Column -->
       <div class="col-span-12 xl:col-span-4 space-y-6">
+        <DashboardUpcomingBills v-if="authStore.hasPermission('plan')" />
         <DashboardSystemUpdates />
         <DashboardFeedback />
       </div>
@@ -21,6 +22,10 @@
 <script setup>
 import DashboardWelcome from '../partials/dashboard/DashboardWelcome.vue';
 import DashboardRecentActivity from '../partials/dashboard/DashboardRecentActivity.vue';
+import DashboardUpcomingBills from '../partials/dashboard/DashboardUpcomingBills.vue';
 import DashboardSystemUpdates from '../partials/dashboard/DashboardSystemUpdates.vue';
 import DashboardFeedback from '../partials/dashboard/DashboardFeedback.vue';
+import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
+
+const authStore = useAuthStore();
 </script>

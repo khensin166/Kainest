@@ -1,18 +1,21 @@
 <template>
   <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
     <!-- Header -->
-    <div class="sm:flex sm:justify-between sm:items-center mb-8">
+    <div class="sm:flex sm:justify-between sm:items-center mb-6">
       <div class="mb-4 sm:mb-0">
-        <h1 class="text-2xl md:text-3xl text-text-primary font-bold flex items-center gap-2">
-          <SparklesIcon class="w-8 h-8 text-brand-primary" />
-          Split Bill AI
-        </h1>
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2">
+            <IconAi class="w-5 h-5 text-ai shrink-0" aria-hidden="true" />
+            Split Bill AI
+          </h1>
+          <PageGuide :steps="pageGuides.split" />
+        </div>
         <p class="text-sm text-text-muted mt-1">Otomatis deteksi struk, bagi tagihan lebih adil tanpa pusing.</p>
       </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="bg-surface-card rounded-2xl border border-border-default overflow-hidden">
+    <div class="bg-surface-card rounded-lg border border-border-default overflow-hidden">
       
       <!-- STEPPER -->
       <div class="flex border-b border-border-default">
@@ -30,34 +33,30 @@
         
         <!-- STEP 1: UPLOAD -->
         <div v-if="currentStep === 0" class="space-y-6">
-          <div class="border-2 border-dashed border-border-default rounded-2xl p-12 text-center hover:bg-surface-hover transition-colors cursor-pointer"
+          <div class="border-2 border-dashed border-border-default rounded-lg p-12 text-center hover:bg-surface-hover transition-colors cursor-pointer"
                @click="triggerFileInput"
                @dragover.prevent
                @drop.prevent="handleDrop">
             
             <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileChange" />
             
-            <DocumentArrowUpIcon class="w-16 h-16 mx-auto text-text-faint mb-4" />
+            <IconUpload class="w-16 h-16 mx-auto text-text-faint mb-4" />
             
             <h3 class="text-lg font-medium text-text-primary">Upload Foto Struk</h3>
             <p class="text-sm text-text-muted mt-1">Klik untuk memilih atau drag & drop file (JPG, PNG)</p>
             
             <div v-if="selectedFile" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-soft text-brand-text rounded-lg text-sm">
-              <CheckCircleIcon class="w-5 h-5" />
+              <IconCheckCircle class="w-5 h-5" />
               {{ selectedFile.name }}
             </div>
           </div>
           
           <div class="flex justify-end">
-            <button 
-              @click="scanReceipt" 
-              :disabled="!selectedFile || isScanning"
-              class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all"
-            >
-              <ArrowPathIcon v-if="isScanning" class="w-5 h-5 animate-spin" />
-              <SparklesIcon v-else class="w-5 h-5" />
+            <Button variant="primary" @click="scanReceipt" :disabled="!selectedFile || isScanning">
+              <IconRefresh v-if="isScanning" class="w-5 h-5 animate-spin" />
+              <IconAi v-else class="w-5 h-5" />
               {{ isScanning ? 'Membaca Struk...' : 'Mulai Scan AI' }}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -65,9 +64,9 @@
         <div v-if="currentStep === 1" class="space-y-8 animate-fade-in-up">
           
           <!-- Rincian Nota -->
-          <div class="bg-surface-subtle rounded-xl p-5 border border-border-default">
+          <div class="bg-surface-subtle rounded-md p-5 border border-border-default">
             <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-              <ReceiptRefundIcon class="w-5 h-5 text-text-muted" />
+              <IconReceipt class="w-5 h-5 text-text-muted" />
               Rincian Tagihan
             </h3>
             
@@ -94,7 +93,7 @@
           <!-- Tambah Teman -->
           <div>
             <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-              <UsersIcon class="w-5 h-5 text-text-muted" />
+              <IconUsers class="w-5 h-5 text-text-muted" />
               Siapa Saja yang Ikut?
             </h3>
             
@@ -103,7 +102,7 @@
                    class="bg-brand-soft text-brand-text px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-sm">
                 {{ member }}
                 <button @click="removeMember(idx)" class="text-brand-primary hover:text-brand-primary-hover focus:outline-none">
-                  <XMarkIcon class="w-4 h-4" />
+                  <IconClose class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -111,19 +110,19 @@
             <div class="flex gap-2">
               <input type="text" v-model="newMemberName" @keyup.enter="addMember" placeholder="Ketik nama lalu Enter..." 
                      class="form-input flex-1 rounded-lg" />
-              <button @click="addMember" class="btn bg-brand-primary text-text-inverse hover:bg-brand-primary-hover rounded-lg px-4">
+              <Button variant="primary" @click="addMember">
                 Tambah
-              </button>
+              </Button>
             </div>
           </div>
           
           <div class="flex justify-between items-center mt-8">
-            <button @click="currentStep = 0" class="btn border-border-default hover:border-border-strong text-text-secondary">
+            <Button variant="secondary" @click="currentStep = 0">
               Kembali
-            </button>
-            <button @click="goToAssignment" :disabled="members.length < 1" class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-xl px-6">
+            </Button>
+            <Button variant="primary" @click="goToAssignment" :disabled="members.length < 1">
               Lanjut Bagi Menu
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -133,7 +132,7 @@
           
           <div class="space-y-4">
             <div v-for="(item, idx) in receiptData.items" :key="idx" 
-                 class="bg-surface-card border border-border-default rounded-xl p-4 transition-shadow hover:border-border-strong">
+                 class="bg-surface-card border border-border-default rounded-md p-4 transition-shadow hover:border-border-strong">
               
               <div class="flex justify-between items-start mb-3">
                 <div>
@@ -150,10 +149,7 @@
                          :value="member" 
                          v-model="itemAssignments[idx]" 
                          class="peer sr-only" />
-                  <div class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-                              bg-surface-subtle text-text-muted
-                              peer-checked:bg-brand-soft peer-checked:text-brand-text 
-                              border border-transparent peer-checked:border-brand-primary">
+                  <div class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-surface-subtle text-text-muted peer-checked:bg-brand-soft peer-checked:text-brand-text border border-transparent peer-checked:border-brand-primary">
                     {{ member }}
                   </div>
                 </label>
@@ -162,14 +158,14 @@
           </div>
           
           <div class="flex justify-between items-center mt-8 pt-6 border-t border-border-default">
-            <button @click="currentStep = 1" class="btn border-border-default hover:border-border-strong text-text-secondary">
+            <Button variant="secondary" @click="currentStep = 1">
               Kembali
-            </button>
-            <button @click="processSplit" :disabled="isProcessing" class="btn bg-brand-primary hover:bg-brand-primary-hover text-text-inverse rounded-xl px-6 flex items-center gap-2">
-              <ArrowPathIcon v-if="isProcessing" class="w-5 h-5 animate-spin" />
-              <CheckCircleIcon v-else class="w-5 h-5" />
+            </Button>
+            <Button variant="primary" @click="processSplit" :disabled="isProcessing">
+              <IconRefresh v-if="isProcessing" class="w-5 h-5 animate-spin" />
+              <IconCheckCircle v-else class="w-5 h-5" />
               {{ isProcessing ? 'Memproses...' : 'Selesai & Bagi Tagihan' }}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -177,10 +173,10 @@
     </div>
 
     <!-- HISTORY SECTION -->
-    <div class="mt-12 bg-surface-card rounded-2xl border border-border-default overflow-hidden">
+    <div class="mt-12 bg-surface-card rounded-lg border border-border-default overflow-hidden">
       <div class="p-6 md:p-8">
         <h2 class="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
-          <ReceiptRefundIcon class="w-6 h-6 text-brand-primary" />
+          <IconReceipt class="w-6 h-6 text-brand-primary" />
           Riwayat Split Bill
         </h2>
         
@@ -201,7 +197,7 @@
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div v-for="history in historyList" :key="history.id" 
                @click="openHistory(history.id)"
-               class="bg-surface-subtle border border-border-default p-5 rounded-xl cursor-pointer hover:border-brand-primary transition-colors">
+               class="bg-surface-subtle border border-border-default p-5 rounded-md cursor-pointer hover:border-brand-primary transition-colors">
             <div class="flex justify-between items-start mb-2">
               <h3 class="font-bold text-text-primary text-lg">{{ history.merchant || 'Tempat Makan' }}</h3>
               <span class="text-xs text-text-faint">{{ formatDate(history.createdAt) }}</span>
@@ -218,21 +214,19 @@
 </template>
 
 <script setup>
+import PageGuide from '@/components/PageGuide.vue';
+import { pageGuides } from '@/config/pageGuides';
+import { IconAi, IconCheckCircle, IconClose, IconReceipt, IconRefresh, IconUpload, IconUsers } from '@/ui/icons';
+import { Button } from '@/ui';
+import { notify } from "@/lib/notify";
+import { useCelebration } from '@/composables/useCelebration';
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import apiClient from '@/lib/apiClient';
-import { 
-  SparklesIcon, 
-  DocumentArrowUpIcon, 
-  CheckCircleIcon, 
-  ArrowPathIcon,
-  ReceiptRefundIcon,
-  UsersIcon,
-  XMarkIcon
-} from '@heroicons/vue/24/outline';
 
 const router = useRouter();
 const steps = ['Upload Struk', 'Review & Teman', 'Bagi Menu'];
+const { celebrate } = useCelebration();
 const currentStep = ref(0);
 
 // History State
@@ -341,12 +335,15 @@ const scanReceipt = async () => {
       
       // Initialize assignments array based on items length
       itemAssignments.value = data.items.map(() => []);
+
+      // Struk berhasil diurai AI — momen "wow" fitur ini.
+      celebrate('split-bill');
       
       currentStep.value = 1;
     }
   } catch (error) {
     console.error("Gagal scan:", error);
-    alert("Gagal memproses struk. Pastikan format foto jelas.");
+    notify.error("Gagal memproses struk. Pastikan format foto jelas.");
   } finally {
     isScanning.value = false;
   }
@@ -372,7 +369,7 @@ const removeMember = (index) => {
 
 const goToAssignment = () => {
   if (members.value.length === 0) {
-    alert("Tambahkan setidaknya 1 orang.");
+    notify.warning("Tambahkan setidaknya 1 orang.");
     return;
   }
   currentStep.value = 2;
@@ -383,11 +380,28 @@ const processSplit = async () => {
   isProcessing.value = true;
   try {
     // Bangun payload yang sesuai dengan Schema SplitBillRequest
-    const assignmentsPayload = receiptData.items.map((item, idx) => ({
+    let assignmentsPayload = receiptData.items.map((item, idx) => ({
       item_name: item.name,
       total_price: item.price,
       assigned_to: itemAssignments.value[idx]
     })).filter(a => a.assigned_to.length > 0);
+
+    // Smart Payload / Validasi
+    if (assignmentsPayload.length === 0) {
+      if (receiptData.items.length === 1) {
+        // Auto assign jika hanya 1 produk
+        assignmentsPayload = [{
+          item_name: receiptData.items[0].name,
+          total_price: receiptData.items[0].price,
+          assigned_to: members.value
+        }];
+      } else {
+        // Hentikan jika produk > 1 dan tidak ada assignment
+        notify.warning("Silakan pilih siapa saja yang mengkonsumsi masing-masing barang sebelum melanjutkan.");
+        isProcessing.value = false;
+        return;
+      }
+    }
 
     const payload = {
       mode: 'itemized',
@@ -410,7 +424,9 @@ const processSplit = async () => {
     }
   } catch (error) {
     console.error("Gagal proses split:", error);
-    alert("Terjadi kesalahan saat memproses tagihan.");
+    // Tampilkan pesan error spesifik dari backend/AI jika ada
+    const errMsg = error.response?.data?.details?.detail || error.response?.data?.error || "Terjadi kesalahan saat memproses tagihan.";
+    notify.error(errMsg);
   } finally {
     isProcessing.value = false;
   }
