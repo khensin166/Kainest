@@ -6,6 +6,7 @@ import {
   left,
   right,
   ServerFailure,
+  taggedServerFailure,
   IncorrectPasswordFailure,
   NetworkFailure,
 } from "../../../../core/error/failure.js";
@@ -60,7 +61,7 @@ export class AuthRepository extends IAuthRepository {
       } else {
         // Error JavaScript lainnya
         return left(
-          new ServerFailure(error.message || "Gagal melakukan login.")
+          taggedServerFailure(error, error.message || "Gagal melakukan login.")
         );
       }
     }
@@ -84,7 +85,7 @@ export class AuthRepository extends IAuthRepository {
         return left(new NetworkFailure());
       } else {
         return left(
-          new ServerFailure(error.message || "Gagal melakukan registrasi.")
+          taggedServerFailure(error, error.message || "Gagal melakukan registrasi.")
         );
       }
     }
@@ -109,7 +110,7 @@ export class AuthRepository extends IAuthRepository {
         return left(new NetworkFailure());
       } else {
         return left(
-          new ServerFailure(error.message || "Gagal melakukan inisiasi social login.")
+          taggedServerFailure(error, error.message || "Gagal melakukan inisiasi social login.")
         );
       }
     }
@@ -157,7 +158,7 @@ export class AuthRepository extends IAuthRepository {
       }
       // Error lain (misal server down) adalah Failure
       return left(
-        new ServerFailure(error.message || "Gagal mengambil sesi user.")
+        taggedServerFailure(error, error.message || "Gagal mengambil sesi user.")
       );
     }
   }
@@ -174,7 +175,7 @@ export class AuthRepository extends IAuthRepository {
       return right(true); // Sukses
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message || "Gagal menghapus sesi lokal.")
+        taggedServerFailure(error, error.response?.data?.message || error.message || "Gagal menghapus sesi lokal.")
       );
     }
   }
@@ -185,7 +186,7 @@ export class AuthRepository extends IAuthRepository {
       return right(true);
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message || "Gagal mengirim email reset password.")
+        taggedServerFailure(error, error.response?.data?.message || error.message || "Gagal mengirim email reset password.")
       );
     }
   }
@@ -196,7 +197,7 @@ export class AuthRepository extends IAuthRepository {
       return right(true);
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message || "Gagal mereset kata sandi.")
+        taggedServerFailure(error, error.response?.data?.message || error.message || "Gagal mereset kata sandi.")
       );
     }
   }

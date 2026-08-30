@@ -6,6 +6,7 @@ import {
   left,
   right,
   ServerFailure,
+  taggedServerFailure,
 } from "../../../../core/error/failure";
 
 export class NoteRepository extends INoteRepository {
@@ -24,7 +25,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil notes."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -38,7 +39,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil note."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -52,7 +53,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal membuat note."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -66,7 +67,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal update note."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -80,7 +81,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal update izin."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -93,7 +94,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal menghapus note."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -107,7 +108,7 @@ export class NoteRepository extends INoteRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil note."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 }

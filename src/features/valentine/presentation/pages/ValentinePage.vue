@@ -241,7 +241,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import 'vue3-toastify/dist/index.css';
 import confetti from 'canvas-confetti';
 
@@ -508,10 +508,7 @@ const handleYesClick = () => {
             top: pos.top,
             left: pos.left,
         };
-        toast.warning("Eits! Cluenya tekan2 kali 😝", {
-            autoClose: 2000,
-            position: toast.POSITION.TOP_CENTER,
-        });
+        notify.warning("Eits! Cluenya tekan2 kali 😝");
     } else {
         // SUCCESS!
         isAskCardSolved.value = true;

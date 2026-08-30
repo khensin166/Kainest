@@ -1,6 +1,7 @@
 <!-- Transaction Form -->
 <script setup>
 import { Spinner } from '@/ui';
+import { notify } from "@/lib/notify";
 import { IconArrowDown, IconArrowUp } from '@/ui/icons';
 import { reactive, computed, onMounted, inject, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
@@ -134,17 +135,9 @@ const handleSubmit = async () => {
     if (closeModalFunc) {
       closeModalFunc();
     }
-    modalStore.openModal({
-      newTitle: isEditMode.value ? 'Berhasil Diupdate!' : 'Transaksi Berhasil!',
-      newMessage: isEditMode.value ? 'Data transaksi telah berhasil diperbarui.' : 'Data transaksi Anda telah berhasil disimpan.',
-      newStatus: 'success',
-    });
+    notify.success(isEditMode.value ? 'Data transaksi telah berhasil diperbarui.' : 'Data transaksi Anda telah berhasil disimpan.');
   } else {
-    modalStore.openModal({
-      newTitle: isEditMode.value ? 'Gagal Update' : 'Gagal Menyimpan',
-      newMessage: result.message || 'Terjadi kesalahan saat memproses data.',
-      newStatus: 'error',
-    });
+    notify.error(result.message || 'Terjadi kesalahan saat memproses data.', result);
   }
 };
 </script>

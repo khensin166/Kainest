@@ -5,6 +5,7 @@ import {
   left,
   right,
   ServerFailure,
+  taggedServerFailure,
 } from "../../../../core/error/failure";
 
 export class CoupleRepository extends ICoupleRepository {
@@ -25,7 +26,7 @@ export class CoupleRepository extends ICoupleRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil status pasangan."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Error server."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Error server."));
     }
   }
 
@@ -40,7 +41,7 @@ export class CoupleRepository extends ICoupleRepository {
         return left(new ServerFailure(response.message || "Gagal terhubung."));
       }
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Gagal terhubung."));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Gagal terhubung."));
     }
   }
 }

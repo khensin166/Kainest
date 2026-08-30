@@ -57,7 +57,7 @@
 import { Button } from '@/ui';
 import { ref, computed, defineEmits, defineProps, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import CurrencyInput from '@/components/forms/CurrencyInput.vue';
 
 const props = defineProps({
@@ -104,7 +104,7 @@ watch(() => budgetStore.payday, (newVal) => {
 const handleSubmit = async () => {
     // Validasi sederhana
     if (!salary.value) {
-        toast.warning('Mohon isi pemasukan / gaji bulanan Anda.');
+        notify.warning('Mohon isi pemasukan / gaji bulanan Anda.');
         return;
     }
 
@@ -119,10 +119,10 @@ const handleSubmit = async () => {
     isSubmitting.value = false;
 
     if (result.success) {
-        toast.success('Konfigurasi budget berhasil disimpan!');
+        notify.success('Konfigurasi budget berhasil disimpan!');
         emit('close', { refresh: true });
     } else {
-        toast.error(result.message || 'Gagal menyimpan konfigurasi.');
+        notify.error(result.message || 'Gagal menyimpan konfigurasi.');
     }
 };
 </script>

@@ -1,4 +1,4 @@
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 // src/features/wabot/presentation/stores/useWaBotStore.js
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -151,7 +151,7 @@ export const useWaBotStore = defineStore("wabot", () => {
   // 6. PERBAIKAN ACTION: Fetch All Keys (Pakai Repository)
   async function fetchApiKeysList() {
     if (!baseUrl.value || !adminSecret.value) {
-      toast.warning("Base URL dan Admin Secret harus diisi dulu!");
+      notify.warning("Base URL dan Admin Secret harus diisi dulu!");
       return;
     }
 
@@ -166,7 +166,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       apiKeysList.value = keys; // Repository sudah mengembalikan array data
     } catch (error) {
       console.error("Gagal ambil list key:", error);
-      toast.error("Gagal mengambil list API Key. Pastikan Admin Secret benar.");
+      notify.error("Gagal mengambil list API Key. Pastikan Admin Secret benar.");
     } finally {
       isLoading.value = false;
     }
@@ -231,7 +231,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       await fetchBackupTargets(); // refresh list
       return true;
     } catch (error) {
-      toast.error("Gagal menambah backup: " + error.message);
+      notify.error("Gagal menambah backup: " + error.message);
       return false;
     }
   }
@@ -252,7 +252,7 @@ export const useWaBotStore = defineStore("wabot", () => {
       await fetchBackupTargets(); // refresh list
       return true;
     } catch (error) {
-      toast.error("Gagal menghapus backup: " + error.message);
+      notify.error("Gagal menghapus backup: " + error.message);
       return false;
     }
   }

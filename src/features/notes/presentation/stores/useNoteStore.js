@@ -1,5 +1,6 @@
 // src/features/notes/presentation/stores/useNoteStore.js
 import { defineStore } from "pinia";
+import { notify } from "@/lib/notify";
 import { ref } from "vue";
 import { 
   getNotesUseCase, 
@@ -45,11 +46,7 @@ export const useNoteStore = defineStore("note", () => {
     if (result.right) {
       notesList.value = result.right; // result.right adalah NoteEntity[]
     } else {
-      modalStore.openModal({
-        newTitle: "Error",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
     }
   }
 
@@ -65,11 +62,7 @@ export const useNoteStore = defineStore("note", () => {
     if (result.right) {
       currentNote.value = result.right; // result.right adalah NoteEntity
     } else {
-      modalStore.openModal({
-        newTitle: "Error",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left)); // Lempar error agar page bisa redirect
     }
   }
@@ -88,11 +81,7 @@ export const useNoteStore = defineStore("note", () => {
       notesList.value.unshift(result.right);
       return result.right; // Kembalikan note baru
     } else {
-      modalStore.openModal({
-        newTitle: "Gagal Membuat Note",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left));
     }
   }
@@ -107,17 +96,9 @@ export const useNoteStore = defineStore("note", () => {
 
     if (result.right) {
       currentNote.value = result.right;
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Note disimpan.",
-        newStatus: "success",
-      });
+      notify.success("Note disimpan.");
     } else {
-      modalStore.openModal({
-        newTitle: "Gagal Menyimpan",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left));
     }
   }
@@ -132,17 +113,9 @@ export const useNoteStore = defineStore("note", () => {
 
     if (result.right) {
       currentNote.value = result.right;
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Pengaturan berhasil disimpan.",
-        newStatus: "success",
-      });
+      notify.success("Pengaturan berhasil disimpan.");
     } else {
-      modalStore.openModal({
-        newTitle: "Gagal",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left));
     }
   }
@@ -158,17 +131,9 @@ export const useNoteStore = defineStore("note", () => {
     if (result.right) {
       // Hapus dari list state
       notesList.value = notesList.value.filter((n) => n.id !== noteId);
-      modalStore.openModal({
-        newTitle: "Berhasil",
-        newMessage: "Note telah dihapus.",
-        newStatus: "success",
-      });
+      notify.success("Note telah dihapus.");
     } else {
-      modalStore.openModal({
-        newTitle: "Gagal Menghapus",
-        newMessage: mapFailureToMessage(result.left),
-        newStatus: "error",
-      });
+      notify.error(mapFailureToMessage(result.left), result.left);
       throw new Error(mapFailureToMessage(result.left));
     }
   }

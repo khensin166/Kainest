@@ -1,7 +1,7 @@
 import { INotificationRepository } from "../../domain/repository/INotificationRepository";
 import { NotificationRemoteSource } from "../source/NotificationRemoteSource";
 import { NotificationMapper } from "../mappers/NotificationMapper";
-import { left, right, ServerFailure } from "@/core/error/failure";
+import { left, right, ServerFailure, taggedServerFailure } from "@/core/error/failure";
 
 export class NotificationRepository extends INotificationRepository {
   constructor() {
@@ -17,7 +17,7 @@ export class NotificationRepository extends INotificationRepository {
         unreadCount: data?.unreadCount ?? 0,
       });
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -26,7 +26,7 @@ export class NotificationRepository extends INotificationRepository {
       await this.remoteSource.markAsRead(id);
       return right(true);
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 }

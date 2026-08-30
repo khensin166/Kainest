@@ -7,6 +7,7 @@ export default {
 </script>
 <script setup>
 import { IconDelete, IconFilter, IconMoney, IconSearch } from '@/ui/icons';
+import { notify } from "@/lib/notify";
 import { Button, Spinner } from '@/ui';
 import { onMounted, ref, watch, computed, provide, onActivated } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
@@ -155,19 +156,11 @@ const handleDeleteClick = (id) => {
 
       if (result.success) {
         // Tampilkan notifikasi sukses global
-        modalStore.openModal({
-          newTitle: 'Berhasil Dihapus',
-          newMessage: 'Transaksi telah berhasil dihapus.',
-          newStatus: 'success',
-        });
+        notify.success('Transaksi telah berhasil dihapus.');
         // Data list otomatis refresh
       } else {
         // Tampilkan notifikasi error global
-        modalStore.openModal({
-          newTitle: 'Gagal Menghapus',
-          newMessage: result.message || 'Terjadi kesalahan.',
-          newStatus: 'error',
-        });
+        notify.error(result.message || 'Terjadi kesalahan.', result);
         throw new Error(result.message);
       }
     }

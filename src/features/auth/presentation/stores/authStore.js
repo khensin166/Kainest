@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { notify } from "@/lib/notify";
 import { ref, computed } from "vue";
 import { useModalStore } from "../../../../stores/modalStore";
 // import { AuthRepository } from "../../data/repository/AuthRepository"; // DIP: Removed direct dependency
@@ -126,11 +127,7 @@ export const useAuthStore = defineStore("auth", () => {
       isAuthenticated.value = true;
       isLoading.value = false;
 
-      modalStore.openModal({
-        newTitle: "Login Berhasil!",
-        newMessage: `Selamat datang kembali, ${result.right.displayName}!`,
-        newStatus: "success",
-      });
+      notify.success(`Selamat datang kembali, ${result.right.displayName}!`);
     }
   }
 
@@ -161,9 +158,10 @@ export const useAuthStore = defineStore("auth", () => {
       // Sukses
       isLoading.value = false;
 
+      // lint-ok: momen sekali seumur akun, diikuti pindah halaman
+
       modalStore.openModal({
         newTitle: "Registrasi Berhasil!",
-        // Ubah pesan ini, karena tidak ada lagi verifikasi email (kecuali Anda menambahkannya di Hono)
         newMessage: `Akun untuk ${credentials.email} telah dibuat. Silakan login.`,
         newStatus: "success",
       });
@@ -228,20 +226,12 @@ export const useAuthStore = defineStore("auth", () => {
       error.value = message;
       isLoading.value = false;
       
-      modalStore.openModal({
-        newTitle: "Gagal Mengirim Link",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
       
       throw new Error(message);
     } else {
       isLoading.value = false;
-      modalStore.openModal({
-        newTitle: "Link Terkirim!",
-        newMessage: `Kami telah mengirimkan tautan reset password ke ${email}. Silakan cek kotak masuk Anda.`,
-        newStatus: "success",
-      });
+      notify.success(`Kami telah mengirimkan tautan reset password ke ${email}. Silakan cek kotak masuk Anda.`);
       return true;
     }
   }
@@ -258,20 +248,12 @@ export const useAuthStore = defineStore("auth", () => {
       error.value = message;
       isLoading.value = false;
       
-      modalStore.openModal({
-        newTitle: "Gagal Mereset Kata Sandi",
-        newMessage: message,
-        newStatus: "error",
-      });
+      notify.error(message);
       
       throw new Error(message);
     } else {
       isLoading.value = false;
-      modalStore.openModal({
-        newTitle: "Kata Sandi Diperbarui!",
-        newMessage: "Kata sandi Anda telah berhasil direset. Silakan login menggunakan kata sandi baru Anda.",
-        newStatus: "success",
-      });
+      notify.success("Kata sandi Anda telah berhasil direset. Silakan login menggunakan kata sandi baru Anda.");
       return true;
     }
   }

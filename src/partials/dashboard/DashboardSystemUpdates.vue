@@ -50,7 +50,7 @@
 
 <script setup>
 import { IconAnnounce, IconRefresh, IconRelease } from '@/ui/icons';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import { computed, onMounted } from 'vue';
 import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
 import { useDashboardStore } from '@/features/dashboard/presentation/stores/useDashboardStore';
@@ -73,9 +73,9 @@ const formatDate = (dateString) => {
 const syncGithub = async () => {
   const res = await dashboardStore.syncSystemUpdates();
   if (res.ok) {
-    toast.success(`Sinkronisasi berhasil: ${res.newlyAdded} update baru, ${res.blasted} notifikasi terkirim.`);
+    notify.success(`Sinkronisasi berhasil: ${res.newlyAdded} update baru, ${res.blasted} notifikasi terkirim.`);
   } else if (res.message !== undefined) {
-    toast.error('Gagal melakukan sync dari GitHub.');
+    notify.error('Gagal melakukan sync dari GitHub.');
   }
 };
 

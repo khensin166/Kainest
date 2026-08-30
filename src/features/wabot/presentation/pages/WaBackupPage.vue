@@ -165,7 +165,7 @@ import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
 import { Spinner } from '@/ui';
 import { IconAdd, IconForum, IconWarning } from '@/ui/icons';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useWaBotStore } from '../stores/useWaBotStore';
 import BaseEmptyState from '@/components/BaseEmptyState.vue';
@@ -197,13 +197,13 @@ const onSelectGroup = () => {
 
 const handleAddTarget = async () => {
     if (!formBackup.chatId || !formBackup.sessionId) {
-        toast.warning("Chat ID dan Session ID harus diisi.");
+        notify.warning("Chat ID dan Session ID harus diisi.");
         return;
     }
 
     const success = await waStore.addBackupTarget(formBackup.sessionId, formBackup.chatId, formBackup.chatName);
     if (success) {
-        toast.success("Berhasil menambahkan target backup!");
+        notify.success("Berhasil menambahkan target backup!");
         // Reset form
         formBackup.chatId = '';
         formBackup.chatName = '';

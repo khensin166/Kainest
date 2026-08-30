@@ -103,6 +103,7 @@ export default {
   props: ["sidebarOpen", "variant"],
   components: {
     SidebarLinkGroup,
+    IconChevronLeft, IconChevronRight,
   },
   setup(props, { emit }) {
     const trigger = ref(null);

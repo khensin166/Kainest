@@ -1,5 +1,5 @@
 import { IAdminRepository } from "../../domain/repository/IAdminRepository";
-import { left, right, ServerFailure } from "../../../../core/error/failure";
+import { left, right, ServerFailure, taggedServerFailure } from "../../../../core/error/failure";
 
 export class AdminRepository extends IAdminRepository {
   constructor(remoteSource) {
@@ -16,7 +16,7 @@ export class AdminRepository extends IAdminRepository {
         return left(new ServerFailure(response.message || "Gagal mengambil data user"));
       }
     } catch (error) {
-      return left(new ServerFailure(error.message || "Terjadi kesalahan koneksi"));
+      return left(taggedServerFailure(error, error.message || "Terjadi kesalahan koneksi"));
     }
   }
 
@@ -29,7 +29,7 @@ export class AdminRepository extends IAdminRepository {
         return left(new ServerFailure(response.message || "Gagal update akses user"));
       }
     } catch (error) {
-      return left(new ServerFailure(error.message || "Terjadi kesalahan koneksi"));
+      return left(taggedServerFailure(error, error.message || "Terjadi kesalahan koneksi"));
     }
   }
 }

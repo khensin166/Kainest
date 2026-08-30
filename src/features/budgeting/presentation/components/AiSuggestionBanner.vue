@@ -113,7 +113,7 @@ import { IconArrowDown, IconArrowRight, IconArrowUp, IconBolt, IconCheck, IconCh
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBudgetStore } from '../stores/useBudgetStore';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 
 const budgetStore = useBudgetStore();
 const { aiSuggestion, isApplyingSuggestion, isDismissingSuggestion } = storeToRefs(budgetStore);
@@ -134,9 +134,9 @@ const handleApply = async () => {
   const result = await budgetStore.applyAiSuggestion(aiSuggestion.value.id);
   if (result.success) {
     showDetails.value = false;
-    toast.success(`Berhasil menerapkan ${result.data.appliedCount} rekomendasi budget dari AI!`);
+    notify.success(`Berhasil menerapkan ${result.data.appliedCount} rekomendasi budget dari AI!`);
   } else {
-    toast.error(result.message || 'Gagal menerapkan rekomendasi budget.');
+    notify.error(result.message || 'Gagal menerapkan rekomendasi budget.');
   }
 };
 
@@ -145,9 +145,9 @@ const handleDismiss = async () => {
   const result = await budgetStore.dismissAiSuggestion(aiSuggestion.value.id);
   if (result.success) {
     showDetails.value = false;
-    toast.success(`Saran AI diabaikan.`);
+    notify.success(`Saran AI diabaikan.`);
   } else {
-    toast.error(result.message || 'Gagal mengabaikan rekomendasi budget.');
+    notify.error(result.message || 'Gagal mengabaikan rekomendasi budget.');
   }
 };
 </script>

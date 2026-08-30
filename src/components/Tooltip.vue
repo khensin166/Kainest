@@ -42,6 +42,7 @@ import { IconInfo } from '@/ui/icons'
 import { ref } from 'vue'
 
 export default {
+  components: { IconInfo },
   name: 'Tooltip',
   props: ['bg', 'size', 'position'],
   setup() {

@@ -218,7 +218,7 @@ import PageGuide from '@/components/PageGuide.vue';
 import { pageGuides } from '@/config/pageGuides';
 import { IconAi, IconCheckCircle, IconClose, IconReceipt, IconRefresh, IconUpload, IconUsers } from '@/ui/icons';
 import { Button } from '@/ui';
-import { toast } from 'vue3-toastify';
+import { notify } from "@/lib/notify";
 import { useCelebration } from '@/composables/useCelebration';
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -343,7 +343,7 @@ const scanReceipt = async () => {
     }
   } catch (error) {
     console.error("Gagal scan:", error);
-    toast.error("Gagal memproses struk. Pastikan format foto jelas.");
+    notify.error("Gagal memproses struk. Pastikan format foto jelas.");
   } finally {
     isScanning.value = false;
   }
@@ -369,7 +369,7 @@ const removeMember = (index) => {
 
 const goToAssignment = () => {
   if (members.value.length === 0) {
-    toast.warning("Tambahkan setidaknya 1 orang.");
+    notify.warning("Tambahkan setidaknya 1 orang.");
     return;
   }
   currentStep.value = 2;
@@ -407,7 +407,7 @@ const processSplit = async () => {
     }
   } catch (error) {
     console.error("Gagal proses split:", error);
-    toast.error("Terjadi kesalahan saat memproses tagihan.");
+    notify.error("Terjadi kesalahan saat memproses tagihan.");
   } finally {
     isProcessing.value = false;
   }

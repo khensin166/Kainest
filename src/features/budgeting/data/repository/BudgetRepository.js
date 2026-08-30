@@ -2,7 +2,7 @@ import { IBudgetRepository } from "../../domain/repository/IBudgetRepository";
 // src/features/budgeting/data/repository/BudgetRepository.js
 import { BudgetRemoteSource } from "../source/BudgetRemoteSource";
 import { BudgetMapper } from "../mappers/BudgetMapper";
-import { left, right, ServerFailure } from "../../../../core/error/failure";
+import { left, right, ServerFailure, taggedServerFailure } from "../../../../core/error/failure";
 
 export class BudgetRepository extends IBudgetRepository {
   constructor() {
@@ -48,7 +48,7 @@ export class BudgetRepository extends IBudgetRepository {
     } catch (error) {
       // Tangkap error jaringan/axios
       return left(
-        new ServerFailure(
+        taggedServerFailure(error, 
           error.response?.data?.message ||
             error.message ||
             "Terjadi kesalahan koneksi."
@@ -71,7 +71,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(
+        taggedServerFailure(error, 
           error.response?.data?.message || "AI tidak merespons."
         )
       );
@@ -95,7 +95,7 @@ export class BudgetRepository extends IBudgetRepository {
     } catch (error) {
       // Ekstrak kode error dari response API (misal: TRANSACTION_CLOSED_PERIOD)
       const errData = error.response?.data;
-      const failure = new ServerFailure(
+      const failure = taggedServerFailure(error, 
         errData?.message || error.response?.data?.message || "Kesalahan server.",
         errData?.code
       );
@@ -129,7 +129,7 @@ export class BudgetRepository extends IBudgetRepository {
     } catch (error) {
       // Tangkap error jaringan/axios
       return left(
-        new ServerFailure(
+        taggedServerFailure(error, 
           error.response?.data?.message ||
             error.message ||
             "Terjadi kesalahan koneksi."
@@ -151,7 +151,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Failed to create category"));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || "Server error"));
+      return left(taggedServerFailure(error, error.response?.data?.message || "Server error"));
     }
   }
 
@@ -175,7 +175,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(
+        taggedServerFailure(error, 
           error.response?.data?.message ||
             error.message ||
             "Terjadi kesalahan koneksi."
@@ -218,7 +218,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message)
+        taggedServerFailure(error, error.response?.data?.message || error.message)
       );
     }
   }
@@ -239,7 +239,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message)
+        taggedServerFailure(error, error.response?.data?.message || error.message)
       );
     }
   }
@@ -260,7 +260,7 @@ export class BudgetRepository extends IBudgetRepository {
     } catch (error) {
       const errData = error.response?.data;
       return left(
-        new ServerFailure(errData?.message || error.message, errData?.code)
+        taggedServerFailure(error, errData?.message || error.message, errData?.code)
       );
     }
   }
@@ -280,7 +280,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message)
+        taggedServerFailure(error, error.response?.data?.message || error.message)
       );
     }
   }
@@ -299,7 +299,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
     } catch (error) {
       return left(
-        new ServerFailure(error.response?.data?.message || error.message)
+        taggedServerFailure(error, error.response?.data?.message || error.message)
       );
     }
   }
@@ -317,7 +317,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal mengambil daftar kantong."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -329,7 +329,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal menyimpan kantong."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -341,7 +341,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal menghapus kantong."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -353,7 +353,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal menyimpan konfigurasi kantong."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -365,7 +365,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal mengupdate kata kunci."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -386,7 +386,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal klasifikasi AI."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -402,7 +402,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal mengambil riwayat."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -418,7 +418,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal memuat saran AI."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -430,7 +430,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal menerapkan saran AI."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 
@@ -442,7 +442,7 @@ export class BudgetRepository extends IBudgetRepository {
       }
       return left(new ServerFailure(response.message || "Gagal mengabaikan saran AI."));
     } catch (error) {
-      return left(new ServerFailure(error.response?.data?.message || error.message));
+      return left(taggedServerFailure(error, error.response?.data?.message || error.message));
     }
   }
 }
