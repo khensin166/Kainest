@@ -45,6 +45,8 @@ export { default as IconDownload }   from '~icons/material-symbols/download'
 export { default as IconLink }       from '~icons/material-symbols/link'
 export { default as IconLogout }     from '~icons/material-symbols/logout'
 export { default as IconSettings }   from '~icons/material-symbols/settings-outline'
+export { default as IconSave }       from '~icons/material-symbols/save-outline'
+export { default as IconFlag }       from '~icons/material-symbols/flag-outline'
 
 /* ── Keuangan (domain inti Kainest) ──────────────────────────── */
 export { default as IconWallet }      from '~icons/material-symbols/account-balance-wallet-outline'

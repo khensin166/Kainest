@@ -66,22 +66,56 @@
         <Transition
           enter-active-class="transition-all duration-200 ease-out"
           enter-from-class="opacity-0 max-h-0"
-          enter-to-class="opacity-100 max-h-48"
+          enter-to-class="opacity-100 max-h-[600px]"
           leave-active-class="transition-all duration-150 ease-in"
-          leave-from-class="opacity-100 max-h-48"
+          leave-from-class="opacity-100 max-h-[600px]"
           leave-to-class="opacity-0 max-h-0"
         >
           <div v-show="isBlueprintExpanded" class="px-4 py-3 border-t border-border-default">
+            <!-- Template Sistem (preset bawaan) -->
+            <p class="text-xs font-medium text-text-muted mb-2">Template Sistem</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button type="button" @click="applyBlueprint('503020')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
+              <button type="button" @click="requestApplyBlueprint('503020')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
                 <h4 class="font-medium text-sm text-text-primary">Aturan 50-30-20</h4>
                 <p class="text-xs text-text-muted mt-1">Ideal: 50% Pokok, 30% Hiburan, 20% Tabungan.</p>
               </button>
-              <button type="button" @click="applyBlueprint('hemat')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
+              <button type="button" @click="requestApplyBlueprint('hemat')" class="p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary text-left transition-all">
                 <h4 class="font-medium text-sm text-text-primary">Mahasiswa Kos (Hemat)</h4>
                 <p class="text-xs text-text-muted mt-1">Fokus: 70% Pokok, 10% Hiburan, 20% Tabungan.</p>
               </button>
             </div>
+
+            <!-- Template Kustom (dari pengguna) -->
+            <template v-if="plansStore.templates.length > 0">
+              <p class="text-xs font-medium text-text-muted mt-4 mb-2">Template Kustom</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="tmpl in plansStore.templates"
+                  :key="tmpl.id"
+                  class="relative group p-3 border border-border-default rounded-md bg-surface-card hover:border-brand-primary hover:ring-1 hover:ring-brand-primary transition-all"
+                >
+                  <button type="button" @click="requestApplyTemplate(tmpl)" class="w-full text-left">
+                    <h4 class="font-medium text-sm text-text-primary truncate pr-6">{{ tmpl.name }}</h4>
+                    <p class="text-xs text-text-muted mt-1">
+                      {{ tmpl.pockets?.length ?? 0 }} kantong
+                      <span v-if="tmpl.missingCategoryCount > 0" class="text-status-warning">
+                        · {{ tmpl.missingCategoryCount }} kategori hilang
+                      </span>
+                    </p>
+                  </button>
+                  <!-- Tombol hapus template kustom -->
+                  <button
+                    type="button"
+                    @click.stop="plansStore.deleteTemplate(tmpl.id)"
+                    :disabled="plansStore.isSubmitting"
+                    class="absolute top-2 right-2 p-1 rounded-sm text-text-faint hover:text-status-danger hover:bg-surface-hover transition-colors opacity-0 group-hover:opacity-100"
+                    :title="'Hapus template ' + tmpl.name"
+                  >
+                    <IconDelete class="w-3.5 h-3.5" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </template>
           </div>
         </Transition>
       </div>
@@ -269,7 +303,19 @@
           Batal
         </button>
 
-        <!-- Simpan -->
+        <!-- Simpan sebagai Template -->
+        <button
+          type="button"
+          @click="openSaveTemplateDialog"
+          :disabled="isSubmitting || pocketsData.filter(p => p.categoryId).length === 0"
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-text-secondary bg-surface-card border border-border-default hover:bg-surface-hover hover:border-brand-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+          title="Simpan susunan kantong ini sebagai template"
+        >
+          <IconSave class="w-4 h-4" aria-hidden="true" />
+          <span class="hidden sm:inline">Simpan Template</span>
+        </button>
+
+        <!-- Simpan Kantong -->
         <button
           type="button"
           @click="handleSubmit"
@@ -316,14 +362,66 @@
         </p>
       </template>
     </BaseModal>
+
+    <!-- ===================================================== -->
+    <!-- KONFIRMASI TERAPKAN TEMPLATE — menimpa seluruh kantong -->
+    <!-- ===================================================== -->
+    <BaseModal
+      :isOpen="applyTemplateDialog.show"
+      @close="applyTemplateDialog.show = false"
+      @confirm="confirmApplyTemplate"
+      size="sm"
+    >
+      <template #header>Terapkan Template?</template>
+      <template #body>
+        <p class="text-sm text-text-muted mb-3">
+          Menerapkan template <strong class="text-text-primary">{{ applyTemplateDialog.name }}</strong>
+          akan <strong class="text-status-warning">menimpa seluruh susunan kantong</strong> yang sedang ada.
+        </p>
+        <p v-if="applyTemplateDialog.missingCount > 0" class="text-xs text-status-warning mb-3 flex items-center gap-1.5">
+          <IconWarning class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          {{ applyTemplateDialog.missingCount }} kantong di template ini akan dilewati karena kategorinya sudah dihapus.
+        </p>
+        <p class="text-xs text-text-muted">Perubahan baru tersimpan ke server setelah Anda menekan <strong>"Simpan Kantong"</strong>.</p>
+      </template>
+    </BaseModal>
+
+    <!-- ===================================================== -->
+    <!-- MODAL SIMPAN TEMPLATE — Menamai template baru -->
+    <!-- ===================================================== -->
+    <BaseModal
+      :isOpen="saveTemplateDialog.show"
+      @close="saveTemplateDialog.show = false"
+      @confirm="confirmSaveTemplate"
+      size="sm"
+    >
+      <template #header>Simpan sebagai Template</template>
+      <template #body>
+        <p class="text-sm text-text-muted mb-4">Beri nama untuk template susunan kantong ini agar bisa dipakai ulang nanti.</p>
+        <label class="block text-xs font-medium text-text-muted mb-1">Nama Template <span class="text-status-danger">*</span></label>
+        <input
+          v-model="saveTemplateDialog.name"
+          type="text"
+          class="form-input w-full text-sm rounded-md"
+          placeholder="cth: Bulan Ramadan, Gaji Kecil"
+          maxlength="50"
+          @keyup.enter="confirmSaveTemplate"
+        />
+        <p v-if="saveTemplateDialog.error" class="mt-2 text-xs text-status-danger flex items-center gap-1">
+          <IconWarning class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          {{ saveTemplateDialog.error }}
+        </p>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script setup>
 import { Spinner } from '@/ui';
-import { IconAdd, IconArrowRight, IconBolt, IconCheck, IconChevronDown, IconClose, IconDelete, IconTag, IconWarning, IconWave } from '@/ui/icons';
+import { IconAdd, IconArrowRight, IconBolt, IconCheck, IconChevronDown, IconClose, IconDelete, IconSave, IconTag, IconWarning, IconWave } from '@/ui/icons';
 import { ref, computed, onMounted, defineEmits, nextTick } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore';
+import { usePlansStore } from '@/features/plans/presentation/stores/usePlansStore';
 import { notify } from "@/lib/notify";
 import DropdownSelect from '@/components/forms/DropdownSelect.vue';
 import BaseModal from '@/components/modals/BaseModal.vue';
@@ -332,6 +430,7 @@ import { formatRupiah } from '@/utils/Utils';
 
 const emit = defineEmits(['close']);
 const budgetStore = useBudgetStore();
+const plansStore = usePlansStore();
 
 // Default kosong
 const pocketsData = ref([]);
@@ -392,8 +491,11 @@ onMounted(async () => {
     await budgetStore.fetchAllCategories();
   }
 
-  // 2. Baru load daftar pocket yang sudah tersimpan
-  await budgetStore.fetchPockets();
+  // 2. Load daftar pocket dan template secara paralel
+  await Promise.all([
+    budgetStore.fetchPockets(),
+    plansStore.fetchTemplates(),
+  ]);
 
   if (budgetStore.pocketsList.length > 0) {
     pocketsData.value = budgetStore.pocketsList.map(p => ({
@@ -520,7 +622,7 @@ const cancelCategoryChange = () => {
 };
 
 // ==========================================
-// Blueprint
+// Blueprint & Template
 // ==========================================
 
 const applyBlueprint = (type) => {
@@ -562,6 +664,131 @@ const applyBlueprint = (type) => {
   }
 
   if (pocketsData.value.length === 0) addPocket();
+};
+
+// --- Dialog konfirmasi penerapan template (menimpa) ---
+const applyTemplateDialog = ref({
+  show: false,
+  name: '',
+  pockets: [],
+  missingCount: 0,
+  isBlueprint: false,
+  blueprintType: '',
+});
+
+/**
+ * Intercept sebelum menerapkan blueprint bawaan — jika ada perubahan aktif,
+ * tampilkan konfirmasi terlebih dahulu agar draf tidak hilang tanpa sengaja.
+ */
+const requestApplyBlueprint = (type) => {
+  if (hasChanges.value) {
+    applyTemplateDialog.value = {
+      show: true,
+      name: type === '503020' ? 'Aturan 50-30-20' : 'Mahasiswa Kos (Hemat)',
+      pockets: [],
+      missingCount: 0,
+      isBlueprint: true,
+      blueprintType: type,
+    };
+  } else {
+    applyBlueprint(type);
+  }
+};
+
+/**
+ * Intercept sebelum menerapkan template kustom — jika ada perubahan aktif,
+ * tampilkan konfirmasi. Kategori yang sudah terhapus dilaporkan via missingCount.
+ */
+const requestApplyTemplate = (tmpl) => {
+  const validPockets = (tmpl.pockets || []).filter(p =>
+    availableCategories.value.some(c => c.id === p.categoryId)
+  );
+  const missingCount = (tmpl.pockets?.length ?? 0) - validPockets.length;
+
+  if (hasChanges.value) {
+    applyTemplateDialog.value = {
+      show: true,
+      name: tmpl.name,
+      pockets: validPockets,
+      missingCount,
+      isBlueprint: false,
+      blueprintType: '',
+    };
+  } else {
+    _doApplyTemplate(validPockets, missingCount, tmpl.name);
+  }
+};
+
+const confirmApplyTemplate = () => {
+  applyTemplateDialog.value.show = false;
+  if (applyTemplateDialog.value.isBlueprint) {
+    applyBlueprint(applyTemplateDialog.value.blueprintType);
+  } else {
+    _doApplyTemplate(
+      applyTemplateDialog.value.pockets,
+      applyTemplateDialog.value.missingCount,
+      applyTemplateDialog.value.name,
+    );
+  }
+};
+
+/** Terapkan daftar kantong dari template kustom ke pocketsData. */
+const _doApplyTemplate = (validPockets, missingCount, templateName) => {
+  pocketsData.value = validPockets.map(p => {
+    const cat = availableCategories.value.find(c => c.id === p.categoryId);
+    return {
+      categoryId: p.categoryId,
+      limitType: p.limitType ?? 'percentage',
+      percentage: p.percentage ?? null,
+      limitAmount: p.limitAmount ?? null,
+      keywordsInput: cat?.keywords?.length ? cat.keywords.join(', ') : (p.keywordsInput ?? ''),
+    };
+  });
+
+  if (pocketsData.value.length === 0) addPocket();
+
+  if (missingCount > 0) {
+    notify.warning(`Template "${templateName}" diterapkan. ${missingCount} kantong dilewati karena kategorinya sudah dihapus.`);
+  } else {
+    notify.success(`Template "${templateName}" diterapkan!`);
+  }
+};
+
+// --- Dialog simpan template baru ---
+const saveTemplateDialog = ref({
+  show: false,
+  name: '',
+  error: '',
+});
+
+const openSaveTemplateDialog = () => {
+  saveTemplateDialog.value = { show: true, name: '', error: '' };
+};
+
+const confirmSaveTemplate = async () => {
+  const name = saveTemplateDialog.value.name.trim();
+  if (!name) {
+    saveTemplateDialog.value.error = 'Nama template wajib diisi.';
+    return;
+  }
+  saveTemplateDialog.value.error = '';
+
+  // Ambil hanya kantong yang sudah punya kategori
+  const pocketsToSave = pocketsData.value
+    .filter(p => p.categoryId)
+    .map(p => ({
+      categoryId: p.categoryId,
+      limitType: p.limitType,
+      percentage: p.percentage,
+      limitAmount: p.limitAmount,
+      keywordsInput: p.keywordsInput,
+    }));
+
+  const result = await plansStore.createTemplate(name, pocketsToSave);
+  if (result.success) {
+    saveTemplateDialog.value.show = false;
+  }
+  // Kegagalan sudah ditangani oleh jalankan() di store (notify.error + __handled)
 };
 
 // ==========================================
