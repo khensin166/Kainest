@@ -380,11 +380,28 @@ const processSplit = async () => {
   isProcessing.value = true;
   try {
     // Bangun payload yang sesuai dengan Schema SplitBillRequest
-    const assignmentsPayload = receiptData.items.map((item, idx) => ({
+    let assignmentsPayload = receiptData.items.map((item, idx) => ({
       item_name: item.name,
       total_price: item.price,
       assigned_to: itemAssignments.value[idx]
     })).filter(a => a.assigned_to.length > 0);
+
+    // Smart Payload / Validasi
+    if (assignmentsPayload.length === 0) {
+      if (receiptData.items.length === 1) {
+        // Auto assign jika hanya 1 produk
+        assignmentsPayload = [{
+          item_name: receiptData.items[0].name,
+          total_price: receiptData.items[0].price,
+          assigned_to: members.value
+        }];
+      } else {
+        // Hentikan jika produk > 1 dan tidak ada assignment
+        notify.warning("Silakan pilih siapa saja yang mengkonsumsi masing-masing barang sebelum melanjutkan.");
+        isProcessing.value = false;
+        return;
+      }
+    }
 
     const payload = {
       mode: 'itemized',
@@ -407,7 +424,9 @@ const processSplit = async () => {
     }
   } catch (error) {
     console.error("Gagal proses split:", error);
-    notify.error("Terjadi kesalahan saat memproses tagihan.");
+    // Tampilkan pesan error spesifik dari backend/AI jika ada
+    const errMsg = error.response?.data?.details?.detail || error.response?.data?.error || "Terjadi kesalahan saat memproses tagihan.";
+    notify.error(errMsg);
   } finally {
     isProcessing.value = false;
   }

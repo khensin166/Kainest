@@ -148,7 +148,7 @@ import { notify } from "@/lib/notify";
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
+import apiClient from '@/lib/apiClient';
 
 const route = useRoute();
 const splitId = route.params.id;
@@ -214,16 +214,10 @@ const blastWhatsApp = async () => {
   
   isBlasting.value = true;
   try {
-    // Ambil auth token dari localStorage karena ini action privileged
-    const token = localStorage.getItem("auth_token");
-    
-    await axios.post(`${API_BASE}/split/blast`, {
+    // Gunakan apiClient agar credentials (cookies better-auth) otomatis disertakan
+    await apiClient.post('/split/blast', {
       targetPhone: blastPhone.value,
       message: formattedSummaryText.value
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
     });
     
     notify.success("Berhasil! Pesan tagihan & link promo Kainest telah diblast via GOWA.");
