@@ -168,7 +168,7 @@
             <select
               v-model="user.userGroupId"
               @change="ubahGroup(user)"
-              class="w-full px-3 py-2 border border-border-default rounded-md bg-surface text-sm text-text-primary focus:ring-2 focus:ring-brand-primary"
+              class="w-full px-3 py-2 border border-border-default rounded-md bg-transparent text-sm text-text-primary focus:ring-2 focus:ring-brand-primary [&>option]:bg-surface"
             >
               <option :value="null">Pilih Grup...</option>
               <option v-for="group in groups" :key="group.id" :value="group.id">
@@ -178,6 +178,20 @@
             <p class="text-xs text-text-muted mt-2">
               Hak akses modul secara otomatis diturunkan dari grup yang dipilih.
             </p>
+            
+            <div v-if="user.userGroupId" class="mt-3">
+              <p class="text-xs font-semibold text-text-secondary mb-1">Modul yang Diaktifkan:</p>
+              <div class="flex flex-wrap gap-1.5">
+                <Badge 
+                  v-for="perm in groups.find(g => g.id === user.userGroupId)?.permissions || []" 
+                  :key="perm"
+                  tone="success"
+                  size="sm"
+                >
+                  {{ perm }}
+                </Badge>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
