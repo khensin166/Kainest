@@ -1,5 +1,5 @@
 <template>
-  <div class="px-5 py-4 w-full max-h-[85vh] overflow-y-auto" ref="scrollContainer" @scroll="handleScroll">
+  <div class="px-5 pt-4 pb-12 sm:pb-4 w-full max-h-[85vh] overflow-y-auto" ref="scrollContainer" @scroll="handleScroll">
     <div class="text-sm font-medium text-text-muted mb-6">
       Kelola "Kantong" (Pocket) Pengeluaran Anda. Tentukan batas persentase atau nominal untuk tiap kategori.
     </div>
@@ -285,7 +285,7 @@
     <!-- ====================================================== -->
     <!-- STATIC FOOTER - Visible completely when scrolled to bottom -->
     <!-- ====================================================== -->
-    <div class="mt-6 flex flex-col sm:flex-row justify-end items-center gap-3 pt-5 border-t border-border-default">
+    <div class="mt-6 flex flex-col sm:flex-row justify-end items-center gap-3 pt-5 pb-[env(safe-area-inset-bottom)] sm:pb-0 border-t border-border-default">
       
       <!-- Info text (Ada perubahan atau melebihi 100%) -->
       <div class="w-full sm:w-auto flex-1 text-center sm:text-left mb-2 sm:mb-0">
