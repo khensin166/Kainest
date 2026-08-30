@@ -149,6 +149,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import apiClient from '@/lib/apiClient';
+import { useAuthStore } from '@/features/auth/presentation/stores/authStore';
 
 const route = useRoute();
 const splitId = route.params.id;
