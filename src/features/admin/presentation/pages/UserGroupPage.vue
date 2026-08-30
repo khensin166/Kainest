@@ -66,7 +66,7 @@
     </div>
 
     <!-- Modal Form Group -->
-    <Modal v-model="isModalOpen" :title="editingGroup ? 'Edit Grup Akses' : 'Buat Grup Baru'">
+    <Modal v-model:open="isModalOpen" :title="editingGroup ? 'Edit Grup Akses' : 'Buat Grup Baru'">
       <div class="space-y-6">
         <div>
           <label class="block text-sm font-medium text-text-primary mb-1">Nama Grup <span class="text-status-danger">*</span></label>
