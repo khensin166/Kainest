@@ -78,8 +78,9 @@ const closeSetupModal = async (payload) => {
   // sehingga data salary sudah terupdate di Store. Memanggil ulang di sini
   // hanya akan menyebabkan loading state berkedip (double-fetch).
 
-  // Hanya paksa setup kembali jika konteksnya memang forced DAN salary masih 0
-  if (isSetupForced.value && budgetStore.salary === 0) {
+  if (payload?.refresh) {
+    isSetupForced.value = false;
+  } else if (isSetupForced.value && budgetStore.salary === 0) {
     checkAndForceSetup();
   } else {
     // Setup berhasil, lepaskan flag forced

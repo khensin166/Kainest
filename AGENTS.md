@@ -38,6 +38,14 @@
   - Kategori tetap menyimpan `keywords` sebagai *template* (nilai *default*) saat pengguna membuat kantong baru.
   - Jika pengguna mengosongkan *keywords* pada kantongnya, sistem (Kenin AI) akan otomatis melakukan *fallback* ke *keywords* milik kategori sebagai pengaman.
 
+## Update Akhir Agustus 2026 (Batch 3)
+- **Frontend & Backend (Autentikasi & RBAC)**:
+  - Mengimplementasikan `UserGroup` pada Prisma schema dan seeding default via `upsert` pada `rbac.controller.ts`.
+  - Memperbaiki bug pendaftaran `FAILED_TO_CREATE_USER` yang disebabkan oleh *mismatch* `fieldName` di plugin `better-auth`. *Field* `user_group_id` pada konfigurasi auth diubah menjadi `userGroupId` agar selaras dengan skema Prisma *camelCase*.
+  - Menambahkan pembatasan fitur *GOWA* (WhatsApp Bot) agar menyesuaikan dengan limitasi peran *Free* (contoh: tidak dapat menggunakan `!tagihan` atau `!tabungan`).
+  - Memperbaiki bug pada *Budget Setup Modal* (`BudgetDashboardPage.vue`) yang terus terbuka kembali setelah penyimpanan berhasil dengan memeriksa `payload.refresh` untuk membersihkan *flag* paksa (`isSetupForced.value = false`).
+  - Meningkatkan tampilan IAM Group dropdown agar serasi dengan *Dark Mode* tanpa warna latar yang menyilaukan.
+
 ## Update 19 Juni 2026
 - **Frontend (UI & UX Dashboard/Rekap)**:
   - Halaman **Rekap Bulanan** (`FinancialHistoryPage.vue`) mendapat fitur *filter* dinamis (3, 6, 12, Semua rentang bulan). Kartu akordion bulan yang berjalan otomatis terbuka (*auto-expand*) saat halaman dimuat. 
