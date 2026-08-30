@@ -10,6 +10,8 @@ import BaseModal from '@/components/modals/BaseModal.vue';
 import TransactionForm from '../components/TransactionForm.vue';
 import SpendingTrendChart from '../components/SpendingTrendChart.vue';
 import PocketManagementModal from '../components/PocketManagementModal.vue';
+import OtherAllocationCard from '@/features/plans/presentation/components/OtherAllocationCard.vue';
+import { usePlansStore } from '@/features/plans/presentation/stores/usePlansStore';
 import BudgetSetupModal from '../components/BudgetSetupModal.vue';
 import AiSuggestionBanner from '../components/AiSuggestionBanner.vue';
 import PageGuide from '@/components/PageGuide.vue';
@@ -18,6 +20,21 @@ import { pageGuides } from '@/config/pageGuides';
 
 // Inisialisasi store
 const budgetStore = useBudgetStore();
+const plansStore = usePlansStore();
+
+// Kartu "Alokasi Lain" hanya memuat komitmen yang TIDAK punya kantong sendiri.
+// Tagihan yang kategorinya sudah punya kantong sudah terwakili limit kantong itu;
+// menghitungnya lagi membuat total alokasi di layar melebihi gaji.
+const idKategoriBerkantong = computed(() =>
+  (budgetStore.budgetCategories || []).map((k) => k.categoryId)
+);
+
+/** Komitmen ditarik agar kartu Alokasi Lain punya isi saat grid dirender. */
+function muatKomitmen() {
+  plansStore.fetchBills();
+  plansStore.fetchGoals();
+  plansStore.fetchHealth();
+}
 
 const isTransactionModalOpen = ref(false);
 const selectedTransactionToEdit = ref(null);
@@ -108,6 +125,7 @@ onMounted(async () => {
   // 🧠 Ambil saran AI budget terbaru lebih dulu — paralel, tidak perlu await
   // agar Banner AI langsung muncul tanpa menunggu loading data utama
   budgetStore.fetchAiSuggestion();
+  muatKomitmen();
 
   if (!budgetStore.hasData) {
     await budgetStore.fetchDashboardSummary();
@@ -128,6 +146,7 @@ onActivated(async () => {
 
   // 🧠 Ambil saran AI budget terbaru lebih dulu — paralel, tidak perlu await
   budgetStore.fetchAiSuggestion();
+  muatKomitmen();
 
   await budgetStore.fetchDashboardSummary();
   budgetStore.fetchSpendingTrend();
@@ -226,7 +245,7 @@ onActivated(async () => {
         :monthName="budgetStore.currentPeriodMonth" :trendData="budgetStore.chartDataCollection"
         :totalSalary="budgetStore.salary" :totalIncome="budgetStore.totalIncome" :totalSpent="budgetStore.totalSpent"
         :momSalary="budgetStore.momLimit" :momIncome="budgetStore.momIncome" :momSpent="budgetStore.momSpent"
-        :momRemaining="budgetStore.momRemaining" />
+        :momRemaining="budgetStore.momRemaining" :health="plansStore.health" />
 
       <div
         class="flex flex-col col-span-full sm:col-span-6 xl:col-span-8 bg-surface-card rounded-md border border-border-default">
@@ -258,6 +277,9 @@ onActivated(async () => {
 
       <BudgetCategoryCard v-for="category in budgetStore.budgetCategories" :key="category.categoryId"
         :category="category" />
+
+      <OtherAllocationCard :goals="plansStore.goals" :bills="plansStore.bills"
+        :pocketCategoryIds="idKategoriBerkantong" />
 
 
       <BaseModal :isOpen="isTransactionModalOpen" @close="closeTransactionModal" size="md" :hideFooter="true">

@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { IconAi, IconArchive, IconCalendar, IconChart, IconChat, IconChevronLeft, IconChevronRight, IconDocument, IconEdit, IconHome, IconImage, IconMoney, IconReceipt, IconSettings, IconUsers } from '@/ui/icons';
+import { IconAi, IconArchive, IconCalendar, IconChart, IconChat, IconChevronLeft, IconChevronRight, IconDocument, IconEdit, IconHome, IconImage, IconMoney, IconReceipt, IconSettings, IconUsers, IconSavings } from '@/ui/icons';
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { useAuthStore } from "../features/auth/presentation/stores/authStore";
 import SidebarLinkGroup from "./SidebarLinkGroup.vue";
@@ -166,6 +166,12 @@ export default {
             name: "Kantong Keuangan",
             path: "/app/budgeting",
             iconComponent: IconMoney,
+            requiredPermission: "budgeting",
+          },
+          {
+            name: "Rencana Keuangan",
+            path: "/app/plans",
+            iconComponent: IconSavings,
             requiredPermission: "budgeting",
           },
           {

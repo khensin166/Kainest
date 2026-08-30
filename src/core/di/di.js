@@ -9,6 +9,9 @@ import { AdminRepository } from "../../features/admin/data/repository/AdminRepos
 import { AdminRemoteSource } from "../../features/admin/data/source/AdminRemoteSource";
 import { DashboardRepository } from "../../features/dashboard/data/repository/DashboardRepository";
 import { NotificationRepository } from "../../features/notifications/data/repository/NotificationRepository";
+import { PlansRepository } from "../../features/plans/data/repository/PlansRepository";
+import { PlansRemoteSource } from "../../features/plans/data/source/PlansRemoteSource";
+import { buatUseCases as buatPlansUseCases } from "../../features/plans/domain/use-cases";
 
 // Import Use Cases
 import { LoginUserUseCase } from "../../features/auth/domain/use-cases/LoginUserUseCase";
@@ -148,3 +151,9 @@ export const updateUserAccessUseCase = new UpdateUserAccessUseCase(adminReposito
 
 // Export repository if needed elsewhere (though relying on use cases is better)
 export { authRepository, budgetRepository, noteRepository, coupleRepository, waBotRepository, securityRepository, adminRepository, dashboardRepository, notificationRepository };
+
+// ==========================================
+// Rencana Keuangan (tagihan, cicilan, wishlist tabungan, template kantong)
+// ==========================================
+const plansRepository = new PlansRepository(new PlansRemoteSource());
+export const plansUseCases = buatPlansUseCases(plansRepository);

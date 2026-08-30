@@ -1,10 +1,15 @@
 <!-- BudgetHeroCard.vue -->
 <script setup>
 import { IconChevronDown, IconTrendDown, IconTrendUp, IconWarning } from '@/ui/icons';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { formatRupiah as formatCurrency } from '@/utils/Utils';
 
 const props = defineProps({
+  /** Ringkasan solvabilitas; null bila belum termuat. */
+  health: {
+    type: Object,
+    default: null,
+  },
   totalRemaining: {
     type: Number,
     required: true,
@@ -56,6 +61,22 @@ import { Card, Badge } from '@/ui';
 /** Delta 0 bukan informasi — badge disembunyikan, bukan menampilkan "0% vs bulan lalu". */
 const showDelta = (v) => v !== null && v !== undefined && v !== 0;
 
+const teksZona = computed(() => {
+  const h = props.health;
+  if (!h) return '';
+  if (h.zone === 'DANGER') {
+    return `Kurang ${formatCurrency(h.shortfall)} untuk menutup komitmen bulan ini`;
+  }
+  return `Sisa aman ${formatCurrency(h.sisaAman)} setelah komitmen`;
+});
+
+const kelasZona = computed(() => {
+  const zona = props.health?.zone;
+  if (zona === 'DANGER') return 'text-status-danger-text';
+  if (zona === 'WARNING') return 'text-status-warning-text';
+  return 'text-text-muted';
+});
+
 // Mobile expand/collapse state for secondary stats
 const isDetailsExpanded = ref(false);
 </script>
@@ -73,6 +94,13 @@ const isDetailsExpanded = ref(false);
       <p class="text-xs text-text-muted mb-1.5">Sisa Gaji Pokok</p>
       <p class="text-4xl font-bold text-text-primary tabular-nums tracking-tight leading-none">
         {{ formatCurrency(totalRemaining) }}
+      </p>
+
+      <!-- Zona solvabilitas ditempel di sini, bukan jadi elemen sendiri: angka di
+           atas berubah MAKNA begitu ada komitmen, jadi keterangannya harus terbaca
+           di napas yang sama. -->
+      <p v-if="health" class="mt-2 text-sm" :class="kelasZona">
+        {{ teksZona }}
       </p>
 
       <div v-if="showDelta(momRemaining) || unallocated > 0" class="flex flex-wrap items-center gap-2 mt-3">

@@ -26,6 +26,36 @@ export const pageGuides = {
     }
   ],
 
+  plans: [
+    {
+      title: "Satu tempat untuk yang sudah dijanjikan",
+      desc: "Halaman ini menjawab pertanyaan <b>\"uang saya sudah dijanjikan ke mana?\"</b>. Kantong Keuangan menjawab berapa yang boleh dihabiskan; di sini kamu melihat berapa yang sebenarnya sudah bukan milikmu lagi.",
+    },
+    {
+      title: "Bar hijau/kuning/merah di atas",
+      desc: "Angkanya adalah <b>sisa aman</b>: seluruh uang yang masih bisa dipakai, dikurangi tagihan yang belum dibayar dan tabungan yang belum disetor. Merah berarti uangmu tidak akan cukup untuk tagihan bulan ini.",
+    },
+    {
+      title: "Tagihan hanya berkurang bila kamu bilang sudah bayar",
+      desc: "Sistem tidak pernah mencatat pengeluaran sendiri. Tekan <b>Tandai Lunas</b> dan barulah tercatat sebagai pengeluaran yang memotong kantongnya. Tekan <b>Lewati</b> bila bulan ini dibayar orang lain — budgetmu tidak berkurang sama sekali.",
+    },
+    {
+      title: "Cicilan berhenti menagih sendiri",
+      desc: "Isi <b>jumlah angsuran</b> saat membuat tagihan, misalnya 12 untuk cicilan setahun. Setelah angsuran terakhir lunas, tagihan itu otomatis berhenti muncul — kamu tidak perlu ingat mematikannya.",
+    },
+    {
+      title: "Nominal boleh dikoreksi saat membayar",
+      desc: "Listrik didaftarkan Rp350.000 tapi tagihan aslinya Rp412.000? Isi angka yang sebenarnya saat menandai lunas. Perkiraan di tagihan tetap seperti semula.",
+    },
+    {
+      title: "Tabungan memotong budget, tapi bukan pengeluaran",
+      desc: "Nominal <b>sisihkan per bulan</b> langsung mengurangi uang yang boleh kamu pakai, sama seperti kantong. Tapi setoran tabungan <b>tidak</b> muncul di grafik pengeluaran — ia pemindahan uang, bukan konsumsi.",
+    },
+    {
+      title: "Butuh uangnya kembali? Tarik saja",
+      desc: "Penarikan dicatat sebagai baris tersendiri, bukan dengan menghapus setoran lama, supaya riwayatmu tetap jujur.",
+    },
+  ],
   transactions: [
     {
       emoji: "💳",

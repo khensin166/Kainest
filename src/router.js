@@ -159,6 +159,12 @@ const routes = [
         meta: { requiredPermission: "budgeting" },
       },
       {
+        path: "plans",
+        name: "Plans",
+        component: () => import('./features/plans/presentation/pages/PlansPage.vue'),
+        meta: { requiredPermission: "budgeting" },
+      },
+      {
         path: "split",
         name: "SplitBill",
         component: () => import('./features/budgeting/presentation/pages/SplitBillPage.vue'),
