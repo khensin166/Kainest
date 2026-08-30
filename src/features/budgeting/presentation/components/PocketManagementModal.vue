@@ -29,6 +29,20 @@
       <p v-if="totalPercentage > 100" class="text-xs text-status-danger mt-1">
         Total persentase tidak boleh melebihi 100%.
       </p>
+
+      <div v-if="totalPercentage <= 100"
+        class="mt-3 pt-3 border-t border-border-muted flex items-end justify-between gap-3">
+        <div>
+          <p class="text-xs text-text-muted">Belum dialokasikan</p>
+          <p class="text-sm font-semibold tabular-nums"
+            :class="remainingPercentage === 0 ? 'text-text-muted' : 'text-text-primary'">
+            {{ remainingPercentage }}% · {{ formatRupiah(remainingAmount) }}
+          </p>
+        </div>
+        <p class="text-xs text-text-muted tabular-nums text-right shrink-0">
+          Terpakai {{ formatRupiah(allocatedAmount) }}
+        </p>
+      </div>
     </div>
 
     <form @submit.prevent="handleSubmit">
@@ -167,8 +181,14 @@
                 <p class="text-xs text-text-muted mb-2 leading-tight">Sesuaikan dengan target atau batas rencana pengeluaran bulanan Anda.</p>
                 <div v-if="pocket.limitType === 'percentage'">
                   <input v-model.number="pocket.percentage" type="number" min="1" max="100" class="form-input w-full text-sm rounded-lg" placeholder="Contoh: 15" required />
-                  <div class="mt-1 text-xs font-semibold text-status-success">
-                    ~ {{ formatRupiah((pocket.percentage / 100) * budgetStore.salary) }}
+                  <div class="mt-1 flex items-center justify-between gap-2">
+                    <span class="text-xs font-semibold text-status-success">
+                      ~ {{ formatRupiah((pocket.percentage / 100) * budgetStore.salary) }}
+                    </span>
+                    <button v-if="remainingPercentage > 0" type="button" @click="useRemainingFor(index)"
+                      class="text-xs font-medium text-brand-text hover:underline shrink-0">
+                      Pakai sisa {{ remainingPercentage }}%
+                    </button>
                   </div>
                 </div>
                 <!-- CurrencyInput: format Rupiah realtime, mengirim angka murni ke v-model -->
@@ -405,13 +425,22 @@ const availableCategories = computed(() => budgetStore.categoriesList || []);
 // Computed: true jika user belum punya kantong sama sekali (mode onboarding)
 const isOnboarding = computed(() => budgetStore.pocketsList.length === 0);
 
+/**
+ * Kantong baru disisipkan di ATAS, bukan di dasar daftar.
+ * Sebelumnya memakai push(): kartu baru muncul di luar layar, dan pengguna yang
+ * sedang menggulir di tengah daftar tidak melihat apa pun berubah setelah menekan
+ * tombol. Karena itu unshift saja tidak cukup — daftarnya ikut digulir ke atas.
+ */
 const addPocket = () => {
-  pocketsData.value.push({
+  pocketsData.value.unshift({
     categoryId: '',
     limitType: 'percentage',
     percentage: null,
     limitAmount: null,
     keywordsInput: ''
+  });
+  nextTick(() => {
+    scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' });
   });
 };
 
@@ -594,6 +623,35 @@ const totalPercentage = computed(() => {
   // Bulatkan ke maksimal 2 angka desimal untuk menghindari angka aneh (ex: 70.33333%)
   return Math.round(total * 100) / 100;
 });
+
+/**
+ * Sisa persentase yang belum dialokasikan.
+ * "Total 77%" memberi tahu apa yang sudah terjadi; "sisa 23%" memberi tahu apa yang
+ * masih bisa dilakukan — dan itu yang dibutuhkan saat sedang mengisi.
+ *
+ * CATATAN untuk fitur Tabungan Masa Depan (doc/rencana_tabungan_tagihan.md §12.2c):
+ * begitu alokasi wishlist ikut memakan gaji, angka ini WAJIB menguranginya juga.
+ * Selama fitur itu belum ada, 100 - total sudah benar.
+ */
+const remainingPercentage = computed(() => {
+  return Math.max(0, Math.round((100 - totalPercentage.value) * 100) / 100);
+});
+
+// Persentase saja sulit dinilai — "23%" tidak terasa apa-apa sampai terbaca
+// sebagai Rp1.380.000. Keduanya ditampilkan berdampingan.
+const allocatedAmount = computed(
+  () => (totalPercentage.value / 100) * (budgetStore.salary || 0)
+);
+const remainingAmount = computed(
+  () => (remainingPercentage.value / 100) * (budgetStore.salary || 0)
+);
+
+/** Isi kantong ini dengan seluruh sisa yang belum dialokasikan. */
+const useRemainingFor = (index) => {
+  const pocket = pocketsData.value[index];
+  pocket.limitType = 'percentage';
+  pocket.percentage = remainingPercentage.value;
+};
 
 const handleSubmit = async () => {
   if (totalPercentage.value > 100) {

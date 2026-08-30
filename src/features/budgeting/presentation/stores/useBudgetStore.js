@@ -4,7 +4,6 @@ import { defineStore } from "pinia";
 import { notify } from "@/lib/notify";
 import { useCelebration } from "@/composables/useCelebration";
 import { ref, computed } from "vue";
-import { useModalStore } from "../../../../stores/modalStore";
 
 // --- Dependencies Injection ---
 import { 
@@ -318,11 +317,12 @@ export const useBudgetStore = defineStore("budget", () => {
       fetchMonthlyHistory();
       return { success: true };
     } else {
-      // 🔒 Handle Tutup Buku Permanen — tampilkan modal warning khusus
+      // 🔒 Tutup Buku Permanen adalah aturan, bukan kegagalan — nadanya warning,
+      // bukan error. Hanya store yang bisa membedakannya karena hanya store yang
+      // membaca `code`. `__handled` menahan pemanggil menampilkan toast kedua.
       if (result.left?.code === 'TRANSACTION_CLOSED_PERIOD') {
-        const modalStore = useModalStore();
         notify.warning(result.left.message, result.left);
-        return { success: false, closedPeriod: true, message: result.left.message };
+        return { success: false, closedPeriod: true, __handled: true, message: result.left.message };
       }
       return { success: false, message: result.left?.message };
     }
@@ -342,11 +342,10 @@ export const useBudgetStore = defineStore("budget", () => {
       fetchTransactions({ page: 1 }, true);
       return { success: true };
     } else {
-      // 🔒 Handle Tutup Buku Permanen
+      // 🔒 Sama seperti submitTransaction di atas.
       if (result.left?.code === 'TRANSACTION_CLOSED_PERIOD') {
-        const modalStore = useModalStore();
         notify.warning(result.left.message, result.left);
-        return { success: false, closedPeriod: true, message: result.left.message };
+        return { success: false, closedPeriod: true, __handled: true, message: result.left.message };
       }
       return { success: false, message: result.left?.message };
     }
