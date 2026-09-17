@@ -136,8 +136,13 @@
               
               <div class="flex justify-between items-start mb-3">
                 <div>
-                  <h4 class="font-medium text-text-primary">{{ item.name }}</h4>
-                  <p class="text-sm text-text-muted font-mono">Rp {{ formatNumber(item.price) }}</p>
+                  <h4 class="font-medium text-text-primary">
+                    <span v-if="item.qty > 1" class="text-brand-primary font-bold">{{ item.qty }}x </span>{{ item.name }}
+                  </h4>
+                  <p class="text-sm text-text-muted font-mono">
+                    Rp {{ formatNumber(item.total_price || item.price) }}
+                    <span v-if="item.qty > 1" class="text-text-faint ml-1">(@ Rp {{ formatNumber(item.price) }})</span>
+                  </p>
                 </div>
               </div>
               
@@ -382,7 +387,9 @@ const processSplit = async () => {
     // Bangun payload yang sesuai dengan Schema SplitBillRequest
     let assignmentsPayload = receiptData.items.map((item, idx) => ({
       item_name: item.name,
-      total_price: item.price,
+      // Gunakan total_price (qty × harga satuan) bukan price (harga satuan).
+      // Ini krusial agar kalkulasi proporsional di Backend benar.
+      total_price: item.total_price || item.price,
       assigned_to: itemAssignments.value[idx]
     })).filter(a => a.assigned_to.length > 0);
 
@@ -392,7 +399,7 @@ const processSplit = async () => {
         // Auto assign jika hanya 1 produk
         assignmentsPayload = [{
           item_name: receiptData.items[0].name,
-          total_price: receiptData.items[0].price,
+          total_price: receiptData.items[0].total_price || receiptData.items[0].price,
           assigned_to: members.value
         }];
       } else {
