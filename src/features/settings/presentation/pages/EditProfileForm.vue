@@ -78,6 +78,66 @@
       </div>
     </form>
 
+    <!-- Kartu Grup WhatsApp Terhubung -->
+    <div v-if="user" class="mt-8 pt-6 border-t border-border-default">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+        <div>
+          <h3 class="text-base font-semibold text-text-primary">Grup WhatsApp untuk Mencatat</h3>
+          <p class="text-xs text-text-muted mt-0.5">
+            Pencatatan transaksi hanya aktif di grup WhatsApp terdaftar.
+            <span v-if="!myGroupsMeta.isAdmin">Akun reguler maksimal <strong>1 grup aktif</strong>.</span>
+          </p>
+        </div>
+        <button
+          type="button"
+          @click="showWaModal = true"
+          class="text-xs font-medium text-brand-primary hover:text-brand-primary-hover self-start sm:self-auto"
+        >
+          Panduan Tautkan Grup →
+        </button>
+      </div>
+
+      <div v-if="isLoadingGroups" class="text-xs text-text-muted py-3">
+        Memuat grup WhatsApp terhubung...
+      </div>
+
+      <div v-else-if="myGroups.length === 0" class="p-4 rounded-lg border border-dashed border-border-default bg-surface-subtle">
+        <p class="text-sm text-text-secondary font-medium">Belum ada grup WhatsApp yang terhubung.</p>
+        <p class="text-xs text-text-muted mt-1">
+          Buat Grup WhatsApp baru, masukkan bot Kainest ke dalamnya, lalu kirim <code class="font-mono text-brand-primary">!link {{ user.invitationCode }}</code> langsung di dalam grup tersebut.
+        </p>
+      </div>
+
+      <div v-else class="space-y-2.5">
+        <div
+          v-for="group in myGroups"
+          :key="group.id"
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-lg border border-border-default bg-surface-subtle"
+        >
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-status-success flex-shrink-0"></span>
+              <p class="text-sm font-semibold text-text-primary truncate">
+                {{ group.groupName || 'Grup WhatsApp Aktif (Nama otomatis tersinkron saat transaksi)' }}
+              </p>
+            </div>
+            <p class="text-xs font-mono text-text-muted truncate mt-0.5">{{ group.groupId }}</p>
+          </div>
+          <button
+            type="button"
+            :disabled="unlinkingGroupId === group.groupId"
+            @click="handleUnlinkGroup(group)"
+            class="px-3 py-1.5 text-xs font-medium text-status-danger border border-status-danger/30 hover:bg-status-danger/10 rounded-md transition-colors disabled:opacity-50 self-start sm:self-auto flex-shrink-0"
+          >
+            {{ unlinkingGroupId === group.groupId ? 'Melepas...' : 'Putuskan Grup' }}
+          </button>
+        </div>
+        <p class="text-xs text-text-muted">
+          Ingin pindah grup? Klik <strong>Putuskan Grup</strong> di atas atau ketik <code class="font-mono">!unlink</code> di grup lama, lalu kirim <code class="font-mono">!link</code> di grup baru.
+        </p>
+      </div>
+    </div>
+
     <BaseModal :isOpen="showWaModal" size="md" @close="showWaModal = false" :hideFooter="true">
       <template #header>
         <div class="flex items-center gap-3 w-full">
@@ -144,10 +204,10 @@
               3</div>
             <div>
               <p class="text-sm font-semibold text-text-primary">Kirim kode tautan <span class="text-status-success">di dalam grup</span></p>
-              <p class="text-xs text-text-muted mb-1.5">Paste kode yang sudah kamu salin tadi langsung ke percakapan grup. Akun dan grup akan <strong>langsung aktif sekaligus</strong> — tidak perlu langkah tambahan!</p>
+              <p class="text-xs text-text-muted mb-1.5">Paste kode yang sudah kamu salin tadi langsung ke percakapan <strong>grup WhatsApp</strong> (bukan chat pribadi). Akun reguler maksimal menautkan <strong>1 grup aktif</strong> — gunakan <code class="font-mono">!unlink</code> jika ingin berpindah grup.</p>
               <div class="flex items-center gap-1.5 text-xs text-status-success bg-status-success/20 rounded-lg px-3 py-2">
                 <IconCheck class="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                <span>Setelah kode terkirim, kamu langsung bisa mencatat pengeluaran di grup tersebut! 🎉</span>
+                <span>Setelah kode terkirim di grup, kamu langsung bisa mencatat pengeluaran di grup tersebut! 🎉</span>
               </div>
             </div>
           </div>
@@ -168,6 +228,7 @@ import { ref, watch, computed, onMounted } from "vue";
 import { useProfileStore } from "../../../profile/presentation/stores/useProfileStore";
 import BaseModal from "../../../../components/modals/BaseModal.vue";
 import UserAvatar from "@/images/user-avatar-32.png";
+import api from "@/lib/apiClient";
 
 const props = defineProps({
   user: Object,
@@ -182,6 +243,44 @@ const botPhoneNumber = ref(null);
 const showWaModal = ref(false);
 const copiedCode = ref(false);
 const copiedBotNum = ref(false);
+const myGroups = ref([]);
+const myGroupsMeta = ref({ isAdmin: false, maxGroups: 1 });
+const isLoadingGroups = ref(false);
+const unlinkingGroupId = ref(null);
+
+const fetchMyGroups = async () => {
+  isLoadingGroups.value = true;
+  try {
+    const res = await api.get("/wabot/my-groups");
+    if (res.data?.success && res.data?.data) {
+      myGroups.value = res.data.data.groups || [];
+      myGroupsMeta.value = {
+        isAdmin: !!res.data.data.isAdmin,
+        maxGroups: res.data.data.maxGroups ?? 1,
+      };
+    }
+  } catch (error) {
+    console.error("Gagal memuat grup WhatsApp terhubung:", error);
+  } finally {
+    isLoadingGroups.value = false;
+  }
+};
+
+const handleUnlinkGroup = async (group) => {
+  const label = group.groupName || group.groupId;
+  if (!window.confirm(`Putuskan tautan grup "${label}"? Kamu bisa menautkan grup baru setelah ini.`)) {
+    return;
+  }
+  unlinkingGroupId.value = group.groupId;
+  try {
+    await api.delete(`/wabot/my-groups/${encodeURIComponent(group.groupId)}`);
+    myGroups.value = myGroups.value.filter((g) => g.groupId !== group.groupId);
+  } catch (error) {
+    console.error("Gagal melepas grup:", error);
+  } finally {
+    unlinkingGroupId.value = null;
+  }
+};
 
 const userPhoto = computed(() => {
   return props.user?.avatarUrl || UserAvatar;
@@ -209,6 +308,7 @@ const copyBotNumber = async () => {
 };
 
 onMounted(async () => {
+  fetchMyGroups();
   try {
     const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
     const res = await fetch(`${backendUrl}/wabot/info`);

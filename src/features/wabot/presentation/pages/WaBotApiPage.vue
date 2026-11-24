@@ -110,7 +110,7 @@
               <thead class="sticky top-0 bg-surface-card border-b border-border-default z-10">
                 <tr>
                   <th class="px-4 py-2.5 w-10"></th>
-                  <th class="px-4 py-2.5 font-medium text-text-muted">ID Grup</th>
+                  <th class="px-4 py-2.5 font-medium text-text-muted">Nama / ID Grup</th>
                   <th class="px-4 py-2.5 font-medium text-text-muted">Ditautkan Oleh</th>
                   <th class="px-4 py-2.5 font-medium text-text-muted">Tgl. Terdaftar</th>
                   <th class="px-4 py-2.5 font-medium text-text-muted text-center">Status</th>
@@ -146,8 +146,9 @@
                       @click.stop="toggleSelect(group.groupId)"
                     />
                   </td>
-                  <td class="px-4 py-3 font-mono text-xs text-text-muted max-w-40 truncate" :title="group.groupId">
-                    {{ group.groupId }}
+                  <td class="px-4 py-3 max-w-52" :title="group.groupName || group.groupId">
+                    <div v-if="group.groupName" class="font-medium text-text-primary text-xs truncate">{{ group.groupName }}</div>
+                    <div class="font-mono text-xs text-text-muted truncate">{{ group.groupId }}</div>
                   </td>
                   <td class="px-4 py-3 font-medium text-text-primary">
                     {{ group.linkedBy ? (group.linkedBy.name || group.linkedBy.email) : '—' }}
@@ -280,6 +281,7 @@ const filteredGroups = computed(() => {
     list = list.filter(
       (g) =>
         g.groupId.toLowerCase().includes(q) ||
+        g.groupName?.toLowerCase().includes(q) ||
         g.linkedBy?.name?.toLowerCase().includes(q) ||
         g.linkedBy?.email?.toLowerCase().includes(q)
     );

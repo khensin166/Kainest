@@ -11,18 +11,18 @@ export const pageGuides = {
     },
     {
       emoji: "📲",
-      title: "2. Hubungkan WhatsApp Bot",
-      desc: "Mulai pencatatan otomatis via WhatsApp! Buka <strong>Profil (kanan atas)</strong> ➡️ <strong>Pasangan</strong> ➡️ Salin kode tautanmu. Buat Grup WA baru, masukkan bot, lalu kirim kode itu di dalam grup. Akun dan grup langsung aktif sekaligus!"
+      title: "2. Hubungkan WhatsApp Bot di Grup",
+      desc: "Pencatatan otomatis hanya aktif di dalam <strong>Grup WhatsApp terdaftar</strong> (bukan chat pribadi). Buka <strong>Profil</strong> ➡️ salin kode tautanmu, buat Grup WA baru & undang bot, lalu kirim <strong>!link KODE_KAMU</strong> langsung di dalam grup tersebut."
     },
     {
       emoji: "👨‍👩‍👧‍👦",
-      title: "3. Integrasi ke Grup",
-      desc: "Ingin pasangan/keluarga bisa mencatat di satu tempat? Buat Grup WhatsApp bersama, undang bot Kainest, lalu kirimkan kode <strong>!link KODE_KAMU</strong> langsung di dalam grup tersebut. Grup otomatis aktif dan siap digunakan bersama!"
+      title: "3. Batas 1 Grup Aktif & Ganti Grup",
+      desc: "Akun reguler dapat menautkan maksimal <strong>1 grup WhatsApp aktif</strong> (bisa dipakai sendiri atau bersama pasangan/keluarga). Cek nama grup aktifmu di menu <strong>Profil</strong>, dan ketik <strong>!unlink</strong> (atau klik Putuskan Grup) jika ingin berpindah ke grup baru."
     },
     {
       emoji: "💬",
       title: "4. Mulai Mencatat Cepat",
-      desc: "Selesai! Cukup ketik <strong>'Makan siang 25k'</strong> atau <strong>'Beli bensin 50k'</strong> ke bot, dan AI Kainest akan otomatis memisahkannya ke kantong yang tepat. Ketik <strong>!help</strong> di WhatsApp untuk melihat semua perintah yang tersedia."
+      desc: "Cukup ketik <strong>'Makan siang 25k'</strong> atau <strong>'Beli bensin 50k'</strong> di grup terdaftar, dan AI Kainest akan memisahkannya ke kantong yang tepat. Ketik <strong>!help</strong> di grup untuk daftar perintah (di chat pribadi, bot hanya merespons <strong>hi kainest</strong>)."
     }
   ],
 
